@@ -511,19 +511,24 @@ function HomePage({ lang, setPage }) {
           <p style={{ color:C.muted, fontSize:"1rem", lineHeight:1.7, maxWidth:"480px", marginBottom:"4rem" }}>{t.s2p}</p>
 
           <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1px", background:C.rule }}>
-            {[{pg:"food",h:t.foodH,p:t.foodP,n:"01"},{pg:"fashion",h:t.fashH,p:t.fashP,n:"02"}].map(s => (
+            {[{pg:"food",h:t.foodH,p:t.foodP,n:"01",img:"/secteurs/carte-alimentaire.jpg"},{pg:"fashion",h:t.fashH,p:t.fashP,n:"02",img:"/secteurs/carte-mode.jpg"}].map(s => (
               <button key={s.pg} onClick={() => setPage(s.pg)} style={{
-                background:C.paper, padding:"3rem 2.5rem", textAlign:"left",
+                background:C.paper, padding:"0", textAlign:"left",
                 transition:"background 0.2s", width:"100%",
               }}
                 onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
                 onMouseLeave={e => e.currentTarget.style.background=C.paper}
               >
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"2rem" }}>{s.n}</div>
+                <div style={{ width:"100%", aspectRatio:"16 / 9", overflow:"hidden", background:C.ink }}>
+                  <img src={s.img} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                </div>
+                <div style={{ padding:"2.5rem 2.5rem 3rem" }}>
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.5rem" }}>{s.n}</div>
                 <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.4rem,3vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"1rem" }}>{s.h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"2rem" }}>{s.p}</p>
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>
                   {lang==="en"?"Read more →":"En savoir plus →"}
+                </div>
                 </div>
               </button>
             ))}
@@ -708,12 +713,17 @@ function SectorPage({ lang, setPage, sector }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"65vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section style={{
+        position:"relative", background:C.ink, minHeight:"65vh",
+        display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem",
+        backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.93), rgba(13,37,69,0.74)), url(/secteurs/${sector === "food" ? "alimentaire" : "mode"}-hero.jpg)`,
+        backgroundSize:"cover", backgroundPosition:"center",
+      }}>
+        <div style={{ maxWidth:"900px", position:"relative" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", letterSpacing:"-0.01em", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
-          <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"520px", marginBottom:"2rem" }}>{t.sub}</p>
+          <p className="fu3" style={{ color:"rgba(255,255,255,0.72)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px", marginBottom:"2rem" }}>{t.sub}</p>
           <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
       </section>
