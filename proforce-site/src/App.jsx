@@ -3021,6 +3021,10 @@ const META = {
     en: { title:"Contact | Proforce Personnel", desc:"Get in touch with Proforce Personnel. Montreal: (514) 905-0606. Quebec City: (418) 431-1441. Toronto: (647) 490-6626. info@proforce.ca" },
     fr: { title:"Contact | Proforce Personnel", desc:"Contactez Proforce Personnel. Montréal : (514) 905-0606. Québec : (418) 431-1441. Toronto : (647) 490-6626. info@proforce.ca" },
   },
+  notfound: {
+    en: { title:"Page not found | Proforce Personnel", desc:"That page has moved or does not exist. Head back to the home page or reach out to Proforce Personnel directly." },
+    fr: { title:"Page introuvable | Proforce Personnel", desc:"Cette page a bougé ou n'existe pas. Retourne à l'accueil ou contacte Proforce Personnel directement." },
+  },
   privacy: {
     en: { title:"Privacy Policy | Proforce Personnel", desc:"Proforce Personnel privacy policy. How we collect, use, and protect your personal information." },
     fr: { title:"Politique de confidentialité | Proforce Personnel", desc:"Politique de confidentialité de Proforce Personnel. Comment nous collectons, utilisons et protégeons vos informations personnelles." },
