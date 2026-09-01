@@ -519,7 +519,7 @@ function HomePage({ lang, setPage }) {
                 onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
                 onMouseLeave={e => e.currentTarget.style.background=C.paper}
               >
-                <div style={{ width:"100%", aspectRatio:"16 / 9", overflow:"hidden", background:C.ink }}>
+                <div style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
                   <img src={s.img} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                 </div>
                 <div style={{ padding:"2.5rem 2.5rem 3rem" }}>
