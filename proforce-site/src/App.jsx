@@ -223,6 +223,29 @@ function Avatar({ m, size, full, style }) {
   );
 }
 
+// Chemin reel d'une page. Les moteurs de recherche indexent /equipe, pas /#/equipe.
+function pathOf(page, sub) {
+  const base = page === "home" ? "/" : `/${page}`;
+  return sub ? `${base}/${sub}` : base;
+}
+
+// Un vrai lien <a>, pour que Google puisse suivre la navigation,
+// tout en gardant la navigation instantanee cote client.
+function PageLink({ to, sub, setPage, children, style, className }) {
+  return (
+    <a
+      href={pathOf(to, sub)}
+      className={className}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        setPage(to, sub);
+      }}
+      style={{ textDecoration:"none", ...style }}
+    >{children}</a>
+  );
+}
+
 function Divider({ style }) {
   return <span className="rule" style={style} />;
 }
@@ -265,25 +288,25 @@ function Nav({ page, setPage, lang, setLang }) {
         display:"flex", alignItems:"center", justifyContent:"space-between",
       }}>
         {/* Wordmark */}
-        <button onClick={() => setPage("home")} style={{
+        <PageLink to="home" setPage={setPage} style={{
           fontFamily:"'Clash Display',sans-serif", fontWeight:600,
           fontSize:"1.15rem", color:"#fff", letterSpacing:"-0.01em",
           display:"flex", alignItems:"center", gap:"4px",
         }}>
           PROFORCE
           <span style={{ color:C.orange, fontSize:"1.4rem", lineHeight:1 }}>.</span>
-        </button>
+        </PageLink>
 
         {/* Desktop links */}
         <div className="hide-mobile" style={{ display:"flex", alignItems:"center", gap:"1.75rem" }}>
           {links.map(([k,l]) => (
-            <button key={k} onClick={() => setPage(k)} style={{
+            <PageLink key={k} to={k} setPage={setPage} style={{
               fontFamily:"'DM Mono',monospace", fontSize:"0.68rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
               color: page===k ? C.orange : "rgba(255,255,255,0.65)",
               borderBottom: page===k ? `1px solid ${C.orange}` : "1px solid transparent",
               paddingBottom:"1px", transition:"color 0.2s",
-            }}>{l}</button>
+            }}>{l}</PageLink>
           ))}
           <button onClick={() => setLang(lang==="en"?"fr":"en")} style={{
             fontFamily:"'DM Mono',monospace", fontSize:"0.68rem",
@@ -325,12 +348,13 @@ function Nav({ page, setPage, lang, setLang }) {
           overflowY:"auto",
         }}>
           {links.map(([k,l]) => (
-            <button key={k} onClick={() => { setPage(k); setOpen(false); }} style={{
+            <PageLink key={k} to={k} setPage={(p) => { setPage(p); setOpen(false); }} style={{
+              display:"block",
               fontFamily:"'Clash Display',sans-serif", fontSize:"1.5rem",
               color: page===k ? C.orange : "#fff", textAlign:"left",
               padding:"0.9rem 0", borderBottom:`1px solid rgba(255,255,255,0.08)`,
               fontWeight:600, letterSpacing:"-0.01em",
-            }}>{l}</button>
+            }}>{l}</PageLink>
           ))}
           <button onClick={() => setLang(lang==="en"?"fr":"en")} style={{
             color:C.orange, fontSize:"1rem", textAlign:"left",
@@ -2867,10 +2891,10 @@ function Footer({ lang, setPage }) {
               <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.orange, marginBottom:"1rem" }}>Pages</div>
               <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
                 {links.map(([k,l]) => (
-                  <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s" }}
+                  <PageLink key={k} to={k} setPage={setPage} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.color=C.paper}
                     onMouseLeave={e => e.currentTarget.style.color="rgba(244,241,235,0.45)"}
-                  >{l}</button>
+                  >{l}</PageLink>
                 ))}
               </div>
             </div>
@@ -3279,10 +3303,7 @@ function useSEO(page, lang, blogPostId) {
     const desc = postMeta
       ? postMeta.excerpt[lang]
       : pageMeta.desc;
-    const hashPath = postMeta
-      ? `#/blog/${blogPostId}`
-      : page === "home" ? "" : `#/${page}`;
-    const url = `${base}/${hashPath}`;
+    const url = base + (postMeta ? pathOf("blog", blogPostId) : pathOf(page));
 
     // Title
     document.title = title;
@@ -3317,12 +3338,9 @@ function useSEO(page, lang, blogPostId) {
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
     canonical.href = url;
 
-    // hreflang
-    ["en","fr"].forEach(l => {
-      let el = document.querySelector(`link[hreflang="${l}"]`);
-      if (!el) { el = document.createElement("link"); el.rel = "alternate"; el.hreflang = l; document.head.appendChild(el); }
-      el.href = `${base}/#/${page}`;
-    });
+    // Pas de hreflang: les deux langues vivent a la meme adresse, la balise
+    // enverrait un faux signal. Il faudra des prefixes /fr et /en pour la mettre en place.
+    document.querySelectorAll("link[hreflang]").forEach(el => el.remove());
 
     // ── JSON-LD Schema.org ────────────────────────────────────────────────────
     const removeSchema = (id) => { const el = document.getElementById(id); if (el) el.remove(); };
@@ -3511,7 +3529,7 @@ function useSEO(page, lang, blogPostId) {
 }
 
 // ─── HASH ROUTING HOOK ────────────────────────────────────────────────────────
-const HASH_MAP = {
+const ROUTES = {
   "":           "home",
   "home":       "home",
   "food":       "food",
@@ -3538,17 +3556,23 @@ const HASH_MAP = {
   "contact":    "contact",
 };
 
-function parseHash() {
-  const hash = window.location.hash.replace("#/","").replace("#","").split("/");
-  const key  = hash[0] || "";
-  const page = HASH_MAP[key] !== undefined ? HASH_MAP[key] : "notfound";
-  const sub  = hash[1] || null; // e.g. blog post id
+function parseLocation() {
+  // Compatibilite : les anciennes adresses en #/ sont converties en vrai chemin
+  if (window.location.hash.startsWith("#/")) {
+    const legacy = window.location.hash.slice(2).split("/");
+    const url = "/" + legacy.filter(Boolean).join("/");
+    window.history.replaceState(null, "", url === "/" ? "/" : url);
+  }
+  const parts = window.location.pathname.replace(/^\/+|\/+$/g, "").split("/");
+  const key   = parts[0] || "";
+  const page  = ROUTES[key] !== undefined ? ROUTES[key] : "notfound";
+  const sub   = parts[1] || null; // identifiant d'article de blogue
   return { page, sub };
 }
 
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  const initial = parseHash();
+  const initial = parseLocation();
   const [page, setPage] = useState(initial.page);
   const [lang, setLang] = useState("fr");
   const [blogPost, setBlogPost] = useState(initial.sub);
@@ -3569,7 +3593,7 @@ export default function App() {
   // Sync state when browser back/forward used
   useEffect(() => {
     const onPop = () => {
-      const { page: p, sub } = parseHash();
+      const { page: p, sub } = parseLocation();
       setPage(p);
       setBlogPost(sub);
       window.scrollTo({top:0,behavior:"smooth"});
@@ -3584,16 +3608,14 @@ export default function App() {
   const go = (p, sub) => {
     setPage(p);
     if (p !== "blog") setBlogPost(null);
-    // Update hash URL
-    const hash = sub ? `#/${p}/${sub}` : p === "home" ? "#/" : `#/${p}`;
-    window.history.pushState(null, "", hash);
+    window.history.pushState(null, "", pathOf(p, sub));
     window.scrollTo({top:0,behavior:"smooth"});
   };
 
   const goPost = (postId) => {
     setBlogPost(postId);
     setPage("blog");
-    window.history.pushState(null, "", `#/blog/${postId}`);
+    window.history.pushState(null, "", pathOf("blog", postId));
     window.scrollTo({top:0,behavior:"smooth"});
   };
 
