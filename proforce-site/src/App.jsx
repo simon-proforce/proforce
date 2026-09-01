@@ -1555,7 +1555,7 @@ function JobListingsPage({ lang }) {
 
           <div style={{ marginTop:"4rem", padding:"2.5rem", background:C.paper, borderLeft:`3px solid ${C.orange}` }}>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8, marginBottom:"1.25rem" }}>{t.note}</p>
-            <a href="http://www.proforcejobs.com" target="_blank" rel="noopener noreferrer" className="btn-ink">{t.cta}</a>
+            <a href="https://www.proforcejobs.com" target="_blank" rel="noopener noreferrer" className="btn-ink">{t.cta}</a>
           </div>
         </div>
       </section>
@@ -1906,13 +1906,13 @@ function ContactPage({ lang }) {
                 <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"1.25rem" }}>{o.city}</div>
                 <Divider style={{ marginBottom:"1.25rem" }} />
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Phone":"Téléphone"}</div>
-                <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"1rem" }}>{o.phone}</div>
+                <a href={`tel:+1${o.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"1rem", textDecoration:"none" }}>{o.phone}</a>
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Address":"Adresse"}</div>
                 <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.muted, lineHeight:1.7, whiteSpace:"pre-line" }}>{o.addr}</div>
               </div>
             ))}
             <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>Email</div>
-            <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"2.5rem" }}>info@proforce.ca</div>
+            <a href="mailto:info@proforce.ca" style={{ display:"block", fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"2.5rem", textDecoration:"none" }}>info@proforce.ca</a>
 
             {/* Booking CTA */}
             <div style={{ padding:"1.75rem", background:C.ink, borderLeft:`3px solid ${C.orange}` }}>
@@ -2514,13 +2514,6 @@ function PressPage({ lang, setPage }) {
     },
   }[lang];
 
-  const typeIcon = (type) => {
-    if (type === "Podcast" || type === "Balado") return "🎙";
-    if (type === "Article") return "📰";
-    if (type === "Interview") return "🎥";
-    return "📌";
-  };
-
   const ctaLabel = (type) => {
     if (type === "Podcast" || type === "Balado") return t.listen;
     if (type === "Article") return t.read;
@@ -2553,7 +2546,6 @@ function PressPage({ lang, setPage }) {
             <div key={item.id} style={{ padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1rem", flexWrap:"wrap", gap:"0.75rem" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", flexWrap:"wrap" }}>
-                  <span style={{ fontSize:"1.1rem" }}>{typeIcon(item.type[lang])}</span>
                   <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.muted }}>{item.outlet}</span>
                   <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted }}>·</span>
                   <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted }}>{item.date}</span>
@@ -2885,7 +2877,10 @@ function Footer({ lang, setPage }) {
             <div>
               <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.orange, marginBottom:"1rem" }}>Contact</div>
               <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", lineHeight:2 }}>
-                (514) 905-0606<br/>(418) 431-1441<br/>(647) 490-6626<br/>info@proforce.ca
+                <a href="tel:+15149050606" style={{ color:"inherit", textDecoration:"none" }}>(514) 905-0606</a><br/>
+                <a href="tel:+14184311441" style={{ color:"inherit", textDecoration:"none" }}>(418) 431-1441</a><br/>
+                <a href="tel:+16474906626" style={{ color:"inherit", textDecoration:"none" }}>(647) 490-6626</a><br/>
+                <a href="mailto:info@proforce.ca" style={{ color:"inherit", textDecoration:"none" }}>info@proforce.ca</a>
               </div>
               <div style={{ display:"flex", gap:"0.75rem", marginTop:"1.25rem" }}>
                 <a href="https://www.facebook.com/share/17YcPvUvNn/" target="_blank" rel="noopener noreferrer"
@@ -3040,8 +3035,13 @@ const META_PIXEL_ID       = "YOUR_META_PIXEL_ID";        // Ex: "987654321012345
 // Initialise les deux pixels une seule fois au chargement
 function usePixelInit() {
   useEffect(() => {
+    // Tant que les vrais identifiants ne sont pas en place, on ne charge rien
+    const liReady = LINKEDIN_PARTNER_ID && !LINKEDIN_PARTNER_ID.startsWith("YOUR_");
+    const fbReady = META_PIXEL_ID && !META_PIXEL_ID.startsWith("YOUR_");
+    if (!liReady && !fbReady) return;
 
     // ── LinkedIn Insight Tag ──────────────────────────────────────────────────
+    if (liReady) {
     if (!window._linkedin_data_partner_ids) {
       window._linkedin_data_partner_ids = [];
     }
@@ -3068,9 +3068,10 @@ function usePixelInit() {
     liImg.src = `https://px.ads.linkedin.com/collect/?pid=${LINKEDIN_PARTNER_ID}&fmt=gif`;
     liNoscript.appendChild(liImg);
     document.body.appendChild(liNoscript);
+    }
 
     // ── Meta Pixel ────────────────────────────────────────────────────────────
-    if (!window.fbq) {
+    if (fbReady && !window.fbq) {
       const fbScript = document.createElement("script");
       fbScript.text = `
         !function(f,b,e,v,n,t,s){
@@ -3250,7 +3251,21 @@ function PrivacyPage({ lang, setPage }) {
 // ─── SEO HOOK ─────────────────────────────────────────────────────────────────
 function useSEO(page, lang, blogPostId) {
   useEffect(() => {
-    const base = "https://proforce.ca";
+    // L'origine reelle, pour que les URL canoniques et l'image de partage
+    // fonctionnent autant sur le site de production que sur l'apercu Vercel
+    const PROD_HOSTS = ["proforce.ca", "www.proforce.ca"];
+    const host = typeof window !== "undefined" ? window.location.hostname : "proforce.ca";
+    const base = typeof window !== "undefined" ? window.location.origin : "https://proforce.ca";
+    const isProd = PROD_HOSTS.includes(host);
+
+    // Tant que le site vit sur l'apercu, on empeche Google de l'indexer
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!isProd) {
+      if (!robots) { robots = document.createElement("meta"); robots.name = "robots"; document.head.appendChild(robots); }
+      robots.content = "noindex, nofollow";
+    } else if (robots) {
+      robots.remove();
+    }
     const pageMeta = META[page]?.[lang] || META.home[lang];
     const postMeta = blogPostId ? POSTS.find(p => p.id === blogPostId) : null;
 
@@ -3292,6 +3307,8 @@ function useSEO(page, lang, blogPostId) {
     setMeta('meta[name="geo.placename"]',        "content", "Montreal, Quebec");
 
     // Canonical
+    document.documentElement.lang = lang;
+
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
     canonical.href = url;
@@ -3519,7 +3536,8 @@ const HASH_MAP = {
 
 function parseHash() {
   const hash = window.location.hash.replace("#/","").replace("#","").split("/");
-  const page = HASH_MAP[hash[0]] || "home";
+  const key  = hash[0] || "";
+  const page = HASH_MAP[key] !== undefined ? HASH_MAP[key] : "notfound";
   const sub  = hash[1] || null; // e.g. blog post id
   return { page, sub };
 }
@@ -3955,7 +3973,7 @@ function MarketPage({ lang, setPage, market }) {
           {/* Contact */}
           <div style={{ background:C.paperDark, padding:"2.5rem", borderLeft:`3px solid ${C.orange}` }}>
             <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.5rem" }}>{lang==="en"?"Office":"Bureau"}</div>
-            <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"0.35rem", fontWeight:500 }}>{t.phone}</div>
+            <a href={`tel:+1${t.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"0.35rem", fontWeight:500, textDecoration:"none" }}>{t.phone}</a>
             <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.muted, marginBottom:"1.5rem" }}>{t.addr}</div>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
           </div>
@@ -4114,12 +4132,12 @@ function StartupPage({ lang, setPage }) {
           <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.whoH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"2px", background:C.rule }}>
             {[
-              [t.who1h, t.who1p, "🌱"],
-              [t.who2h, t.who2p, "🏭"],
-              [t.who3h, t.who3p, "📈"],
-            ].map(([h, p, icon]) => (
+              [t.who1h, t.who1p],
+              [t.who2h, t.who2p],
+              [t.who3h, t.who3p],
+            ].map(([h, p]) => (
               <div key={h} style={{ background:C.white, padding:"2.5rem 2rem" }}>
-                <div style={{ fontSize:"1.5rem", marginBottom:"1rem" }}>{icon}</div>
+                <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
                 <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
               </div>
@@ -4352,7 +4370,7 @@ function SimonPage({ lang, setPage }) {
           <Divider style={{ marginBottom:"0" }} />
           {PRESS.map(item => (
             <div key={item.id} style={{ display:"grid", gridTemplateColumns:"auto 1fr auto", gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange }}>🎙</span>
+              <span style={{ width:"18px", height:"2px", background:C.orange, display:"block" }} />
               <div>
                 <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{item.title[lang]}</div>
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted }}>{item.outlet} · {item.date}</div>
