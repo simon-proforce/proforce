@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 
+// ─── LIENS EXTERNES ───────────────────────────────────────────────────────────
+const CALENDLY = "https://calendly.com/simonstamand/proforce";
+
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
 const C = {
   ink:       "#0d2545",       // bleu marine profond
@@ -81,11 +84,28 @@ const G = `
   .fu2 { animation:fadeUp 0.6s 0.1s ease both; }
   .fu3 { animation:fadeUp 0.6s 0.2s ease both; }
 
-  @media(max-width:768px){
+  /* Le menu complet a besoin d'environ 1180px. En bas de ca on passe au burger,
+     sinon le logo colle aux liens et le bouton d'appel sort de l'ecran. */
+  @media(max-width:1200px){
     .hide-mobile { display:none !important; }
     .show-mobile { display:flex !important; }
+  }
+  /* Entre 1200 et 1400 on resserre un peu pour garder de l'air autour du logo. */
+  @media(min-width:1201px) and (max-width:1400px){
+    .nav-links { gap:1.25rem !important; }
+  }
+
+  @media(max-width:768px){
     .two-col     { grid-template-columns:1fr !important; }
     .three-col   { grid-template-columns:1fr !important; }
+    /* Sur telephone le filigrane 2001 tombait pile sur l'etiquette du haut. */
+    .hero-mark   { top:20vh !important; font-size:7rem !important; }
+    .hero-meta   { font-size:0.55rem !important; letter-spacing:0.1em !important; }
+    .hide-narrow { display:none !important; }
+    /* Le bouton flottant recouvrait le bouton Nous contacter. */
+    .float-cta   { bottom:1rem !important; right:1rem !important; left:1rem !important;
+                   justify-content:center !important; padding:14px 16px !important; }
+    .hero-section { padding-bottom:7.5rem !important; }
   }
 `;
 
@@ -298,7 +318,7 @@ function Nav({ page, setPage, lang, setLang }) {
         </PageLink>
 
         {/* Desktop links */}
-        <div className="hide-mobile" style={{ display:"flex", alignItems:"center", gap:"1.75rem" }}>
+        <div className="hide-mobile nav-links" style={{ display:"flex", alignItems:"center", gap:"1.75rem" }}>
           {links.map(([k,l]) => (
             <PageLink key={k} to={k} setPage={setPage} style={{
               fontFamily:"'DM Mono',monospace", fontSize:"0.68rem",
@@ -316,7 +336,7 @@ function Nav({ page, setPage, lang, setLang }) {
           }}>{lang==="en"?"FR":"EN"}</button>
 
           {/* Booking CTA */}
-          <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer"
+          <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
             onClick={() => track.contactClick()}
             style={{
               background:C.orange, color:"#fff", padding:"7px 16px",
@@ -362,7 +382,7 @@ function Nav({ page, setPage, lang, setLang }) {
           }}>{lang==="en"?"Français":"English"}</button>
 
           {/* Mobile booking CTA */}
-          <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer"
+          <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
             onClick={() => { track.contactClick(); setOpen(false); }}
             style={{
               background:C.orange, color:"#fff", padding:"14px 24px",
@@ -436,9 +456,9 @@ function HomePage({ lang, setPage }) {
   return (
     <div>
       {/* ── HERO ── */}
-      <section style={{ background:C.ink, minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-section" style={{ background:C.ink, minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
         {/* Large issue number watermark */}
-        <div style={{
+        <div className="hero-mark" style={{
           position:"absolute", top:"56px", right:"2rem",
           fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(6rem,20vw,18rem)",
           fontWeight:700, color:"rgba(255,255,255,0.04)", lineHeight:1,
@@ -448,9 +468,9 @@ function HomePage({ lang, setPage }) {
         {/* Top rule + issue label */}
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.15)" }} />
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)" }}>{t.issue}</span>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)" }}>proforce.ca</span>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"0.75rem", gap:"1rem" }}>
+            <span className="hero-meta" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>{t.issue}</span>
+            <span className="hero-meta hide-narrow" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>proforce.ca</span>
           </div>
         </div>
 
@@ -466,13 +486,14 @@ function HomePage({ lang, setPage }) {
           }}>
             {t.h1}
           </h1>
-          <h1 className="fu2" style={{
+          {/* Suite du titre, en div: un seul H1 par page pour le referencement */}
+          <div className="fu2" style={{
             fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic",
             fontSize:"clamp(2.5rem,7vw,6.5rem)", lineHeight:0.95,
             letterSpacing:"-0.01em", color:C.orange, marginBottom:"3rem",
           }}>
             {t.h1em}
-          </h1>
+          </div>
 
           <div className="fu3" style={{ display:"flex", alignItems:"flex-start", gap:"4rem", flexWrap:"wrap" }}>
             <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"1rem", lineHeight:1.7, color:"rgba(255,255,255,0.6)", maxWidth:"440px" }}>{t.sub}</p>
@@ -1958,7 +1979,7 @@ function ContactPage({ lang }) {
                   ? "Pick a time that works for you. 15 minutes is usually enough to know if we're the right fit."
                   : "Choisis un moment qui te convient. 15 minutes suffit généralement pour savoir si on est le bon fit."}
               </p>
-              <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer"
+              <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
                 onClick={() => track.contactClick()}
                 className="btn-orange"
                 style={{ display:"inline-block" }}
@@ -2184,7 +2205,7 @@ function CalculatorPage({ lang, setPage }) {
           <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.8rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.03em" }}>{t.cta}</h2>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.cta2}</button>
-            <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
               {lang==="en"?"Book a Call":"Réserver un appel"}
             </a>
           </div>
@@ -2487,7 +2508,7 @@ function HowWeWorkPage({ lang, setPage }) {
               onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
               onMouseLeave={e => e.currentTarget.style.opacity="1"}
             >{t.cta}</button>
-            <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s" }}
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
               onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.5)"}
             >{t.cta2}</a>
@@ -4491,7 +4512,7 @@ function SimonPage({ lang, setPage }) {
           <Eyebrow>{t.conH}</Eyebrow>
           <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.8, marginBottom:"3rem", maxWidth:"520px" }}>{t.conP}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", alignItems:"center", marginBottom:"2.5rem" }}>
-            <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer" className="btn-orange" onClick={() => track.contactClick()}>{t.cta}</a>
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="btn-orange" onClick={() => track.contactClick()}>{t.cta}</a>
             <button className="btn-ghost" onClick={() => setPage("contact")} style={{ borderColor:"rgba(255,255,255,0.25)", color:"#fff" }}
               onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.08)"; }}
               onMouseLeave={e => { e.currentTarget.style.background="transparent"; }}
@@ -4551,7 +4572,8 @@ function SimonPage({ lang, setPage }) {
       <Footer lang={lang} setPage={go} />
 
       {/* ── Floating booking widget ── */}
-      <a href="YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer"
+      <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
+        className="float-cta"
         onClick={() => track.contactClick()}
         style={{
           position:"fixed", bottom:"2rem", right:"2rem", zIndex:150,
