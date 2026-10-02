@@ -141,6 +141,11 @@ const G = `
   }
 
   @media(max-width:768px){
+    /* Sur telephone la vignette d'article rendait la ligne trop serree:
+       l'article en vedette garde sa grande image, les autres non. */
+    .post-row    { grid-template-columns:60px 1fr 90px !important; gap:1rem !important; }
+    .post-thumb  { display:none !important; }
+
     .two-col     { grid-template-columns:1fr !important; }
     .three-col   { grid-template-columns:1fr !important; }
     /* Sur telephone le filigrane 2001 tombait pile sur l'etiquette du haut. */
@@ -1291,7 +1296,7 @@ function AboutPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
@@ -1851,6 +1856,9 @@ function NewsletterWidget({ lang, compact }) {
     </div>
   );
 }
+// Chaque article a son image, nommee comme son identifiant.
+const postCover = id => `/photos/blogue/${id}.jpg`;
+
 function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
   const [activePost, setActivePost] = useState(initialPost || null);
   const [filter, setFilter] = useState("all");
@@ -1889,9 +1897,20 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
               <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>{post.cat[lang]}</span>
               <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted }}>{post.date} · {post.read[lang]}</span>
             </div>
-            <h1 style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.5rem)", letterSpacing:"-0.03em", color:C.ink, lineHeight:1.05, marginBottom:"3rem" }}>{post.title[lang]}</h1>
+            <h1 style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.5rem)", letterSpacing:"-0.03em", color:C.ink, lineHeight:1.05, marginBottom:"2.5rem" }}>{post.title[lang]}</h1>
           </div>
         </section>
+
+        {/* Image d'en tete, plus large que la colonne de texte */}
+        <section style={{ background:C.paper, padding:"0 2rem" }}>
+          <div style={{ maxWidth:"940px", margin:"0 auto" }}>
+            <div style={{ width:"100%", aspectRatio:"16 / 9", overflow:"hidden", background:C.ink }}>
+              <img src={postCover(post.id)} alt="" loading="eager"
+                style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+            </div>
+          </div>
+        </section>
+
         <section style={{ background:C.white, padding:"4rem 2rem 6rem" }}>
           <div style={{ maxWidth:"680px", margin:"0 auto" }}>
             <Divider style={{ marginBottom:"3rem" }} />
@@ -1916,7 +1935,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Proforce Blog":"Blogue Proforce"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"1rem" }}>
@@ -1979,32 +1998,66 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
           )}
 
           <Divider style={{ marginBottom:"0" }} />
-          {filtered.map((post,i) => (
-            <div key={post.id}>
-              <button onClick={() => { openPost(post.id); window.scrollTo({top:0,behavior:"smooth"}); }} style={{
-                width:"100%", display:"grid", gridTemplateColumns:"60px 1fr 120px",
-                gap:"2rem", alignItems:"start", padding:"2.25rem 0", textAlign:"left",
-                transition:"opacity 0.2s",
-              }}
-                onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
-                onMouseLeave={e => e.currentTarget.style.opacity="1"}
-              >
-                <div>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em" }}>0{i+1}</div>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted, letterSpacing:"0.06em", marginTop:"4px" }}>{post.cat[lang]}</div>
+          {filtered.map((post,i) => {
+            // Le premier article est traite en vedette, grande image au dessus
+            // du titre. Les suivants gardent la ligne compacte avec une vignette.
+            const open = () => { openPost(post.id); window.scrollTo({top:0,behavior:"smooth"}); };
+            const meta = (
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date}</div>
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, marginTop:"4px" }}>{post.read[lang]}</div>
+              </div>
+            );
+            if (i === 0) {
+              return (
+                <div key={post.id}>
+                  <button onClick={open} style={{ width:"100%", textAlign:"left", padding:"0 0 2.75rem", transition:"opacity 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.opacity="0.78"}
+                    onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                  >
+                    <div style={{ width:"100%", aspectRatio:"16 / 7", overflow:"hidden", background:C.ink, marginBottom:"1.75rem" }}>
+                      <img src={postCover(post.id)} alt="" loading="lazy"
+                        style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                    </div>
+                    <div style={{ display:"flex", gap:"1.25rem", alignItems:"center", flexWrap:"wrap", marginBottom:"0.9rem" }}>
+                      <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.12em", textTransform:"uppercase" }}>{post.cat[lang]}</span>
+                      <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date} · {post.read[lang]}</span>
+                    </div>
+                    <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.5rem,3.4vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", lineHeight:1.12, marginBottom:"0.8rem" }}>{post.title[lang]}</div>
+                    <div style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:C.muted, lineHeight:1.7, fontStyle:"italic", maxWidth:"620px" }}>{post.excerpt[lang]}</div>
+                  </button>
+                  <Divider />
                 </div>
-                <div>
-                  <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1rem,2.5vw,1.35rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.5rem" }}>{post.title[lang]}</div>
-                  <div style={{ fontFamily:"'Spectral',serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.65, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
-                </div>
-                <div style={{ textAlign:"right" }}>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date}</div>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, marginTop:"4px" }}>{post.read[lang]}</div>
-                </div>
-              </button>
-              <Divider />
-            </div>
-          ))}
+              );
+            }
+            return (
+              <div key={post.id}>
+                <button onClick={open} className="post-row" style={{
+                  width:"100%", display:"grid", gridTemplateColumns:"60px 150px 1fr 120px",
+                  gap:"2rem", alignItems:"start", padding:"2.25rem 0", textAlign:"left",
+                  transition:"opacity 0.2s",
+                }}
+                  onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
+                  onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                >
+                  <div>
+                    <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em" }}>{String(i+1).padStart(2,"0")}</div>
+                    <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted, letterSpacing:"0.06em", marginTop:"4px" }}>{post.cat[lang]}</div>
+                  </div>
+                  <div className="post-thumb" style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
+                    <img src={postCover(post.id)} alt="" loading="lazy"
+                      style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                  </div>
+                  <div>
+                    <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1rem,2.5vw,1.35rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.5rem" }}>{post.title[lang]}</div>
+                    <div style={{ fontFamily:"'Spectral',serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.65, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
+                  </div>
+                  {meta}
+                </button>
+                <Divider />
+              </div>
+            );
+          })}
 
           {/* Newsletter */}
           <div style={{ marginTop:"4rem" }}>
@@ -3560,11 +3613,20 @@ function useSEO(page, lang, blogPostId) {
     setMeta('meta[property="og:url"]',           "content", url);
     setMeta('meta[property="og:type"]',          "content", postMeta ? "article" : "website");
     setMeta('meta[property="og:site_name"]',     "content", "Proforce Personnel");
-    setMeta('meta[property="og:image"]',         "content", `${base}/og-image.jpg`);
+    // Sur un article, c'est son image qui est partagee, pas l'image generique
+    // du site. Un lien sans image propre prend trois fois moins de place dans
+    // un fil LinkedIn.
+    const shareImage = postMeta
+      ? `${base}/photos/blogue/${postMeta.id}.jpg`
+      : `${base}/og-image.jpg`;
+
+    setMeta('meta[property="og:image"]',         "content", shareImage);
+    setMeta('meta[property="og:image:width"]',   "content", "1600");
+    setMeta('meta[property="og:image:height"]',  "content", "873");
     setMeta('meta[name="twitter:card"]',         "content", "summary_large_image");
     setMeta('meta[name="twitter:title"]',        "content", title);
     setMeta('meta[name="twitter:description"]',  "content", desc);
-    setMeta('meta[name="twitter:image"]',        "content", `${base}/og-image.jpg`);
+    setMeta('meta[name="twitter:image"]',        "content", shareImage);
     setMeta('meta[name="robots"]',               "content", "index, follow");
     setMeta('meta[name="language"]',             "content", lang === "fr" ? "fr-CA" : "en-CA");
     setMeta('meta[name="geo.region"]',           "content", "CA-QC");
@@ -3684,6 +3746,7 @@ function useSEO(page, lang, blogPostId) {
         "headline": postMeta.title[lang],
         "description": postMeta.excerpt[lang],
         "url": url,
+        "image": shareImage,
         "inLanguage": lang === "fr" ? "fr-CA" : "en-CA",
         // Google exige une date ISO 8601. postMeta.date est du texte affiche
         // ("Mai 2026"), qui se fait rejeter, alors on envoie postMeta.iso.
