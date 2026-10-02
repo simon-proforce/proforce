@@ -521,6 +521,36 @@ function HomePage({ lang, setPage }) {
 
       <Ticker lang={lang} />
 
+      {/* ── BANDE PHOTO ── ferme le premier ecran, pleine largeur ── */}
+      <section style={{ position:"relative", background:C.ink, overflow:"hidden" }}>
+        <div className="photo-band" style={{ width:"100%", height:"clamp(240px,38vw,460px)", position:"relative" }}>
+          <img
+            src="/photos/parc-industriel.jpg"
+            alt={lang==="en"
+              ? "Food plants and distribution centres along a river in Quebec, seen from the air in autumn"
+              : "Usines alimentaires et centres de distribution le long d'une rivière au Québec, vus des airs à l'automne"}
+            loading="lazy"
+            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+          />
+          {/* voile marine pour garder la legende lisible */}
+          <div style={{
+            position:"absolute", inset:0,
+            background:"linear-gradient(to top, rgba(13,37,69,0.88) 0%, rgba(13,37,69,0.25) 45%, rgba(13,37,69,0.08) 100%)",
+          }} />
+          <div style={{ position:"absolute", left:"2rem", right:"2rem", bottom:"1.75rem" }}>
+            <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
+            <p className="band-caption" style={{
+              fontFamily:"'DM Mono',monospace", fontSize:"0.68rem", letterSpacing:"0.12em",
+              textTransform:"uppercase", color:"rgba(255,255,255,0.78)", maxWidth:"540px", lineHeight:1.7,
+            }}>
+              {lang==="en"
+                ? "Québec · Ontario · Atlantic Canada"
+                : "Québec · Ontario · Provinces atlantiques"}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── SECTORS ── */}
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
@@ -532,7 +562,7 @@ function HomePage({ lang, setPage }) {
           <p style={{ color:C.muted, fontSize:"1rem", lineHeight:1.7, maxWidth:"480px", marginBottom:"4rem" }}>{t.s2p}</p>
 
           <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1px", background:C.rule }}>
-            {[{pg:"food",h:t.foodH,p:t.foodP,n:"01",img:"/secteurs/carte-alimentaire.jpg"},{pg:"fashion",h:t.fashH,p:t.fashP,n:"02",img:"/secteurs/carte-mode.jpg"}].map(s => (
+            {[{pg:"food",h:t.foodH,p:t.foodP,n:"01",img:"/photos/ligne-emballage.jpg"},{pg:"fashion",h:t.fashH,p:t.fashP,n:"02",img:"/photos/entrepot-vetements.jpg"}].map(s => (
               <button key={s.pg} onClick={() => setPage(s.pg)} style={{
                 background:C.paper, padding:"0", textAlign:"left",
                 transition:"background 0.2s", width:"100%",
@@ -737,7 +767,7 @@ function SectorPage({ lang, setPage, sector }) {
       <section style={{
         position:"relative", background:C.ink, minHeight:"65vh",
         display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem",
-        backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.93), rgba(13,37,69,0.74)), url(/secteurs/${sector === "food" ? "alimentaire" : "mode"}-hero.jpg)`,
+        backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.93), rgba(13,37,69,0.74)), url(${sector === "food" ? "/photos/usine-vue-ensemble.jpg" : "/secteurs/mode-hero.jpg"})`,
         backgroundSize:"cover", backgroundPosition:"center",
       }}>
         <div style={{ maxWidth:"900px", position:"relative" }}>
@@ -762,6 +792,23 @@ function SectorPage({ lang, setPage, sector }) {
           </div>
         </div>
       </section>
+
+      {/* Bande photo pleine largeur entre les postes et les trois arguments */}
+      {sector === "food" && (
+        <section style={{ background:C.ink, overflow:"hidden" }}>
+          <div style={{ width:"100%", height:"clamp(200px,28vw,360px)", position:"relative" }}>
+            <img
+              src="/photos/affinage-fromage.jpg"
+              alt={lang==="en"
+                ? "A cheesemaker turning wheels in an aging room"
+                : "Un fromager retourne des meules dans une cave d'affinage"}
+              loading="lazy"
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+            />
+            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(13,37,69,0.72) 0%, rgba(13,37,69,0.05) 60%)" }} />
+          </div>
+        </section>
+      )}
 
       <section style={{ background:C.paper, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
@@ -1332,7 +1379,7 @@ function CandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6.5rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.5rem" }}>{t.h1}</h1>
@@ -1444,7 +1491,7 @@ function EmployersPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"65vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section style={{ background:C.ink, minHeight:"65vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/usine-discussion.jpg)`, backgroundSize:"cover", backgroundPosition:"center" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -1945,7 +1992,7 @@ function ContactPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3.5rem,10vw,9rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
@@ -2456,6 +2503,42 @@ function HowWeWorkPage({ lang, setPage }) {
               )}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Photo + phrase d'appui, le seul dispositif visuel de la page */}
+      <section style={{ background:C.ink, padding:"0" }}>
+        <div className="two-col" style={{
+          maxWidth:"1100px", margin:"0 auto", display:"grid",
+          gridTemplateColumns:"minmax(0,0.85fr) minmax(0,1.15fr)", alignItems:"stretch",
+        }}>
+          <div style={{ minHeight:"340px", position:"relative", overflow:"hidden" }}>
+            <img
+              src="/photos/panneau-controle.jpg"
+              alt={lang==="en"
+                ? "A production operator at the control panel of a packaging line"
+                : "Un opérateur de production au panneau de contrôle d'une ligne d'emballage"}
+              loading="lazy"
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+            />
+          </div>
+          <div style={{ padding:"4rem 2.5rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
+            <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} />
+            <p style={{
+              fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic",
+              fontSize:"clamp(1.3rem,2.6vw,1.9rem)", lineHeight:1.5, color:"#fff", marginBottom:"1.5rem",
+            }}>
+              {lang==="en"
+                ? "The people worth hiring are already working. They are not refreshing a job board on a Tuesday night."
+                : "Le monde que ça vaut la peine d'embaucher travaille déjà. Y sont pas en train de rafraîchir un site d'emploi un mardi soir."}
+            </p>
+            <p style={{
+              fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.12em",
+              textTransform:"uppercase", color:"rgba(255,255,255,0.45)",
+            }}>
+              {lang==="en" ? "That is the whole method" : "C'est là que la méthode commence"}
+            </p>
+          </div>
         </div>
       </section>
 
