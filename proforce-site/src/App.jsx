@@ -2,6 +2,51 @@ import { useState, useEffect } from "react";
 
 // ─── LIENS EXTERNES ───────────────────────────────────────────────────────────
 const CALENDLY = "https://calendly.com/simonstamand/proforce";
+const CONTACT_EMAIL = "info@proforce.ca";
+
+// ─── ENVOI DES FORMULAIRES ────────────────────────────────────────────────────
+// Remplir les quatre valeurs ci dessous active l'envoi silencieux par EmailJS.
+// Tant qu'elles commencent par YOUR_, les formulaires ouvrent plutot le logiciel
+// de courriel du visiteur avec le message deja ecrit. Dans les deux cas le
+// message part pour vrai: on n'affiche jamais une confirmation sans envoi.
+const EMAILJS = {
+  serviceId:          "YOUR_SERVICE_ID",
+  publicKey:          "YOUR_PUBLIC_KEY",
+  contactTemplate:    "YOUR_CONTACT_TEMPLATE_ID",
+  referralTemplate:   "YOUR_REFERRAL_TEMPLATE_ID",
+  newsletterTemplate: "YOUR_NEWSLETTER_TEMPLATE_ID",
+};
+
+const isSet = v => !!v && !String(v).startsWith("YOUR_");
+const emailjsReady = template =>
+  isSet(EMAILJS.serviceId) && isSet(EMAILJS.publicKey) && isSet(template);
+
+const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v).trim());
+
+// Retourne "sent" si EmailJS a confirme, "mail" si on a bascule sur le logiciel
+// de courriel du visiteur. Leve une erreur si EmailJS refuse, pour qu'on puisse
+// le dire au visiteur au lieu de pretendre que c'est parti.
+async function sendForm(template, params, fallback) {
+  if (emailjsReady(template)) {
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id: EMAILJS.serviceId,
+        template_id: template,
+        user_id: EMAILJS.publicKey,
+        template_params: params,
+      }),
+    });
+    if (!res.ok) throw new Error(`EmailJS ${res.status}`);
+    return "sent";
+  }
+  const href = `mailto:${CONTACT_EMAIL}`
+    + `?subject=${encodeURIComponent(fallback.subject)}`
+    + `&body=${encodeURIComponent(fallback.body)}`;
+  window.location.href = href;
+  return "mail";
+}
 
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
 const C = {
@@ -170,9 +215,9 @@ const POSTS = [
 
   { id:"marche-alimentaire-2026", cat:{en:"Market",fr:"Marché"}, date:"Janvier 2026", iso:"2026-01-20", read:{en:"4 min",fr:"4 min"},
     title:{en:"What I'm seeing in food industry hiring right now.",fr:"Ce que je vois dans l'embauche alimentaire en ce moment."},
-    excerpt:{en:"25 years in, I still take notes on what's shifting. Here's the ground-level version, not the LinkedIn think-piece version.",fr:"Après 25 ans, je prends encore des notes sur ce qui change. Voilà la version terrain, pas la version article LinkedIn."},
-    body:{en:`25 years in, I still take notes on what's shifting. Here's what's actually happening, not the LinkedIn think-piece version, the ground-level version.\n\nQuality and food safety roles are tight. Really tight. The pipeline of experienced QA professionals with HACCP, SQF, and FSMA knowledge hasn't kept up with demand, especially in Ontario manufacturing. Companies that used to take two months to hire are now taking five.\n\nSupply chain is in an interesting spot. The panic hiring of 2021 to 2022 created a generation of professionals with inflated titles and thin experience. Companies are now sorting through that, they want people who actually built resilient supply chains.\n\nSalary expectations have reset upward and aren't coming back down. A Plant Manager role that paid $110k in 2019 is now $140k minimum if you want serious candidates. Some clients are still anchored to pre-pandemic comp expectations. That's a conversation we have a lot.\n\nOntario is the growth market. More mandates out of the GTA and southwestern Ontario than ever before. Greenfield facilities coming online, the need for experienced operations and quality leadership is real and ongoing.\n\nThe best candidates are still getting multiple offers. If your process takes eight weeks and four rounds of interviews, you're losing people. Speed is a competitive advantage right now.\n\nThat's the landscape as I see it.`,
-          fr:`Après 25 ans, je prends encore des notes sur ce qui change. Voilà ce qui se passe vraiment, pas la version article LinkedIn, la version terrain.\n\nLes postes en qualité et salubrité alimentaire sont serrés. Vraiment serrés. Le bassin de professionnels QA expérimentés avec des connaissances HACCP, SQF et FSMA n'a pas suivi la demande, surtout en Ontario. Des compagnies qui prenaient deux mois pour embaucher en prennent maintenant cinq.\n\nLa chaîne d'approvisionnement est dans une position intéressante. L'embauche de panique de 2021-2022 a créé une génération de professionnels avec des titres gonflés et une expérience mince.\n\nLes attentes salariales ont remonté et ne redescendront pas. Un poste de directeur d'usine qui payait 110 000$ en 2019 est maintenant 140 000$ minimum si tu veux des candidats sérieux.\n\nL'Ontario est le marché en croissance. Plus de mandats du Grand Toronto et du sud-ouest de l'Ontario que jamais.\n\nLes meilleurs candidats reçoivent encore plusieurs offres. Si ton processus prend huit semaines et quatre rondes d'entrevues, tu perds des gens. La vitesse est un avantage concurrentiel en ce moment.`} },
+    excerpt:{en:"Proforce has been doing this since 2001, and I still take notes on what's shifting. Here's the ground-level version, not the LinkedIn think-piece version.",fr:"Proforce fait ça depuis 2001, et je prends encore des notes sur ce qui change. Voilà la version terrain, pas la version article LinkedIn."},
+    body:{en:`Proforce has been doing this since 2001, and I still take notes on what's shifting. Here's what's actually happening, not the LinkedIn think-piece version, the ground-level version.\n\nQuality and food safety roles are tight. Really tight. The pipeline of experienced QA professionals with HACCP, SQF, and FSMA knowledge hasn't kept up with demand, especially in Ontario manufacturing. Companies that used to take two months to hire are now taking five.\n\nSupply chain is in an interesting spot. The panic hiring of 2021 to 2022 created a generation of professionals with inflated titles and thin experience. Companies are now sorting through that, they want people who actually built resilient supply chains.\n\nSalary expectations have reset upward and aren't coming back down. A Plant Manager role that paid $110k in 2019 is now $140k minimum if you want serious candidates. Some clients are still anchored to pre-pandemic comp expectations. That's a conversation we have a lot.\n\nOntario is the growth market. More mandates out of the GTA and southwestern Ontario than ever before. Greenfield facilities coming online, the need for experienced operations and quality leadership is real and ongoing.\n\nThe best candidates are still getting multiple offers. If your process takes eight weeks and four rounds of interviews, you're losing people. Speed is a competitive advantage right now.\n\nThat's the landscape as I see it.`,
+          fr:`Proforce fait ça depuis 2001, et je prends encore des notes sur ce qui change. Voilà ce qui se passe vraiment, pas la version article LinkedIn, la version terrain.\n\nLes postes en qualité et salubrité alimentaire sont serrés. Vraiment serrés. Le bassin de professionnels QA expérimentés avec des connaissances HACCP, SQF et FSMA n'a pas suivi la demande, surtout en Ontario. Des compagnies qui prenaient deux mois pour embaucher en prennent maintenant cinq.\n\nLa chaîne d'approvisionnement est dans une position intéressante. L'embauche de panique de 2021-2022 a créé une génération de professionnels avec des titres gonflés et une expérience mince.\n\nLes attentes salariales ont remonté et ne redescendront pas. Un poste de directeur d'usine qui payait 110 000$ en 2019 est maintenant 140 000$ minimum si tu veux des candidats sérieux.\n\nL'Ontario est le marché en croissance. Plus de mandats du Grand Toronto et du sud-ouest de l'Ontario que jamais.\n\nLes meilleurs candidats reçoivent encore plusieurs offres. Si ton processus prend huit semaines et quatre rondes d'entrevues, tu perds des gens. La vitesse est un avantage concurrentiel en ce moment.`} },
 
   { id:"combien-coute-recruteur", cat:{en:"Hiring",fr:"Embauche"}, date:"Mai 2026", iso:"2026-05-05", read:{en:"4 min",fr:"4 min"},
     title:{en:"How much does a recruiter cost in food manufacturing? Here's the real answer.",fr:"Combien coûte un recruteur en fabrication alimentaire? Voilà la vraie réponse."},
@@ -1728,32 +1773,24 @@ function NewsletterWidget({ lang, compact }) {
   }[lang];
 
   const handleSubmit = async () => {
-    if (!email || !email.includes("@")) return;
+    if (!validEmail(email)) return;
     setStatus("sending");
     try {
-      // EmailJS call, replace YOUR_PUBLIC_KEY, YOUR_SERVICE_ID, YOUR_TEMPLATE_ID
-      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id:  "YOUR_SERVICE_ID",
-          template_id: "YOUR_NEWSLETTER_TEMPLATE_ID",
-          user_id:     "YOUR_PUBLIC_KEY",
-          template_params: {
-            subscriber_email: email,
-            preferred_lang: prefLang === "fr" ? "Français" : "English",
-            source: "proforce.ca blog",
-          },
-        }),
+      const r = await sendForm(EMAILJS.newsletterTemplate, {
+        subscriber_email: email,
+        preferred_lang: prefLang === "fr" ? "Français" : "English",
+        source: "proforce.ca blog",
+      }, {
+        subject: "Inscription à l'infolettre",
+        body: `Courriel: ${email}\nLangue: ${prefLang === "fr" ? "Français" : "English"}\nSource: blogue`,
       });
-      if (res.ok) setStatus("done");
-      else setStatus("error");
+      setStatus(r === "mail" ? "mail" : "done");
     } catch {
       setStatus("error");
     }
   };
 
-  if (status === "done") {
+  if (status === "done" || status === "mail") {
     return (
       <div style={{ padding: compact ? "1.5rem" : "2.5rem", background: C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
         <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
@@ -1982,10 +2019,39 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 // ─── CONTACT ──────────────────────────────────────────────────────────────────
 function ContactPage({ lang }) {
   const [form, setForm] = useState({name:"",email:"",company:"",message:""});
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | mail | error
+  const [touched, setTouched] = useState(false);
+  const sent = status === "sent" || status === "mail";
+
+  const missing = !form.name.trim() || !validEmail(form.email) || !form.message.trim();
+
+  const submit = async () => {
+    setTouched(true);
+    if (missing || status === "sending") return;
+    setStatus("sending");
+    try {
+      const r = await sendForm(EMAILJS.contactTemplate, {
+        from_name: form.name, reply_to: form.email,
+        company: form.company, message: form.message,
+      }, {
+        subject: `Demande du site, ${form.name}`,
+        body: `Nom: ${form.name}\nCourriel: ${form.email}\nCompagnie: ${form.company || "non precisee"}\n\n${form.message}`,
+      });
+      setStatus(r);
+      track.formSubmit();
+    } catch {
+      setStatus("error");
+    }
+  };
   const t = {
-    en:{ eyebrow:"Get in Touch", h1:"Let's talk.", fName:"Your name", fEmail:"Email", fCo:"Company (optional)", fMsg:"What are you looking for?", send:"Send", sent:"Message sent. We'll be in touch shortly." },
-    fr:{ eyebrow:"Nous joindre", h1:"Jasez avec nous.", fName:"Ton nom", fEmail:"Courriel", fCo:"Compagnie (optionnel)", fMsg:"Qu'est-ce que tu cherches?", send:"Envoyer", sent:"Message envoyé. On te revient bientôt." },
+    en:{ eyebrow:"Get in Touch", h1:"Let's talk.", fName:"Your name", fEmail:"Email", fCo:"Company (optional)", fMsg:"What are you looking for?", send:"Send", sending:"Sending...", sent:"Message sent. We'll be in touch shortly.",
+         sentMail:"Your email program just opened with your message ready to go. Send it and we'll get back to you. If nothing opened, write us at " + CONTACT_EMAIL + ".",
+         errorMsg:"The message didn't go through. Call us at (514) 905-0606 or write to " + CONTACT_EMAIL + " and we'll pick it up from there.",
+         required:"We need your name, a valid email and a message." },
+    fr:{ eyebrow:"Nous joindre", h1:"Jasez avec nous.", fName:"Ton nom", fEmail:"Courriel", fCo:"Compagnie (optionnel)", fMsg:"Qu'est-ce que tu cherches?", send:"Envoyer", sending:"Envoi...", sent:"Message envoyé. On te revient bientôt.",
+         sentMail:"Ton logiciel de courriel vient de s'ouvrir avec ton message déjà écrit. Envoie le et on te revient. Si rien ne s'est ouvert, écris nous au " + CONTACT_EMAIL + ".",
+         errorMsg:"Le message n'est pas parti. Appelle nous au (514) 905-0606 ou écris au " + CONTACT_EMAIL + " et on embarque de là.",
+         required:"Ça prend ton nom, un courriel valide et un message." },
   }[lang];
 
   const inp = { width:"100%", padding:"11px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'DM Sans',sans-serif", fontSize:"0.95rem", outline:"none", transition:"border-color 0.2s" };
@@ -2056,7 +2122,9 @@ function ContactPage({ lang }) {
             {sent ? (
               <div style={{ padding:"4rem 0" }}>
                 <div style={{ width:"32px", height:"2px", background:C.orange, marginBottom:"1.5rem" }} />
-                <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.2rem", color:C.ink, fontStyle:"italic" }}>{t.sent}</p>
+                <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.2rem", color:C.ink, fontStyle:"italic", lineHeight:1.6 }}>
+                  {status === "mail" ? t.sentMail : t.sent}
+                </p>
               </div>
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:"2rem" }}>
@@ -2072,7 +2140,16 @@ function ContactPage({ lang }) {
                   onFocus={e => e.target.style.borderColor=C.orange}
                   onBlur={e => e.target.style.borderColor=C.rule}
                 />
-                <button className="btn-ink" onClick={() => { setSent(true); track.formSubmit(); }} style={{ alignSelf:"flex-start" }}>{t.send}</button>
+                {touched && missing && (
+                  <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, margin:0 }}>{t.required}</p>
+                )}
+                {status === "error" && (
+                  <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, margin:0, lineHeight:1.6 }}>{t.errorMsg}</p>
+                )}
+                <button className="btn-ink" onClick={submit} disabled={status === "sending"}
+                  style={{ alignSelf:"flex-start", opacity: status === "sending" ? 0.6 : 1 }}>
+                  {status === "sending" ? t.sending : t.send}
+                </button>
               </div>
             )}
           </div>
@@ -2733,7 +2810,45 @@ function PressPage({ lang, setPage }) {
 // ─── REFERRAL PAGE ────────────────────────────────────────────────────────────
 function ReferralPage({ lang, setPage }) {
   const [form, setForm] = useState({ yourName:"", yourEmail:"", yourCompany:"", refName:"", refCompany:"", refEmail:"", refPhone:"", context:"" });
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | mail | error
+  const [touched, setTouched] = useState(false);
+  const sent = status === "sent" || status === "mail";
+
+  const missing = !form.yourName.trim() || !validEmail(form.yourEmail) || !form.refName.trim();
+
+  const submit = async () => {
+    setTouched(true);
+    if (missing || status === "sending") return;
+    setStatus("sending");
+    try {
+      const r = await sendForm(EMAILJS.referralTemplate, {
+        from_name: form.yourName, reply_to: form.yourEmail, your_company: form.yourCompany,
+        ref_name: form.refName, ref_company: form.refCompany,
+        ref_email: form.refEmail, ref_phone: form.refPhone, context: form.context,
+      }, {
+        subject: `Référence du site, ${form.refName}`,
+        body: `De la part de: ${form.yourName}\nCourriel: ${form.yourEmail}\nCompagnie: ${form.yourCompany || "non precisee"}\n\n`
+            + `Personne référée: ${form.refName}\nCompagnie: ${form.refCompany || "non precisee"}\n`
+            + `Courriel: ${form.refEmail || "non precise"}\nTéléphone: ${form.refPhone || "non precise"}\n\n`
+            + `Contexte: ${form.context || "aucun"}`,
+      });
+      setStatus(r);
+      track.formSubmit();
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  const msg = {
+    en:{ sending:"Sending...",
+         sentMail:"Your email program just opened with the referral ready to go. Send it and we'll follow up with you. If nothing opened, write us at " + CONTACT_EMAIL + ".",
+         errorMsg:"The referral didn't go through. Call us at (514) 905-0606 or write to " + CONTACT_EMAIL + " and we'll pick it up from there.",
+         required:"We need your name, a valid email, and the name of the person you're referring." },
+    fr:{ sending:"Envoi...",
+         sentMail:"Ton logiciel de courriel vient de s'ouvrir avec la référence déjà écrite. Envoie la et on fait le suivi avec toi. Si rien ne s'est ouvert, écris nous au " + CONTACT_EMAIL + ".",
+         errorMsg:"La référence n'est pas partie. Appelle nous au (514) 905-0606 ou écris au " + CONTACT_EMAIL + " et on embarque de là.",
+         required:"Ça prend ton nom, un courriel valide, et le nom de la personne que tu réfères." },
+  }[lang];
 
   const t = {
     en: {
@@ -2863,7 +2978,7 @@ function ReferralPage({ lang, setPage }) {
           {sent ? (
             <div style={{ padding:"3rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
               <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:C.ink, fontStyle:"italic" }}>{t.sent}</p>
+              <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:C.ink, fontStyle:"italic", lineHeight:1.6 }}>{status === "mail" ? msg.sentMail : t.sent}</p>
             </div>
           ) : (
             <div>
@@ -2907,7 +3022,16 @@ function ReferralPage({ lang, setPage }) {
                 />
               </div>
 
-              <button className="btn-orange" onClick={() => { setSent(true); track.formSubmit(); }}>{t.send}</button>
+              {touched && missing && (
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, marginBottom:"1rem" }}>{msg.required}</p>
+              )}
+              {status === "error" && (
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, marginBottom:"1rem", lineHeight:1.6 }}>{msg.errorMsg}</p>
+              )}
+              <button className="btn-orange" onClick={submit} disabled={status === "sending"}
+                style={{ opacity: status === "sending" ? 0.6 : 1 }}>
+                {status === "sending" ? msg.sending : t.send}
+              </button>
             </div>
           )}
         </div>
@@ -2941,21 +3065,22 @@ function FooterNewsletter({ lang }) {
   }[lang];
 
   const handleSubmit = async () => {
-    if (!email || !email.includes("@")) return;
+    if (!validEmail(email)) return;
     setStatus("sending");
     try {
-      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          service_id:"YOUR_SERVICE_ID", template_id:"YOUR_NEWSLETTER_TEMPLATE_ID", user_id:"YOUR_PUBLIC_KEY",
-          template_params:{ subscriber_email:email, preferred_lang:lang==="fr"?"Français":"English", source:"proforce.ca footer" },
-        }),
+      const r = await sendForm(EMAILJS.newsletterTemplate, {
+        subscriber_email: email,
+        preferred_lang: lang === "fr" ? "Français" : "English",
+        source: "proforce.ca footer",
+      }, {
+        subject: "Inscription à l'infolettre",
+        body: `Courriel: ${email}\nLangue: ${lang === "fr" ? "Français" : "English"}\nSource: pied de page`,
       });
-      setStatus(res.ok ? "done" : "error");
+      setStatus(r === "mail" ? "mail" : "done");
     } catch { setStatus("error"); }
   };
 
-  if (status === "done") return <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>{t.done}</p>;
+  if (status === "done" || status === "mail") return <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>{t.done}</p>;
 
   return (
     <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", alignItems:"flex-end" }}>
@@ -3700,8 +3825,9 @@ export default function App() {
   // Track page views on navigation
   useEffect(() => {
     track.pageView(page);
-    // Track high-value pages specifically
-    if (page === "contact") track.contactClick();
+    // Une visite de la page Contact n'est pas un clic de contact: on la compte
+    // comme une vue de page, et contactClick reste reserve aux vrais clics.
+    if (page === "contact") track.pageView("Contact");
     if (page === "employers") track.pageView("Employers");
     if (page === "startup") track.pageView("Startups");
     if (page === "featured") track.pageView("Featured Candidates");
