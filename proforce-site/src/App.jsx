@@ -140,6 +140,9 @@ const G = `
     .nav-links { gap:1.25rem !important; }
   }
 
+  /* <picture> ne doit pas casser les grilles: il disparait de la mise en page. */
+  picture { display:contents; }
+
   @media(max-width:768px){
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
@@ -274,11 +277,26 @@ const POSTS = [
 ];
 
 // ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
+// Sert le WebP quand le navigateur le prend (tous depuis 2020) et garde le JPEG
+// en filet de securite. width et height evitent que la page saute pendant le
+// chargement: le navigateur reserve la place avant que l'image arrive.
+function Photo({ src, alt = "", w, h, eager, style, className }) {
+  const webp = src.replace(/\.jpg$/, ".webp");
+  return (
+    <picture>
+      <source srcSet={webp} type="image/webp" />
+      <img src={src} alt={alt} width={w} height={h}
+        loading={eager ? "eager" : "lazy"} decoding="async"
+        className={className} style={style} />
+    </picture>
+  );
+}
+
 function Avatar({ m, size, full, style }) {
   const box = full ? { width:"100%", aspectRatio:"1 / 1" } : { width:size, height:size };
   if (m.photo) {
     return (
-      <img src={m.photo} alt={m.name} loading="lazy" style={{
+      <Photo src={m.photo} alt={m.name} w={760} h={760} style={{
         ...box, objectFit:"cover", objectPosition:"center 22%", display:"block",
         background:C.paperDark, flexShrink:0, ...style,
       }} />
@@ -574,12 +592,11 @@ function HomePage({ lang, setPage }) {
       {/* ── BANDE PHOTO ── ferme le premier ecran, pleine largeur ── */}
       <section style={{ position:"relative", background:C.ink, overflow:"hidden" }}>
         <div className="photo-band" style={{ width:"100%", height:"clamp(240px,38vw,460px)", position:"relative" }}>
-          <img
-            src="/photos/parc-industriel.jpg"
+          <Photo
+            src="/photos/parc-industriel.jpg" w={2200} h={933}
             alt={lang==="en"
               ? "Food plants and distribution centres along a river in Quebec, seen from the air in autumn"
               : "Usines alimentaires et centres de distribution le long d'une rivière au Québec, vus des airs à l'automne"}
-            loading="lazy"
             style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
           />
           {/* voile marine pour garder la legende lisible */}
@@ -621,7 +638,7 @@ function HomePage({ lang, setPage }) {
                 onMouseLeave={e => e.currentTarget.style.background=C.paper}
               >
                 <div style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
-                  <img src={s.img} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                  <Photo src={s.img} w={1600} h={1073} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                 </div>
                 <div style={{ padding:"2.5rem 2.5rem 3rem" }}>
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.5rem" }}>{s.n}</div>
@@ -847,12 +864,11 @@ function SectorPage({ lang, setPage, sector }) {
       {sector === "food" && (
         <section style={{ background:C.ink, overflow:"hidden" }}>
           <div style={{ width:"100%", height:"clamp(200px,28vw,360px)", position:"relative" }}>
-            <img
-              src="/photos/affinage-fromage.jpg"
+            <Photo
+              src="/photos/affinage-fromage.jpg" w={1600} h={1073}
               alt={lang==="en"
                 ? "A cheesemaker turning wheels in an aging room"
                 : "Un fromager retourne des meules dans une cave d'affinage"}
-              loading="lazy"
               style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
             />
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(13,37,69,0.72) 0%, rgba(13,37,69,0.05) 60%)" }} />
@@ -1190,7 +1206,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"55vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"55vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/talents.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6.5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
@@ -1296,7 +1312,7 @@ function AboutPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
@@ -1429,7 +1445,7 @@ function CandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6.5rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.5rem" }}>{t.h1}</h1>
@@ -1541,7 +1557,7 @@ function EmployersPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"65vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/usine-discussion.jpg)`, backgroundSize:"cover", backgroundPosition:"center" }}>
+      <section style={{ background:C.ink, minHeight:"65vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/usine-discussion.webp)`, backgroundSize:"cover", backgroundPosition:"center" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -1680,7 +1696,7 @@ function JobListingsPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/emplois.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
@@ -1724,7 +1740,7 @@ function GivingPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/dons.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
@@ -1905,7 +1921,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
         <section style={{ background:C.paper, padding:"0 2rem" }}>
           <div style={{ maxWidth:"940px", margin:"0 auto" }}>
             <div style={{ width:"100%", aspectRatio:"16 / 9", overflow:"hidden", background:C.ink }}>
-              <img src={postCover(post.id)} alt="" loading="eager"
+              <Photo src={postCover(post.id)} w={1600} h={873} eager
                 style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
             </div>
           </div>
@@ -1935,7 +1951,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Proforce Blog":"Blogue Proforce"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"1rem" }}>
@@ -2016,7 +2032,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                     onMouseLeave={e => e.currentTarget.style.opacity="1"}
                   >
                     <div style={{ width:"100%", aspectRatio:"16 / 7", overflow:"hidden", background:C.ink, marginBottom:"1.75rem" }}>
-                      <img src={postCover(post.id)} alt="" loading="lazy"
+                      <Photo src={postCover(post.id)} w={1600} h={873}
                         style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                     </div>
                     <div style={{ display:"flex", gap:"1.25rem", alignItems:"center", flexWrap:"wrap", marginBottom:"0.9rem" }}>
@@ -2045,7 +2061,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                     <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted, letterSpacing:"0.06em", marginTop:"4px" }}>{post.cat[lang]}</div>
                   </div>
                   <div className="post-thumb" style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
-                    <img src={postCover(post.id)} alt="" loading="lazy"
+                    <Photo src={postCover(post.id).replace(".jpg", "-480.jpg")} w={480} h={262}
                       style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                   </div>
                   <div>
@@ -2111,7 +2127,7 @@ function ContactPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.jpg)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3.5rem,10vw,9rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
@@ -2643,12 +2659,11 @@ function HowWeWorkPage({ lang, setPage }) {
           gridTemplateColumns:"minmax(0,0.85fr) minmax(0,1.15fr)", alignItems:"stretch",
         }}>
           <div style={{ minHeight:"340px", position:"relative", overflow:"hidden" }}>
-            <img
-              src="/photos/panneau-controle.jpg"
+            <Photo
+              src="/photos/panneau-controle.jpg" w={896} h={1200}
               alt={lang==="en"
                 ? "A production operator at the control panel of a packaging line"
                 : "Un opérateur de production au panneau de contrôle d'une ligne d'emballage"}
-              loading="lazy"
               style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
             />
           </div>
@@ -4243,13 +4258,22 @@ function GlossaryPage({ lang, setPage }) {
 }
 
 // ─── MARKET PAGE ──────────────────────────────────────────────────────────────
+// Montreal n'a pas encore sa propre photo: on emprunte la vue aerienne de
+// l'accueil en attendant, plutot que de laisser le hero en marine plein.
+const MARKET_PHOTOS = {
+  montreal: "/photos/parc-industriel.jpg",
+  quebec:   "/photos/marche-quebec.jpg",
+  toronto:  "/photos/marche-toronto.jpg",
+};
+
 function MarketPage({ lang, setPage, market }) {
   const t = MARKETS[market][lang];
+  const marketPhoto = MARKET_PHOTOS[market] || "/photos/parc-industriel.jpg";
   const recruiters = MARKETS[market].recruiters.map(name => TEAM.find(m => m.name === name)).filter(Boolean);
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(${marketPhoto.replace(".jpg", ".webp")})`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -4415,7 +4439,7 @@ function StartupPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"70vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section style={{ background:C.ink, minHeight:"70vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/startup.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
