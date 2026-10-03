@@ -144,6 +144,14 @@ const G = `
   picture { display:contents; }
 
   @media(max-width:768px){
+    /* Les chiffres debordaient de leur colonne et se chevauchaient:
+       MTL+TOR a 2.5rem demande plus de largeur qu'une demi colonne de 390px. */
+    .stat-band  { padding:3rem 1.25rem !important; }
+    .stat-cell  { padding:1.25rem 1rem !important; }
+    .stat-cell:nth-child(2n) { border-right:none !important; }
+    .stat-num   { font-size:1.7rem !important; }
+    .stat-lab   { font-size:0.58rem !important; letter-spacing:0.1em !important; }
+
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
     .post-row    { grid-template-columns:60px 1fr 90px !important; gap:1rem !important; }
@@ -655,13 +663,13 @@ function HomePage({ lang, setPage }) {
       </section>
 
       {/* ── STATS ── editorial strip ── */}
-      <section style={{ background:C.ink, padding:"4rem 2rem" }}>
+      <section className="stat-band" style={{ background:C.ink, padding:"4rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:"0" }}>
             {[[t.stat1,t.sl1],[t.stat2,t.sl2],[t.stat3,t.sl3],[t.stat4,t.sl4]].map(([n,l],i) => (
-              <div key={l} style={{ padding:"2rem", borderRight: i<3 ? `1px solid rgba(255,255,255,0.08)` : "none" }}>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2.5rem,5vw,4rem)", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1 }}>{n}</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginTop:"0.5rem" }}>{l}</div>
+              <div key={l} className="stat-cell" style={{ padding:"2rem", minWidth:0, borderRight: i<3 ? `1px solid rgba(255,255,255,0.08)` : "none" }}>
+                <div className="stat-num" style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.7rem,2.6vw,2.6rem)", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1, whiteSpace:"nowrap" }}>{n}</div>
+                <div className="stat-lab" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginTop:"0.5rem" }}>{l}</div>
               </div>
             ))}
           </div>
