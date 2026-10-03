@@ -146,11 +146,9 @@ const G = `
   @media(max-width:768px){
     /* Les chiffres debordaient de leur colonne et se chevauchaient:
        MTL+TOR a 2.5rem demande plus de largeur qu'une demi colonne de 390px. */
-    .stat-band  { padding:3rem 1.25rem !important; }
-    .stat-cell  { padding:1.25rem 1rem !important; }
-    .stat-cell:nth-child(2n) { border-right:none !important; }
-    .stat-num   { font-size:1.7rem !important; }
-    .stat-lab   { font-size:0.58rem !important; letter-spacing:0.1em !important; }
+    .stat-band  { padding:3.5rem 1.5rem !important; }
+    .proof-row  { grid-template-columns:1fr !important; gap:2.25rem !important; }
+    .proof-hero { font-size:4rem !important; }
 
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
@@ -501,6 +499,13 @@ function HomePage({ lang, setPage }) {
       h1em:"Not just the job.",
       sub:"Proforce Personnel places food, CPG, and fashion professionals across Montreal, Quebec City, and Toronto. No generalists. No job boards. A network built over 25 years.",
       cta1:"Our Sectors", cta2:"Contact Us",
+      p1n:"83%",
+      p1h:"of our placements come from clients who called us back.",
+      p1p:"76 of 144 companies have given us two mandates or more. Nobody gives a second search to a firm that got the first one wrong.",
+      p2n:"400", p2p:"permanent placements since 2019, in food, CPG and fashion.",
+      p3n:"24", p3p:"clients have trusted us with five mandates or more.",
+      p4n:"90 days to 1 year", p4p:"replacement guarantee on every permanent placement, depending on the role.",
+      psrc:"Figures from our placement records, March 2019 to September 2026",
       s2label:"Two industries. Full stop.",
       s2p:"Food and fashion. We made that call a long time ago. Because doing two things properly beats doing eight things adequately.",
       foodH:"Food & CPG", foodP:"From plant floor to executive office, quality directors, plant managers, supply chain leads, sales reps.",
@@ -517,6 +522,13 @@ function HomePage({ lang, setPage }) {
       h1em:"Pas juste le poste.",
       sub:"Proforce Personnel place des professionnels de l'alimentaire, du CPG et de la mode à Montréal, Québec et Toronto. Pas de généralistes. Pas de babillards. Un réseau bâti sur 25 ans.",
       cta1:"Nos secteurs", cta2:"Nous contacter",
+      p1n:"83 %",
+      p1h:"de nos placements viennent de clients qui nous ont rappelés.",
+      p1p:"76 entreprises sur 144 nous ont confié deux mandats ou plus. Personne ne donne une deuxième recherche à une firme qui a manqué la première.",
+      p2n:"400", p2p:"placements permanents depuis 2019, en alimentaire, CPG et mode.",
+      p3n:"24", p3p:"clients nous ont confié cinq mandats ou plus.",
+      p4n:"90 jours à 1 an", p4p:"de garantie de remplacement sur chaque placement permanent, selon le poste.",
+      psrc:"Chiffres tirés de nos registres de placements, mars 2019 à septembre 2026",
       s2label:"Deux industries. Point final.",
       s2p:"Alimentaire et mode. On a fait ce choix il y a longtemps. Parce que bien faire deux choses vaut mieux que faire huit choses à moitié.",
       foodH:"Alimentaire & CPG", foodP:"Du plancher d'usine jusqu'à la direction, directeurs qualité, directeurs d'usine, responsables chaîne d'approvisionnement.",
@@ -662,17 +674,39 @@ function HomePage({ lang, setPage }) {
         </div>
       </section>
 
-      {/* ── STATS ── editorial strip ── */}
-      <section className="stat-band" style={{ background:C.ink, padding:"4rem 2rem" }}>
+      {/* ── PREUVE ── chiffres verifies sur l'export JobAdder, pas de tuiles ── */}
+      <section className="stat-band" style={{ background:C.ink, padding:"5.5rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:"0" }}>
-            {[[t.stat1,t.sl1],[t.stat2,t.sl2],[t.stat3,t.sl3],[t.stat4,t.sl4]].map(([n,l],i) => (
-              <div key={l} className="stat-cell" style={{ padding:"2rem", minWidth:0, borderRight: i<3 ? `1px solid rgba(255,255,255,0.08)` : "none" }}>
-                <div className="stat-num" style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.7rem,2.6vw,2.6rem)", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1, whiteSpace:"nowrap" }}>{n}</div>
-                <div className="stat-lab" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginTop:"0.5rem" }}>{l}</div>
+
+          {/* Le chiffre en vedette, avec sa phrase */}
+          <div className="two-col" style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:"3rem", alignItems:"baseline", marginBottom:"4rem" }}>
+            <div className="proof-hero" style={{
+              fontFamily:"'Clash Display',sans-serif", fontWeight:700, color:C.orange,
+              fontSize:"clamp(4.5rem,11vw,9rem)", lineHeight:0.85, letterSpacing:"-0.04em", whiteSpace:"nowrap",
+            }}>{t.p1n}</div>
+            <div style={{ maxWidth:"460px" }}>
+              <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
+              <p style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontSize:"clamp(1.1rem,2vw,1.5rem)", lineHeight:1.55, color:"#fff", marginBottom:"0.75rem" }}>{t.p1h}</p>
+              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.5)" }}>{t.p1p}</p>
+            </div>
+          </div>
+
+          <div style={{ height:"1px", background:"rgba(255,255,255,0.12)", marginBottom:"3rem" }} />
+
+          {/* Les trois autres, en ligne ragged plutot qu'en tuiles egales */}
+          <div className="proof-row" style={{ display:"grid", gridTemplateColumns:"1.1fr 1fr 1fr", gap:"3rem" }}>
+            {[[t.p2n,t.p2p],[t.p3n,t.p3p],[t.p4n,t.p4p]].map(([n,p]) => (
+              <div key={p}>
+                <div className="proof-num" style={{
+                  fontFamily:"'Clash Display',sans-serif", fontWeight:700, color:C.orange,
+                  fontSize:"clamp(2rem,3.4vw,3.2rem)", lineHeight:1, letterSpacing:"-0.03em", marginBottom:"0.85rem",
+                }}>{n}</div>
+                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.62)" }}>{p}</p>
               </div>
             ))}
           </div>
+
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.28)", marginTop:"3rem" }}>{t.psrc}</p>
         </div>
       </section>
 
