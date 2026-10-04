@@ -149,6 +149,7 @@ const G = `
     .stat-band  { padding:3.5rem 1.5rem !important; }
     .proof-row  { grid-template-columns:1fr !important; gap:2.25rem !important; }
     .proof-hero { font-size:4rem !important; }
+    .client-grid{ grid-template-columns:repeat(2,1fr) !important; }
 
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
@@ -506,6 +507,8 @@ function HomePage({ lang, setPage }) {
       p3n:"24", p3p:"clients have trusted us with five mandates or more.",
       p4n:"90 days to 1 year", p4p:"replacement guarantee on every permanent placement, depending on the role.",
       psrc:"Figures from our placement records, March 2019 to September 2026",
+      cliH:"144 companies have trusted us with a search since 2019.",
+      cliP:"Here are a few of them. Each one gave us permission to show their name.",
       s2label:"Two industries. Full stop.",
       s2p:"Food and fashion. We made that call a long time ago. Because doing two things properly beats doing eight things adequately.",
       foodH:"Food & CPG", foodP:"From plant floor to executive office, quality directors, plant managers, supply chain leads, sales reps.",
@@ -529,6 +532,8 @@ function HomePage({ lang, setPage }) {
       p3n:"24", p3p:"clients nous ont confié cinq mandats ou plus.",
       p4n:"90 jours à 1 an", p4p:"de garantie de remplacement sur chaque placement permanent, selon le poste.",
       psrc:"Chiffres tirés de nos registres de placements, mars 2019 à septembre 2026",
+      cliH:"144 entreprises nous ont confié un mandat depuis 2019.",
+      cliP:"En voici quelques unes. Chacune nous a donné sa permission pour afficher son nom.",
       s2label:"Deux industries. Point final.",
       s2p:"Alimentaire et mode. On a fait ce choix il y a longtemps. Parce que bien faire deux choses vaut mieux que faire huit choses à moitié.",
       foodH:"Alimentaire & CPG", foodP:"Du plancher d'usine jusqu'à la direction, directeurs qualité, directeurs d'usine, responsables chaîne d'approvisionnement.",
@@ -709,6 +714,37 @@ function HomePage({ lang, setPage }) {
           <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.28)", marginTop:"3rem" }}>{t.psrc}</p>
         </div>
       </section>
+
+      {/* ── LOGOS CLIENTS ── ne s'affiche que si on a des permissions ── */}
+      {CLIENTS.length > 0 && (
+        <section style={{ background:C.paper, padding:"6rem 2rem" }}>
+          <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
+            <Eyebrow>{lang==="en"?"Clients":"Clients"}</Eyebrow>
+            <h2 style={{
+              fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.6rem,3.4vw,2.6rem)",
+              letterSpacing:"-0.03em", color:C.ink, lineHeight:1.15, margin:"1.25rem 0 0.9rem", maxWidth:"620px",
+            }}>{t.cliH}</h2>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.7, maxWidth:"520px", marginBottom:"3.5rem" }}>{t.cliP}</p>
+
+            {/* Les filets sont dessines par chaque case, pas par le fond de la
+                grille: sinon la derniere rangee incomplete laisse du gris. */}
+            <div className="client-grid" style={{
+              display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))", gap:0,
+            }}>
+              {CLIENTS.map(c => (
+                <div key={c.nom} style={{
+                  background:C.white, display:"flex", alignItems:"center", justifyContent:"center",
+                  padding:"2.25rem 1.5rem", minHeight:"130px",
+                  boxShadow:`0 0 0 1px ${C.rule}`,
+                }}>
+                  <img src={c.logo} alt={c.nom} loading="lazy"
+                    style={{ maxWidth:"100%", maxHeight:"46px", width:"auto", height:"auto", display:"block" }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── WHY ── */}
       <section style={{ background:C.paper, padding:"6rem 2rem" }}>
@@ -1058,6 +1094,14 @@ function FAQSection({ lang, type, setPage }) {
 }
 
 // ─── FEATURED CANDIDATES DATA ─────────────────────────────────────────────────
+// ─── LOGOS CLIENTS ────────────────────────────────────────────────────────────
+// Vide par defaut: la section ne s'affiche pas tant qu'il n'y a aucun logo.
+// Pour en ajouter un, deposer le fichier dans public/clients/ et ajouter une
+// ligne ici. N'ajouter un client QUE si on a sa permission ecrite: afficher un
+// logo sous "ils nous ont fait confiance" sous entend une recommandation.
+//   { nom:"Nom de l'entreprise", logo:"/clients/nom-entreprise.svg" },
+const CLIENTS = [];
+
 const FEATURED = [
   {
     id: "fc-01",
