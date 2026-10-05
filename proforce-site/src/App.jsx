@@ -151,6 +151,10 @@ const G = `
     .proof-hero { font-size:4rem !important; }
     .client-grid{ grid-template-columns:repeat(2,1fr) !important; }
 
+    /* Sur telephone un carre de 280px mangeait les trois quarts de l'ecran
+       avant meme qu'on voie le nom de la personne. */
+    .team-photo { max-width:190px !important; }
+
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
     .post-row    { grid-template-columns:60px 1fr 90px !important; gap:1rem !important; }
@@ -294,7 +298,7 @@ function Photo({ src, alt = "", w, h, eager, style, className }) {
       <source srcSet={webp} type="image/webp" />
       <img src={src} alt={alt} width={w} height={h}
         loading={eager ? "eager" : "lazy"} decoding="async"
-        className={className} style={style} />
+        className={className} style={{ height:"auto", ...style }} />
     </picture>
   );
 }
@@ -1460,7 +1464,9 @@ function TeamPage({ lang, setPage, setBlogPost }) {
               >
                 {/* Left: identity */}
                 <div>
-                  <Avatar m={m} full style={{ marginBottom:"1.5rem", maxWidth:"280px" }} />
+                  <div className="team-photo" style={{ marginBottom:"1.5rem", maxWidth:"280px" }}>
+                    <Avatar m={m} full />
+                  </div>
                   <div style={{ marginBottom:"1.5rem" }}>
                     <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.15rem", color:C.ink, fontWeight:600 }}>{m.name}</div>
                     <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginTop:"4px" }}>{m.title[lang]}</div>
