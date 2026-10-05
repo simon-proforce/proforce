@@ -184,12 +184,18 @@ const TEAM = [
   { name:"Stéphanie Lanoie", photo:"/equipe/stephanie-lanoie.jpg", init:"SL", title:{en:"Recruiter",fr:"Recruteuse"}, sector:{en:"Food Industry, Quebec",fr:"Alimentaire, Québec"}, linkedin:"https://www.linkedin.com/in/stephanie-lanoie-84a321a4", articles:["erreurs-offre-emploi","changer-recruteur"],
     bio:{en:"Stéphanie is Proforce's Quebec food industry specialist. She knows the province's manufacturing and CPG sector, the plants, the companies, the people, and she brings that knowledge to every search. Her candidates aren't pulled from a database. They come from a network built through years of real conversations.",
          fr:"Stéphanie est la spécialiste de l'alimentaire au Québec chez Proforce. Elle connaît le secteur manufacturier et CPG de la province, les usines, les compagnies, les gens, et elle apporte cette connaissance à chaque mandat. Ses candidats ne viennent pas d'une base de données."} },
+  { name:"Mathieu Roy",      photo:"/equipe/mathieu-roy.jpg", init:"MR", title:{en:"Senior Recruiter",fr:"Recruteur senior"}, sector:{en:"Food Industry, Quebec",fr:"Alimentaire, Québec"}, linkedin:"https://www.linkedin.com/in/mathieu-roy-453876204/", articles:[],
+    bio:{en:"Mathieu is a senior recruiter at Proforce, focused on Quebec's food industry. He handles searches across the province, from the plant floor to management.",
+         fr:"Mathieu est recruteur senior chez Proforce, spécialisé dans l'industrie alimentaire au Québec. Il prend en charge les mandats de la province, du plancher de production jusqu'à la gestion."} },
   { name:"Rana Yamak",       photo:"/equipe/rana-yamak.jpg", init:"RY", title:{en:"Recruiter",fr:"Recruteuse"}, sector:{en:"Food & CPG, Canada / US",fr:"Alimentaire & CPG, Canada / É.-U."}, linkedin:"https://www.linkedin.com/in/rana-yamak-13a107250", articles:["recrutement-passif","marche-alimentaire-2026","salaires-alimentaire-canada-2026","penurie-main-oeuvre-alimentaire","linkedin-profil-alimentaire"],
     bio:{en:"Rana covers the food and CPG market across Ontario and the United States with the same depth that Stéphanie brings to Quebec. She specializes in quality, food safety, and operations roles: the mandates that require real industry knowledge to fill well.",
          fr:"Rana couvre le marché alimentaire et CPG en Ontario et aux États-Unis avec la même profondeur que Stéphanie apporte au Québec. Elle se spécialise dans les rôles en qualité, salubrité alimentaire et opérations."} },
   { name:"Michaela Landers", photo:"/equipe/michaela-landers.jpg", init:"ML", title:{en:"Recruiting Director",fr:"Directrice, recrutement"}, sector:{en:"Food Industry, Ontario",fr:"Alimentaire, Ontario"}, linkedin:"https://www.linkedin.com/in/michaelalanders", articles:["agisme-recrutement","marche-alimentaire-2026","processus-entrevue-trop-long","onboarding-nouveau-directeur"],
     bio:{en:"Michaela leads Proforce's Ontario food manufacturing practice. She focuses on production, operations, and supply chain: the roles that keep a plant running. Her placements tend to stick because she takes the time to understand what a company actually needs.",
          fr:"Michaela dirige la pratique en fabrication alimentaire en Ontario chez Proforce. Elle se concentre sur la production, les opérations et la chaîne d'approvisionnement. Ses placements tendent à durer parce qu'elle prend le temps de comprendre ce qu'une compagnie a vraiment besoin."} },
+  { name:"Richard Saucier",  photo:"/equipe/richard-saucier.jpg", init:"RS", title:{en:"Senior Advisor, Food Industry",fr:"Conseiller principal, industrie alimentaire"}, sector:{en:"Food Industry, Ontario & Quebec",fr:"Alimentaire, Ontario et Québec"}, linkedin:"https://www.linkedin.com/in/richardsaucier2/", articles:[],
+    bio:{en:"Richard spent 30 years in the food industry before joining Proforce. He knows the business from the inside and has built a network across the industry over three decades.\n\nAt Proforce, he works with food companies in Ontario and Quebec on their hiring needs, and makes sure every mandate starts with a real understanding of the business.",
+         fr:"Richard a passé 30 ans dans l'industrie alimentaire avant de se joindre à Proforce. Il connaît le milieu de l'intérieur et s'est bâti un réseau dans toute l'industrie au fil de trois décennies.\n\nChez Proforce, il accompagne les entreprises alimentaires de l'Ontario et du Québec dans leurs besoins d'embauche, et s'assure que chaque mandat part d'une vraie compréhension de leur réalité."} },
 ];
 
 const FOOD_ROLES = {
@@ -1443,7 +1449,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Our Team":"Notre équipe"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,6.5rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"1.5rem" }}>
-            {lang==="en"?"Five specialists." : "Cinq spécialistes."}
+            {lang==="en"?"Seven specialists." : "Sept spécialistes."}
           </h1>
           <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95 }}>
             {lang==="en"?"No generalists." : "Aucun généraliste."}
@@ -3378,8 +3384,8 @@ const META = {
     fr: { title:"À propos de Proforce Personnel | Recrutement alimentaire, CPG et mode depuis 2001", desc:"Proforce Personnel a été fondée en 2001. Simon St-Amand a rejoint la firme en 2015 et en est président depuis 2018. Recrutement spécialisé en alimentaire, CPG et mode au Québec, en Ontario et dans les provinces atlantiques." },
   },
   team: {
-    en: { title:"Our Team | Proforce Personnel", desc:"Meet the Proforce team: Simon St-Amand, Robin Anisef, Stéphanie Lanoie, Rana Yamak, and Michaela Landers. Five specialist recruiters in food, CPG, and fashion." },
-    fr: { title:"Notre équipe | Proforce Personnel", desc:"Rencontrez l'équipe Proforce : Simon St-Amand, Robin Anisef, Stéphanie Lanoie, Rana Yamak et Michaela Landers. Cinq recruteurs spécialisés en alimentaire, CPG et mode." },
+    en: { title:"Our Team | Proforce Personnel", desc:"Meet the Proforce team: Simon St-Amand, Robin Anisef, Stéphanie Lanoie, Mathieu Roy, Rana Yamak, Michaela Landers, and Richard Saucier. Seven specialists in food, CPG, and fashion recruitment." },
+    fr: { title:"Notre équipe | Proforce Personnel", desc:"Rencontrez l'équipe Proforce : Simon St-Amand, Robin Anisef, Stéphanie Lanoie, Mathieu Roy, Rana Yamak, Michaela Landers et Richard Saucier. Sept spécialistes du recrutement en alimentaire, CPG et mode." },
   },
   candidates: {
     en: { title:"Food, CPG & Fashion Candidates | Proforce Personnel", desc:"Looking for your next opportunity in food manufacturing, CPG, or fashion in Montreal, Toronto, or Atlantic Canada? Proforce works with people, not just résumés." },
@@ -4194,7 +4200,7 @@ const MARKETS = {
       phone: "(514) 905-0606",
       addr: "500 Place d'Armes, Bureau 1800, Montréal, QC H2Y 2W2",
     },
-    recruiters: ["Simon St-Amand","Robin Anisef","Stéphanie Lanoie"],
+    recruiters: ["Simon St-Amand","Robin Anisef","Stéphanie Lanoie","Mathieu Roy"],
   },
   quebec: {
     en: {
@@ -4227,7 +4233,7 @@ const MARKETS = {
       phone: "(418) 431-1441",
       addr: "1020, rue Bouvier, Bureau 400, Québec, QC G2K 0K9",
     },
-    recruiters: ["Stéphanie Lanoie","Simon St-Amand"],
+    recruiters: ["Stéphanie Lanoie","Mathieu Roy","Simon St-Amand"],
   },
   toronto: {
     en: {
