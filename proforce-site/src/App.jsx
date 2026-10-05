@@ -172,8 +172,8 @@ const G = `
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 const TEAM = [
   { name:"Simon St-Amand",   photo:"/equipe/simon-st-amand.jpg", init:"SS", title:{en:"President",fr:"Président"}, sector:{en:"Food / CPG & Fashion",fr:"Alimentaire / CPG & Mode"}, linkedin:"https://www.linkedin.com/in/simonstamand", articles:["recrutement-passif","agisme-recrutement","erreurs-offre-emploi","marche-alimentaire-2026","combien-coute-recruteur","processus-entrevue-trop-long","salaires-alimentaire-canada-2026","penurie-main-oeuvre-alimentaire","onboarding-nouveau-directeur"],
-    bio:{en:"Simon has been President and shareholder of Proforce since 2018. He joined the firm in 2015, founded its food division, and opened Ontario and the Maritimes as territories. He knows the food, CPG, and fashion markets in Quebec and Ontario as well as anyone in recruitment. His approach is direct, relationship-driven, and built on accountability. When you work with Proforce, you work with someone who's been doing this long enough to know what actually matters.",
-         fr:"Simon est président et actionnaire de Proforce depuis 2018. Il a rejoint la firme en 2015, y a fondé la division alimentaire et ouvert l'Ontario et les Maritimes comme territoires. Il connaît les marchés alimentaire, CPG et mode au Québec et en Ontario aussi bien que n'importe qui dans le recrutement. Son approche est directe, axée sur les relations et fondée sur l'imputabilité. Quand tu travailles avec Proforce, tu travailles avec quelqu'un qui fait ça depuis assez longtemps pour savoir ce qui compte vraiment."} },
+    bio:{en:"Simon has been President and shareholder of Proforce since 2018. He joined in 2015, built the food division from nothing, and opened Ontario and the Maritimes.\n\nSince 2019 he has personally placed more than 100 people, mostly plant managers, production supervisors and quality roles. 78 % of those placements came from clients who were coming back: twenty companies gave him a second search, five gave him five or more.\n\nHe will tell you no before taking a mandate he cannot deliver. It costs him searches. It saves you three months.",
+         fr:"Simon est président et actionnaire de Proforce depuis 2018. Il est arrivé en 2015, a fondé la division alimentaire à partir de rien et ouvert l'Ontario et les Maritimes.\n\nDepuis 2019 il a personnellement placé plus de 100 personnes, surtout des directeurs d'usine, des superviseurs de production et du monde en qualité. 78 % de ces placements viennent de clients qui revenaient: vingt entreprises lui ont redonné un mandat, cinq lui en ont confié cinq ou plus.\n\nIl va te dire non avant de prendre un mandat qu'il ne peut pas livrer. Ça lui coûte des mandats. Ça t'évite trois mois perdus."} },
   { name:"Robin Anisef",     photo:"/equipe/robin-anisef.jpg", init:"RA", title:{en:"Partner",fr:"Associée"}, sector:{en:"Fashion & Apparel",fr:"Mode & Habillement"}, linkedin:"https://www.linkedin.com/in/robinanisef", articles:["mode-recrutement-canada"],
     bio:{en:"Robin is the reason Proforce's fashion practice is what it is. She spent years working in the fashion industry before moving into recruiting, which means she understands the business from the inside, not just from a job description. She's been recruiting in Canadian fashion for over 20 years and has built a network that runs deep across Montreal and Toronto.",
          fr:"Robin est la raison pour laquelle la pratique mode de Proforce est ce qu'elle est. Elle a travaillé dans l'industrie de la mode avant de passer au recrutement, ce qui veut dire qu'elle comprend le business de l'intérieur. Elle recrute dans la mode canadienne depuis plus de 20 ans et a bâti un réseau qui va loin dans Montréal et Toronto."} },
@@ -1478,7 +1478,12 @@ function TeamPage({ lang, setPage, setBlogPost }) {
 
                 {/* Right: bio + articles */}
                 <div>
-                  <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8, marginBottom: m.articles.length ? "2rem" : "0" }}>{m.bio[lang]}</p>
+                  {/* Les fiches peuvent contenir plusieurs paragraphes, separes
+                      par une ligne vide dans le texte. */}
+                  {m.bio[lang].split("\n\n").map((para,bi,arr) => (
+                    <p key={bi} style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8,
+                      marginBottom: bi < arr.length-1 ? "1.25rem" : (m.articles.length ? "2rem" : "0") }}>{para}</p>
+                  ))}
                   {m.articles.length > 0 && (
                     <div>
                       <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.75rem" }}>
