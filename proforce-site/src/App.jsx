@@ -4421,7 +4421,7 @@ function GlossaryPage({ lang, setPage }) {
 // Montreal n'a pas encore sa propre photo: on emprunte la vue aerienne de
 // l'accueil en attendant, plutot que de laisser le hero en marine plein.
 const MARKET_PHOTOS = {
-  montreal: "/photos/parc-industriel.jpg",
+  montreal: "/photos/marche-montreal.jpg",
   quebec:   "/photos/marche-quebec.jpg",
   toronto:  "/photos/marche-toronto.jpg",
 };
