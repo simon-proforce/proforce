@@ -2392,65 +2392,69 @@ function ContactPage({ lang }) {
 function CalculatorPage({ lang, setPage }) {
   const [salary, setSalary] = useState(110000);
   const [weeks, setWeeks] = useState(12);
+  const [prodLoss, setProdLoss] = useState(70);
   const [turnover, setTurnover] = useState(40);
+  const [badHirePct, setBadHirePct] = useState(30);
   const [feePct, setFeePct] = useState(20);
   const [fillTime, setFillTime] = useState(6);
 
   const fmt = (n) => n.toLocaleString(lang === "fr" ? "fr-CA" : "en-CA", { style:"currency", currency:"CAD", maximumFractionDigits:0 });
 
+  // Aucune hypothese n'est cachee dans le calcul: les cinq qui faisaient varier
+  // le resultat sont maintenant des curseurs que le visiteur controle lui meme.
   const weeklyRate = salary / 52;
-  const vacancyCostDIY = weeks * weeklyRate * 0.7;
-  const badHireCost = salary * 0.30;
+  const vacancyCost = weeks * weeklyRate * (prodLoss / 100);
+  const badHireCost = salary * (badHirePct / 100);
   const expectedBadHire = badHireCost * (turnover / 100);
-  const totalDIY = vacancyCostDIY + expectedBadHire;
+  const totalCost = vacancyCost + expectedBadHire;
   const fee = salary * (feePct / 100);
   const weeksSaved = Math.max(0, weeks - fillTime);
-  const vacancySaved = weeksSaved * weeklyRate * 0.7;
-  const badHireSaved = badHireCost * Math.max(0, (turnover / 100) - 0.10);
-  const grossSavings = vacancySaved + badHireSaved;
-  const roi = grossSavings - fee;
+  const vacancySaved = weeksSaved * weeklyRate * (prodLoss / 100);
+  const ecart = vacancySaved - fee;
 
   const t = {
     en:{
-      eyebrow:"Recruitment ROI Calculator",
-      h1:"What does hiring actually cost?",
-      h1i:"Let's do the math.",
-      sub:"Most companies underestimate the real cost of a vacant role. Adjust the sliders to see your numbers.",
-      salary:"Annual salary of the role", weeks:"Weeks to fill without a recruiter",
-      turnover:"Probability of a bad hire without a recruiter", feePct:"Proforce fee percentage",
-      fillTime:"Weeks to fill with Proforce",
-      resultsH:"Your numbers.",
-      r1:"Cost of vacancy (DIY)", r1s:"Lost productivity during search",
-      r2:"Expected bad hire cost", r2s:"Training + exit + re-recruit (weighted by probability)",
-      r3:"Total DIY hiring risk", r3s:"What you're actually exposed to",
-      r4:"Proforce fee", r4s:"One-time, success-based",
-      r5:"Vacancy savings", r5s:"Filling faster = faster productivity",
-      r6:"Bad hire risk eliminated", r6s:"Pre-screened candidates + placement guarantee",
-      roiLabel:"Net savings with Proforce",
-      positive: (r, f, s) => `A Proforce fee of ${f} on a ${s} role generates an estimated net savings of ${r}. The fee pays for itself before the candidate's 90-day mark.`,
-      negative: (f) => `At these parameters, the ${f} fee is near breakeven. In most real food manufacturing scenarios, with higher vacancy costs and bad hire risk, the gap is wider.`,
-      disclaimer:"These calculations use industry-average assumptions. Actual results vary based on your specific situation.",
+      eyebrow:"Cost of a vacant role",
+      h1:"What is that empty seat",
+      h1i:"actually costing you?",
+      sub:"Every assumption below is a slider you control. Nothing goes into the math that you did not set yourself. Move one and watch the answer change, that is the point.",
+      salary:"Annual salary of the role", weeks:"Weeks to fill on your own",
+      prodLoss:"Productivity lost while the seat is empty",
+      turnover:"Odds of a bad hire", badHirePct:"Cost of a bad hire, as a share of salary",
+      feePct:"Fee percentage",
+      fillTime:"Weeks to fill with a recruiter",
+      resultsH:"What it costs you.",
+      cmpH:"Now compare.",
+      r1:"Cost of the vacancy", r1s:"Lost productivity during the search, at the rate you set",
+      r2:"Expected cost of a bad hire", r2s:"Cost of a miss, weighted by the odds you set",
+      r3:"Total", r3s:"Before anyone talks about fees",
+      r4:"Fee", r4s:"One time, payable on success",
+      r5:"Vacancy saved", r5s:"The weeks gained, at the productivity rate you set",
+      r6:"Difference", r6s:"Vacancy saved minus the fee",
+      note:"This math puts no value on the guarantee. It runs from 90 days to a year and it is in the contract, not in an estimate. Same for the candidates who never answer a job posting. We cannot put a number on them, and they are usually the ones you are looking for.",
+      disclaimer:"This is not a study. It is your scenario with your assumptions. We did not hide a number anywhere to make the answer come out our way.",
       cta:"Ready to talk?", cta2:"Contact Us",
     },
     fr:{
-      eyebrow:"Calculateur de ROI en recrutement",
-      h1:"C'est quoi le vrai coût d'embaucher?",
-      h1i:"On fait les chiffres.",
-      sub:"La plupart des compagnies sous-estiment le vrai coût d'un poste vacant. Ajuste les curseurs pour voir tes chiffres.",
-      salary:"Salaire annuel du poste", weeks:"Semaines pour combler sans recruteur",
-      turnover:"Probabilité d'un mauvais candidat sans recruteur", feePct:"Pourcentage d'honoraires Proforce",
-      fillTime:"Semaines pour combler avec Proforce",
-      resultsH:"Tes chiffres.",
-      r1:"Coût du poste vacant (DIY)", r1s:"Perte de productivité pendant la recherche",
-      r2:"Coût attendu d'un mauvais candidat", r2s:"Formation + départ + reprise (pondéré par probabilité)",
-      r3:"Risque total si tu gères seul", r3s:"Ce à quoi tu es vraiment exposé",
-      r4:"Honoraires Proforce", r4s:"Unique, basé sur le succès",
-      r5:"Économie sur la vacance", r5s:"Combler plus vite = productivité plus rapide",
-      r6:"Risque de mauvais candidat éliminé", r6s:"Candidats présélectionnés + garantie de placement",
-      roiLabel:"Économies nettes avec Proforce",
-      positive: (r, f, s) => `Les honoraires Proforce de ${f} sur un poste à ${s} génèrent une économie nette estimée à ${r}. Les honoraires se remboursent avant les 90 premiers jours du candidat.`,
-      negative: (f) => `Avec ces paramètres, les honoraires de ${f} sont proches du seuil de rentabilité. Dans la plupart des scénarios réels de fabrication alimentaire, l'écart est plus large.`,
-      disclaimer:"Ces calculs utilisent des hypothèses moyennes de l'industrie. Les résultats réels varient selon ta situation spécifique.",
+      eyebrow:"Coût d'un poste vacant",
+      h1:"Ça te coûte quoi au juste,",
+      h1i:"une chaise vide?",
+      sub:"Chaque hypothèse en dessous est un curseur que tu contrôles. Rien n'entre dans le calcul que tu n'as pas réglé toi-même. Bouge un curseur et la réponse change, c'est le but.",
+      salary:"Salaire annuel du poste", weeks:"Semaines pour combler par toi-même",
+      prodLoss:"Productivité perdue pendant que la chaise est vide",
+      turnover:"Probabilité d'un mauvais candidat", badHirePct:"Coût d'un mauvais candidat, en % du salaire",
+      feePct:"Pourcentage d'honoraires",
+      fillTime:"Semaines pour combler avec un recruteur",
+      resultsH:"Ce que ça te coûte.",
+      cmpH:"Maintenant, compare.",
+      r1:"Coût du poste vacant", r1s:"Productivité perdue pendant la recherche, au taux que tu as fixé",
+      r2:"Coût attendu d'un mauvais candidat", r2s:"Le coût d'un échec, pondéré par la probabilité que tu as fixée",
+      r3:"Total", r3s:"Avant même qu'on parle d'honoraires",
+      r4:"Honoraires", r4s:"Une seule fois, payable au succès",
+      r5:"Vacance économisée", r5s:"Les semaines gagnées, à la productivité que tu as fixée",
+      r6:"Écart", r6s:"La vacance économisée moins les honoraires",
+      note:"Ce calcul ne met aucune valeur sur la garantie. Elle va de 90 jours à un an et elle est dans le contrat, pas dans une estimation. Même chose pour les candidats qui ne répondent jamais à une annonce: on ne peut pas les chiffrer, et c'est souvent eux que tu cherches.",
+      disclaimer:"C'est pas une étude. C'est ton scénario, avec tes hypothèses. On n'a caché aucun chiffre pour que la réponse sorte de notre bord.",
       cta:"Prêt à jaser?", cta2:"Nous contacter",
     },
   }[lang];
@@ -2458,18 +2462,24 @@ function CalculatorPage({ lang, setPage }) {
   const sliders = [
     { label:t.salary, value:salary, set:setSalary, min:60000, max:250000, step:5000, fmt:(v)=>`${fmt(v)}` },
     { label:t.weeks, value:weeks, set:setWeeks, min:4, max:26, step:1, fmt:(v)=>`${v} ${lang==="en"?"weeks":"semaines"}` },
-    { label:t.turnover, value:turnover, set:setTurnover, min:10, max:70, step:5, fmt:(v)=>`${v}%` },
+    { label:t.prodLoss, value:prodLoss, set:setProdLoss, min:0, max:100, step:5, fmt:(v)=>`${v}%` },
+    { label:t.turnover, value:turnover, set:setTurnover, min:0, max:70, step:5, fmt:(v)=>`${v}%` },
+    { label:t.badHirePct, value:badHirePct, set:setBadHirePct, min:0, max:100, step:5, fmt:(v)=>`${v}%` },
     { label:t.feePct, value:feePct, set:setFeePct, min:15, max:25, step:1, fmt:(v)=>`${v}%` },
     { label:t.fillTime, value:fillTime, set:setFillTime, min:2, max:16, step:1, fmt:(v)=>`${v} ${lang==="en"?"weeks":"semaines"}` },
   ];
 
+  // Deux blocs separes: ce que le poste vacant coute, puis seulement apres la
+  // comparaison avec un mandat. Le premier bloc ne mentionne pas Proforce.
   const rows = [
-    { label:t.r1, sub:t.r1s, value:vacancyCostDIY, type:"cost" },
+    { label:t.r1, sub:t.r1s, value:vacancyCost, type:"cost" },
     { label:t.r2, sub:t.r2s, value:expectedBadHire, type:"cost" },
-    { label:t.r3, sub:t.r3s, value:totalDIY, type:"total" },
+    { label:t.r3, sub:t.r3s, value:totalCost, type:"total" },
+  ];
+  const cmpRows = [
     { label:t.r4, sub:t.r4s, value:fee, type:"fee" },
     { label:t.r5, sub:t.r5s, value:vacancySaved, type:"saving" },
-    { label:t.r6, sub:t.r6s, value:badHireSaved, type:"saving" },
+    { label:t.r6, sub:t.r6s, value:ecart, type: ecart >= 0 ? "saving" : "cost" },
   ];
 
   const sliderStyle = { width:"100%", accentColor:C.orange, cursor:"pointer" };
@@ -2536,17 +2546,40 @@ function CalculatorPage({ lang, setPage }) {
               </div>
             ))}
 
-            {/* ROI highlight */}
-            <div style={{ marginTop:"1.5rem", padding:"1.75rem", background: roi >= 0 ? C.ink : "#fdf0ed", borderLeft:`4px solid ${roi >= 0 ? C.orange : "#c0392b"}` }}>
-              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color: roi >= 0 ? C.orange : "#c0392b", marginBottom:"0.5rem" }}>{t.roiLabel}</div>
-              <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2.5rem", fontWeight:700, letterSpacing:"-0.03em", color: roi >= 0 ? "#fff" : "#c0392b", lineHeight:1, marginBottom:"0.75rem" }}>
-                {roi >= 0 ? "+" : ""}{fmt(Math.abs(roi))}
+            {/* Le total du poste vacant: le seul chiffre mis en vedette, et il ne
+                parle pas de nous. */}
+            <div style={{ marginTop:"1.5rem", padding:"1.75rem", background:C.ink, borderLeft:`4px solid ${C.orange}` }}>
+              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.5rem" }}>{t.r3}</div>
+              <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2.5rem", fontWeight:700, letterSpacing:"-0.03em", color:"#fff", lineHeight:1 }}>
+                {fmt(totalCost)}
               </div>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.88rem", color: roi >= 0 ? "rgba(255,255,255,0.7)" : C.muted, lineHeight:1.7, fontWeight:300, fontStyle:"italic" }}
-                dangerouslySetInnerHTML={{ __html: roi >= 0 ? t.positive(fmt(roi), fmt(fee), fmt(salary)) : t.negative(fmt(fee)) }}
-              />
             </div>
 
+            {/* La comparaison vient apres, et elle est presentee comme un ecart,
+                pas comme une economie garantie. */}
+            <div style={{ marginTop:"3rem" }}>
+              <Eyebrow>{t.cmpH}</Eyebrow>
+              <Divider style={{ marginBottom:"0" }} />
+              {cmpRows.map((row, i) => (
+                <div key={i} style={{
+                  display:"flex", justifyContent:"space-between", alignItems:"center",
+                  padding:"0.9rem 0", borderBottom:`1px solid ${C.rule}`,
+                }}>
+                  <div>
+                    <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.ink }}>{row.label}</div>
+                    <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
+                  </div>
+                  <div style={{
+                    fontFamily:"'DM Mono',monospace", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
+                    color: row.type==="cost" ? "#c0392b" : row.type==="fee" ? C.muted : "#27ae60",
+                  }}>
+                    {row.type==="saving" && row.value > 0 ? "+" : ""}{fmt(row.value)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"1.5rem" }}>{t.note}</p>
             <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.75rem", color:C.muted, lineHeight:1.6, marginTop:"1rem" }}>{t.disclaimer}</p>
           </div>
         </div>
@@ -3330,8 +3363,8 @@ function FooterNewsletter({ lang }) {
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 function Footer({ lang, setPage }) {
   const links = lang==="en"
-    ? [["food","Food"],["fashion","Fashion"],["employers","Employers"],["howwework","How We Work"],["calculator","ROI Calculator"],["startup","Startups"],["about","About"],["team","Team"],["simon","Simon St-Amand"],["press","Press"],["candidates","Candidates"],["featured","Talent"],["referral","Refer a Client"],["giving","Giving Back"],["jobs","Jobs"],["blog","Blog"],["glossary","Glossary"],["montreal","Montreal"],["quebec","Quebec City"],["toronto","Toronto"],["contact","Contact"]]
-    : [["food","Alimentaire"],["fashion","Mode"],["employers","Employeurs"],["howwework","Comment on travaille"],["calculator","Calculateur ROI"],["startup","Startups"],["about","À propos"],["team","Équipe"],["simon","Simon St-Amand"],["press","Presse"],["candidates","Candidats"],["featured","Talents"],["referral","Référer un client"],["giving","Donner en retour"],["jobs","Emplois"],["blog","Blogue"],["glossary","Glossaire"],["montreal","Montréal"],["quebec","Québec"],["toronto","Toronto"],["contact","Contact"]];
+    ? [["food","Food"],["fashion","Fashion"],["employers","Employers"],["howwework","How We Work"],["calculator","Cost of a Vacancy"],["startup","Startups"],["about","About"],["team","Team"],["simon","Simon St-Amand"],["press","Press"],["candidates","Candidates"],["featured","Talent"],["referral","Refer a Client"],["giving","Giving Back"],["jobs","Jobs"],["blog","Blog"],["glossary","Glossary"],["montreal","Montreal"],["quebec","Quebec City"],["toronto","Toronto"],["contact","Contact"]]
+    : [["food","Alimentaire"],["fashion","Mode"],["employers","Employeurs"],["howwework","Comment on travaille"],["calculator","Coût d'un poste vacant"],["startup","Startups"],["about","À propos"],["team","Équipe"],["simon","Simon St-Amand"],["press","Presse"],["candidates","Candidats"],["featured","Talents"],["referral","Référer un client"],["giving","Donner en retour"],["jobs","Emplois"],["blog","Blogue"],["glossary","Glossaire"],["montreal","Montréal"],["quebec","Québec"],["toronto","Toronto"],["contact","Contact"]];
 
   return (
     <footer style={{ background:C.ink, padding:"4rem 2rem 2rem" }}>
@@ -3477,8 +3510,8 @@ const META = {
     fr: { title:"Recrutement alimentaire & CPG à Toronto et en Ontario | Proforce Personnel", desc:"Proforce Personnel place des professionnels de la fabrication alimentaire et du CPG à Toronto, dans le Grand Toronto et en Ontario. Recruteurs dédiés à l'Ontario avec une connaissance approfondie de l'industrie." },
   },
   calculator: {
-    en: { title:"Recruitment ROI Calculator | Proforce Personnel", desc:"Calculate the real cost of a vacant role and the ROI of using a specialist recruiter. Vacancy cost, bad hire risk, Proforce fee, see your numbers." },
-    fr: { title:"Calculateur de ROI en recrutement | Proforce Personnel", desc:"Calculez le vrai coût d'un poste vacant et le ROI d'utiliser un recruteur spécialisé. Coût de vacance, risque de mauvais candidat, honoraires Proforce, voyez vos chiffres." },
+    en: { title:"What a vacant role costs you | Proforce Personnel", desc:"Work out what an empty seat costs your plant. Every assumption is a slider you set yourself, then compare it with the cost of a search." },
+    fr: { title:"Ce que te coûte un poste vacant | Proforce Personnel", desc:"Calculez ce qu'une chaise vide coûte à votre usine. Chaque hypothèse est un curseur que vous réglez vous-même, puis comparez avec le coût d'un mandat." },
   },
   howwework: {
     en: { title:"How We Work | Proforce Personnel Recruitment Process", desc:"A complete breakdown of Proforce Personnel's 9-step recruitment process for employers. Discovery, search, screening, shortlist, offer, negotiation, references, and placement guarantee." },
