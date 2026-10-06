@@ -426,8 +426,8 @@ function Nav({ page, setPage, lang, setLang }) {
   }, []);
 
   const links = lang === "en"
-    ? [["food","Food"],["fashion","Fashion"],["employers","Employers"],["about","About"],["team","Team"],["candidates","Candidates"],["featured","Talent"],["jobs","Jobs"],["blog","Blog"],["contact","Contact"]]
-    : [["food","Alimentaire"],["fashion","Mode"],["employers","Employeurs"],["about","À propos"],["team","Équipe"],["candidates","Candidats"],["featured","Talents"],["jobs","Emplois"],["blog","Blogue"],["contact","Contact"]];
+    ? [["food","Food"],["fashion","Fashion"],["employers","Employers"],["team","Team"],["blog","Blog"],["candidates","Candidates"],["jobs","Jobs"],["contact","Contact"]]
+    : [["food","Alimentaire"],["fashion","Mode"],["employers","Employeurs"],["team","Équipe"],["blog","Blogue"],["candidates","Candidats"],["jobs","Emplois"],["contact","Contact"]];
 
   return (
     <>
@@ -575,6 +575,8 @@ function HomePage({ lang, setPage }) {
       w1h:"Network over noise", w1p:"We don't post and wait. We call people we already know, people who aren't looking but who'd be perfect.",
       w2h:"Specialists, not generalists", w2p:"Your recruiter lives inside your industry. They've been there long enough to know who's who.",
       w3h:"Placement guarantee", w3p:"Every permanent placement is guaranteed. We stand behind who we send you.",
+      noH:"We will tell you no before taking a search we cannot deliver.\nIt costs us searches.\nIt saves you three months.",
+      noSrc:"Simon St-Amand, President", noLink:"Read his page",
       ctaH:"Ready to talk?", ctaP:"One call is usually enough to know if we're the right fit.", cta3:"Get in Touch",
     },
     fr:{
@@ -600,6 +602,8 @@ function HomePage({ lang, setPage }) {
       w1h:"Réseau plutôt que bruit", w1p:"On n'affiche pas et on n'attend pas. On appelle des gens qu'on connaît déjà, des gens qui ne cherchent pas, mais qui seraient parfaits.",
       w2h:"Spécialistes, pas généralistes", w2p:"Ton recruteur vit à l'intérieur de ton industrie. Il y est depuis assez longtemps pour savoir qui est qui.",
       w3h:"Garantie de placement", w3p:"Chaque placement permanent est garanti. On se tient derrière les gens qu'on t'envoie.",
+      noH:"On va te dire non avant de prendre un mandat qu'on ne peut pas livrer.\nÇa nous coûte des mandats.\nÇa t'évite trois mois perdus.",
+      noSrc:"Simon St-Amand, président", noLink:"Lire sa page",
       ctaH:"Prêt à jaser?", ctaP:"Un appel suffit généralement pour savoir si on est le bon fit.", cta3:"Nous contacter",
     },
   }[lang];
@@ -909,6 +913,25 @@ function HomePage({ lang, setPage }) {
               <Divider />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── LA PHRASE ── */}
+      <section style={{ background:C.ink, padding:"7rem 2rem" }}>
+        <div style={{ maxWidth:"900px", margin:"0 auto" }}>
+          <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2.5rem" }} />
+          <p style={{
+            fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic",
+            fontSize:"clamp(1.5rem,3.4vw,2.6rem)", lineHeight:1.3, color:"#fff",
+            whiteSpace:"pre-line", marginBottom:"2.5rem",
+          }}>{t.noH}</p>
+          <div style={{ display:"flex", alignItems:"center", gap:"1.25rem", flexWrap:"wrap" }}>
+            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"rgba(255,255,255,0.45)" }}>{t.noSrc}</span>
+            <button onClick={() => setPage("simon")} style={{
+              fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase",
+              color:C.orange, borderBottom:`1px solid ${C.orange}`, paddingBottom:"2px",
+            }}>{t.noLink} →</button>
+          </div>
         </div>
       </section>
 
@@ -1575,6 +1598,18 @@ function TeamPage({ lang, setPage, setBlogPost }) {
           ))}
         </div>
       </section>
+
+      {/* L'histoire de la firme, retiree du menu principal */}
+      <section style={{ background:C.paperDark, padding:"4.5rem 2rem" }}>
+        <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
+          <div style={{ maxWidth:"540px" }}>
+            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "Proforce has been doing this since 2001." : "Proforce fait ça depuis 2001."}</h3>
+            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Seven people is what the firm looks like today. If you want the rest of the story, how it started and what changed along the way, it is on the about page." : "Sept personnes, c'est ce que la firme est aujourd'hui. Si tu veux le reste de l'histoire, comment ça a commencé et ce qui a changé en chemin, c'est sur la page À propos."}</p>
+          </div>
+          <button className="btn-ink" onClick={() => setPage("about")} style={{ flexShrink:0 }}>{lang==="en" ? "About Proforce" : "À propos de Proforce"}</button>
+        </div>
+      </section>
+
     </div>
   );
 }
@@ -1830,6 +1865,18 @@ function EmployersPage({ lang, setPage }) {
           >{t.cta}</button>
         </div>
       </section>
+
+      {/* Candidats vedettes, retires du menu et ramenes la ou ils servent */}
+      <section style={{ background:C.paperDark, padding:"4.5rem 2rem" }}>
+        <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
+          <div style={{ maxWidth:"540px" }}>
+            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "People we are talking to right now." : "Du monde à qui on parle en ce moment."}</h3>
+            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Anonymous profiles of real candidates we know personally. If one of them looks like the person you need, tell us and we will make the introduction." : "Des profils anonymisés de vrais candidats qu'on connaît personnellement. Si un d'eux ressemble à la personne qu'il te faut, dis-le nous et on fait l'introduction."}</p>
+          </div>
+          <button className="btn-ink" onClick={() => setPage("featured")} style={{ flexShrink:0 }}>{lang==="en" ? "See the profiles" : "Voir les profils"}</button>
+        </div>
+      </section>
+
     </div>
   );
 }
