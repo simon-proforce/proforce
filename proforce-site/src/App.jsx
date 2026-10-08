@@ -62,10 +62,11 @@ const C = {
 };
 
 // ─── FONTS ────────────────────────────────────────────────────────────────────
-// Clash Display (condensed grotesque bold) + Spectral (serif éditorial) + DM Mono (chiffres)
+// Deux familles, pas quatre. Archivo porte tout le sans, des titres jusqu'aux
+// etiquettes; Spectral reste pour les moments editoriaux. Quatre familles,
+// c'est une habitude de generateur; deux, c'est une marque.
 const fonts = `
-  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
-  @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
 `;
 
 // ─── GLOBAL ───────────────────────────────────────────────────────────────────
@@ -73,18 +74,21 @@ const G = `
   ${fonts}
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
   html { scroll-behavior:smooth; }
-  body { font-family:'DM Sans',sans-serif; background:${C.paper}; color:${C.ink}; }
+  body { font-family:'Archivo',sans-serif; background:${C.paper}; color:${C.ink}; }
 
-  h1,h2,h3 { font-family:'Clash Display',sans-serif; font-weight:600; letter-spacing:-0.02em; }
+  h1,h2,h3 { font-family:'Archivo',sans-serif; font-weight:600; letter-spacing:-0.012em; }
 
   /* Règle typographique */
   .rule { display:block; width:100%; height:1px; background:${C.rule}; }
   .rule-orange { display:block; height:2px; background:${C.orange}; }
 
   /* Label de section */
+  /* L'etiquette etait en monospace majuscules espacee a 0.18em, 41 fois sur le
+     site. C'est le tic le plus copie des pages generees. Elle redevient une
+     ligne de texte ordinaire. */
   .eyebrow {
-    font-family:'DM Mono',monospace; font-size:0.68rem;
-    letter-spacing:0.18em; text-transform:uppercase; color:${C.muted};
+    font-family:'Archivo',sans-serif; font-size:0.82rem; font-weight:500;
+    letter-spacing:0; text-transform:none; color:${C.muted};
     display:flex; align-items:center; gap:10px;
   }
   .eyebrow::before { content:''; display:inline-block; width:20px; height:1px; background:${C.orange}; }
@@ -92,7 +96,7 @@ const G = `
   /* Boutons */
   .btn-ink {
     display:inline-block; background:${C.ink}; color:#fff;
-    padding:12px 28px; font-family:'DM Sans',sans-serif; font-weight:600;
+    padding:12px 28px; font-family:'Archivo',sans-serif; font-weight:600;
     font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
     transition:background 0.2s, transform 0.15s;
   }
@@ -100,7 +104,7 @@ const G = `
 
   .btn-orange {
     display:inline-block; background:${C.orange}; color:#fff;
-    padding:12px 28px; font-family:'DM Sans',sans-serif; font-weight:600;
+    padding:12px 28px; font-family:'Archivo',sans-serif; font-weight:600;
     font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
     transition:background 0.2s, transform 0.15s;
   }
@@ -108,7 +112,7 @@ const G = `
 
   .btn-ghost {
     display:inline-block; border:1.5px solid ${C.ink}; color:${C.ink};
-    padding:11px 28px; font-family:'DM Sans',sans-serif; font-weight:600;
+    padding:11px 28px; font-family:'Archivo',sans-serif; font-weight:600;
     font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
     transition:background 0.2s, color 0.2s;
   }
@@ -370,7 +374,7 @@ function Avatar({ m, size, full, style }) {
   return (
     <div style={{
       ...box, background:C.orange, display:"flex", alignItems:"center", justifyContent:"center",
-      fontFamily:"'Clash Display',sans-serif", fontSize: full ? "2rem" : (size >= 56 ? "1rem" : "0.8rem"),
+      fontFamily:"'Archivo',sans-serif", fontSize: full ? "2rem" : (size >= 56 ? "1rem" : "0.8rem"),
       color:"#fff", fontWeight:700, flexShrink:0, ...style,
     }}>{m.init}</div>
   );
@@ -442,7 +446,7 @@ function Nav({ page, setPage, lang, setLang }) {
       }}>
         {/* Wordmark */}
         <PageLink to="home" setPage={setPage} style={{
-          fontFamily:"'Clash Display',sans-serif", fontWeight:600,
+          fontFamily:"'Archivo',sans-serif", fontWeight:600,
           fontSize:"1.15rem", color:"#fff", letterSpacing:"-0.01em",
           display:"flex", alignItems:"center", gap:"4px",
         }}>
@@ -454,7 +458,7 @@ function Nav({ page, setPage, lang, setLang }) {
         <div className="hide-mobile nav-links" style={{ display:"flex", alignItems:"center", gap:"1.75rem" }}>
           {links.map(([k,l]) => (
             <PageLink key={k} to={k} setPage={setPage} style={{
-              fontFamily:"'DM Mono',monospace", fontSize:"0.68rem",
+              fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
               color: page===k ? C.orange : "rgba(255,255,255,0.65)",
               borderBottom: page===k ? `1px solid ${C.orange}` : "1px solid transparent",
@@ -462,7 +466,7 @@ function Nav({ page, setPage, lang, setLang }) {
             }}>{l}</PageLink>
           ))}
           <button onClick={() => setLang(lang==="en"?"fr":"en")} style={{
-            fontFamily:"'DM Mono',monospace", fontSize:"0.68rem",
+            fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem",
             letterSpacing:"0.08em", textTransform:"uppercase",
             color:C.orange, borderBottom:`1px solid ${C.orange}`,
             paddingBottom:"1px",
@@ -473,7 +477,7 @@ function Nav({ page, setPage, lang, setLang }) {
             onClick={() => track.contactClick()}
             style={{
               background:C.orange, color:"#fff", padding:"7px 16px",
-              fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:"0.72rem",
+              fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.72rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
               transition:"background 0.2s", whiteSpace:"nowrap",
             }}
@@ -487,7 +491,7 @@ function Nav({ page, setPage, lang, setLang }) {
         {/* Mobile burger */}
         <button className="show-mobile" onClick={() => setOpen(!open)} style={{
           display:"none", color:"#fff", fontSize:"1.2rem",
-          fontFamily:"'DM Mono',monospace",
+          fontFamily:"'Archivo',sans-serif",
         }}>{open?"✕":"☰"}</button>
       </nav>
 
@@ -503,7 +507,7 @@ function Nav({ page, setPage, lang, setLang }) {
           {links.map(([k,l]) => (
             <PageLink key={k} to={k} setPage={(p) => { setPage(p); setOpen(false); }} style={{
               display:"block",
-              fontFamily:"'Clash Display',sans-serif", fontSize:"1.5rem",
+              fontFamily:"'Archivo',sans-serif", fontSize:"1.5rem",
               color: page===k ? C.orange : "#fff", textAlign:"left",
               padding:"0.9rem 0", borderBottom:`1px solid rgba(255,255,255,0.08)`,
               fontWeight:600, letterSpacing:"-0.01em",
@@ -511,7 +515,7 @@ function Nav({ page, setPage, lang, setLang }) {
           ))}
           <button onClick={() => setLang(lang==="en"?"fr":"en")} style={{
             color:C.orange, fontSize:"1rem", textAlign:"left",
-            padding:"1rem 0", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em",
+            padding:"1rem 0", fontFamily:"'Archivo',sans-serif", letterSpacing:"0.08em",
           }}>{lang==="en"?"Français":"English"}</button>
 
           {/* Mobile booking CTA */}
@@ -519,7 +523,7 @@ function Nav({ page, setPage, lang, setLang }) {
             onClick={() => { track.contactClick(); setOpen(false); }}
             style={{
               background:C.orange, color:"#fff", padding:"14px 24px",
-              fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.85rem",
+              fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.85rem",
               letterSpacing:"0.08em", textTransform:"uppercase", textAlign:"center",
               marginTop:"1.5rem", display:"block",
             }}
@@ -541,7 +545,7 @@ function Ticker({ lang }) {
   return (
     <div style={{ background:C.ink, overflow:"hidden", whiteSpace:"nowrap", padding:"10px 0" }}>
       <div style={{ display:"inline-block", animation:"ticker 32s linear infinite" }}>
-        <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange }}>
+        <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange }}>
           {text}&nbsp;&nbsp;&nbsp;{text}
         </span>
       </div>
@@ -611,21 +615,21 @@ function HomePage({ lang, setPage }) {
   return (
     <div>
       {/* ── HERO ── */}
-      <section className="hero-section" style={{ background:C.ink, minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-section" style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
         {/* Large issue number watermark */}
         <div className="hero-mark" style={{
           position:"absolute", top:"56px", right:"2rem",
-          fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(6rem,20vw,18rem)",
+          fontFamily:"'Archivo',sans-serif", fontSize:"clamp(6rem,20vw,18rem)",
           fontWeight:700, color:"rgba(255,255,255,0.04)", lineHeight:1,
-          userSelect:"none", pointerEvents:"none", letterSpacing:"-0.04em",
+          userSelect:"none", pointerEvents:"none", letterSpacing:"-0.02em",
         }}>2001</div>
 
         {/* Top rule + issue label */}
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.15)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"0.75rem", gap:"1rem" }}>
-            <span className="hero-meta" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>{t.issue}</span>
-            <span className="hero-meta hide-narrow" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>proforce.ca</span>
+            <span className="hero-meta" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>{t.issue}</span>
+            <span className="hero-meta hide-narrow" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>proforce.ca</span>
           </div>
         </div>
 
@@ -634,29 +638,29 @@ function HomePage({ lang, setPage }) {
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
 
           <h1 className="fu2" style={{
-            fontFamily:"'Clash Display',sans-serif", fontWeight:700,
-            fontSize:"clamp(3.5rem,10vw,9rem)", lineHeight:0.92,
-            letterSpacing:"-0.03em", color:"#fff", whiteSpace:"pre-line",
+            fontFamily:"'Archivo',sans-serif", fontWeight:700,
+            fontSize:"clamp(2.4rem,6vw,4.4rem)", lineHeight:0.92,
+            letterSpacing:"-0.015em", color:"#fff", whiteSpace:"pre-line",
             marginBottom:"1rem",
           }}>
             {t.h1}
           </h1>
           {/* Suite du titre, en div: un seul H1 par page pour le referencement */}
           <div className="fu2" style={{
-            fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic",
-            fontSize:"clamp(2.5rem,7vw,6.5rem)", lineHeight:0.95,
+            fontFamily:"'Archivo',sans-serif", fontWeight:400,
+            fontSize:"clamp(2rem,5vw,3.8rem)", lineHeight:0.95,
             letterSpacing:"-0.01em", color:C.orange, marginBottom:"3rem",
           }}>
             {t.h1em}
           </div>
 
           <div className="fu3" style={{ display:"flex", alignItems:"flex-start", gap:"4rem", flexWrap:"wrap" }}>
-            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"1rem", lineHeight:1.7, color:"rgba(255,255,255,0.6)", maxWidth:"440px" }}>{t.sub}</p>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", lineHeight:1.7, color:"rgba(255,255,255,0.6)", maxWidth:"440px" }}>{t.sub}</p>
             <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem", paddingTop:"0.25rem" }}>
               <button className="btn-orange" onClick={() => setPage("food")}>{t.cta1}</button>
               <button style={{
                 display:"inline-block", border:"1.5px solid rgba(255,255,255,0.3)", color:"#fff",
-                padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:600,
+                padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600,
                 fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase",
                 transition:"border-color 0.2s, background 0.2s", cursor:"pointer", background:"transparent",
               }}
@@ -694,7 +698,7 @@ function HomePage({ lang, setPage }) {
           <div style={{ position:"absolute", left:"2rem", right:"2rem", bottom:"1.75rem" }}>
             <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
             <p className="band-caption" style={{
-              fontFamily:"'DM Mono',monospace", fontSize:"0.68rem", letterSpacing:"0.12em",
+              fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem", letterSpacing:"0.03em",
               textTransform:"uppercase", color:"rgba(255,255,255,0.78)", maxWidth:"540px", lineHeight:1.7,
             }}>
               {lang==="en"
@@ -710,7 +714,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:"3rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow>{lang==="en"?"Specialties":"Spécialités"}</Eyebrow>
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.6rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink }}>{t.s2label}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,4vw,3rem)", letterSpacing:"-0.015em", color:C.ink }}>{t.s2label}</h2>
           </div>
           <Divider style={{ marginBottom:"3rem" }} />
           <p style={{ color:C.muted, fontSize:"1rem", lineHeight:1.7, maxWidth:"480px", marginBottom:"4rem" }}>{t.s2p}</p>
@@ -728,10 +732,10 @@ function HomePage({ lang, setPage }) {
                   <Photo src={s.img} w={1600} h={1073} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                 </div>
                 <div style={{ padding:"2.5rem 2.5rem 3rem" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.5rem" }}>{s.n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.4rem,3vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"1rem" }}>{s.h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{s.n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.4rem,3vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"1rem" }}>{s.h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"2rem" }}>{s.p}</p>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange }}>
                   {lang==="en"?"Read more →":"En savoir plus →"}
                 </div>
                 </div>
@@ -748,13 +752,13 @@ function HomePage({ lang, setPage }) {
           {/* Le chiffre en vedette, avec sa phrase */}
           <div className="two-col" style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:"3rem", alignItems:"baseline", marginBottom:"4rem" }}>
             <div className="proof-hero" style={{
-              fontFamily:"'Clash Display',sans-serif", fontWeight:700, color:C.orange,
-              fontSize:"clamp(4.5rem,11vw,9rem)", lineHeight:0.85, letterSpacing:"-0.04em", whiteSpace:"nowrap",
+              fontFamily:"'Archivo',sans-serif", fontWeight:700, color:C.orange,
+              fontSize:"clamp(4.5rem,11vw,9rem)", lineHeight:0.85, letterSpacing:"-0.02em", whiteSpace:"nowrap",
             }}>{t.p1n}</div>
             <div style={{ maxWidth:"460px" }}>
               <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
               <p style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontSize:"clamp(1.1rem,2vw,1.5rem)", lineHeight:1.55, color:"#fff", marginBottom:"0.75rem" }}>{t.p1h}</p>
-              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.5)" }}>{t.p1p}</p>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.5)" }}>{t.p1p}</p>
             </div>
           </div>
 
@@ -765,15 +769,15 @@ function HomePage({ lang, setPage }) {
             {[[t.p2n,t.p2p],[t.p3n,t.p3p],[t.p4n,t.p4p]].map(([n,p]) => (
               <div key={p}>
                 <div className="proof-num" style={{
-                  fontFamily:"'Clash Display',sans-serif", fontWeight:700, color:C.orange,
-                  fontSize:"clamp(2rem,3.4vw,3.2rem)", lineHeight:1, letterSpacing:"-0.03em", marginBottom:"0.85rem",
+                  fontFamily:"'Archivo',sans-serif", fontWeight:700, color:C.orange,
+                  fontSize:"clamp(2rem,3.4vw,3.2rem)", lineHeight:1, letterSpacing:"-0.015em", marginBottom:"0.85rem",
                 }}>{n}</div>
-                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.62)" }}>{p}</p>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.62)" }}>{p}</p>
               </div>
             ))}
           </div>
 
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.28)", marginTop:"3rem" }}>{t.psrc}</p>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.28)", marginTop:"3rem" }}>{t.psrc}</p>
         </div>
       </section>
 
@@ -783,8 +787,8 @@ function HomePage({ lang, setPage }) {
           <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
             <Eyebrow>{lang==="en"?"Clients":"Clients"}</Eyebrow>
             <h2 style={{
-              fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.6rem,3.4vw,2.6rem)",
-              letterSpacing:"-0.03em", color:C.ink, lineHeight:1.15, margin:"1.25rem 0 0.9rem", maxWidth:"620px",
+              fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3.4vw,2.6rem)",
+              letterSpacing:"-0.015em", color:C.ink, lineHeight:1.15, margin:"1.25rem 0 0.9rem", maxWidth:"620px",
             }}>{t.cliH}</h2>
             <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.7, maxWidth:"520px", marginBottom:"3.5rem" }}>{t.cliP}</p>
 
@@ -816,8 +820,8 @@ function HomePage({ lang, setPage }) {
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", letterSpacing:"-0.02em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", letterSpacing:"-0.02em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -830,7 +834,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow>{lang==="en"?"The Team":"L'équipe"}</Eyebrow>
-            <button onClick={() => setPage("team")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("team")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"Meet everyone →":"Voir l'équipe →"}
             </button>
           </div>
@@ -842,8 +846,8 @@ function HomePage({ lang, setPage }) {
                 borderRight: i<TEAM.length-1 ? `1px solid ${C.rule}` : "none",
               }}>
                 <Avatar m={m} size={56} style={{ marginBottom:"1rem" }} />
-                <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", fontWeight:600, color:C.ink, marginBottom:"0.2rem" }}>{m.name}</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted }}>{m.title[lang]}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:600, color:C.ink, marginBottom:"0.2rem" }}>{m.name}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted }}>{m.title[lang]}</div>
               </div>
             ))}
           </div>
@@ -855,7 +859,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{lang==="en"?"Featured Candidates":"Candidats vedettes"}</Eyebrow>
-            <button onClick={() => setPage("featured")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("featured")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"All profiles →":"Tous les profils →"}
             </button>
           </div>
@@ -870,15 +874,15 @@ function HomePage({ lang, setPage }) {
               onMouseEnter={e => e.currentTarget.style.opacity="0.7"}
               onMouseLeave={e => e.currentTarget.style.opacity="1"}
             >
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em", width:"28px" }}>0{i+1}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em", width:"28px" }}>0{i+1}</span>
               <div>
-                <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:"rgba(255,255,255,0.35)", marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"rgba(255,255,255,0.35)", marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:"rgba(255,255,255,0.3)", letterSpacing:"0.06em" }}>{c.market[lang]}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"rgba(255,255,255,0.3)", letterSpacing:"0.06em" }}>{c.market[lang]}</div>
                 {c.avail.en==="Actively looking" && (
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.orange, letterSpacing:"0.06em", marginTop:"3px" }}>{lang==="en"?"Active":"Actif"}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.orange, letterSpacing:"0.06em", marginTop:"3px" }}>{lang==="en"?"Active":"Actif"}</div>
                 )}
               </div>
             </button>
@@ -891,7 +895,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow>{lang==="en"?"From the Blog":"Du blogue"}</Eyebrow>
-            <button onClick={() => setPage("blog")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("blog")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"All articles →":"Tous les articles →"}
             </button>
           </div>
@@ -906,9 +910,9 @@ function HomePage({ lang, setPage }) {
                 onMouseEnter={e => e.currentTarget.style.opacity="0.7"}
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
               >
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>0{i+1}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>0{i+1}</span>
                 <span style={{ fontFamily:"'Spectral',serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:C.ink, fontWeight:400 }}>{p.title[lang]}</span>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>{p.date}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>{p.date}</span>
               </button>
               <Divider />
             </div>
@@ -921,14 +925,14 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2.5rem" }} />
           <p style={{
-            fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic",
+            fontFamily:"'Archivo',sans-serif", fontWeight:400,
             fontSize:"clamp(1.5rem,3.4vw,2.6rem)", lineHeight:1.3, color:"#fff",
             whiteSpace:"pre-line", marginBottom:"2.5rem",
           }}>{t.noH}</p>
           <div style={{ display:"flex", alignItems:"center", gap:"1.25rem", flexWrap:"wrap" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"rgba(255,255,255,0.45)" }}>{t.noSrc}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.45)" }}>{t.noSrc}</span>
             <button onClick={() => setPage("simon")} style={{
-              fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase",
+              fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em",
               color:C.orange, borderBottom:`1px solid ${C.orange}`, paddingBottom:"2px",
             }}>{t.noLink} →</button>
           </div>
@@ -939,12 +943,12 @@ function HomePage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,5vw,4rem)", color:"#fff", letterSpacing:"-0.03em", lineHeight:0.95, marginBottom:"1rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.7rem,3.4vw,2.6rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", lineHeight:1.7, maxWidth:"420px" }}>{t.ctaP}</p>
           </div>
           <button onClick={() => setPage("contact")} style={{
             background:"#fff", color:C.orange, padding:"14px 32px",
-            fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.82rem",
+            fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem",
             letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0,
             transition:"opacity 0.2s",
           }}
@@ -991,15 +995,15 @@ function SectorPage({ lang, setPage, sector }) {
   return (
     <div>
       <section style={{
-        position:"relative", background:C.ink, minHeight:"65vh",
-        display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem",
+        position:"relative", background:C.ink, minHeight:"32vh",
+        display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem",
         backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.93), rgba(13,37,69,0.74)), url(${sector === "food" ? "/photos/usine-vue-ensemble.jpg" : "/secteurs/mode-hero.jpg"})`,
         backgroundSize:"cover", backgroundPosition:"center",
       }}>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", letterSpacing:"-0.01em", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.01em", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.72)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px", marginBottom:"2rem" }}>{t.sub}</p>
           <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -1011,7 +1015,7 @@ function SectorPage({ lang, setPage, sector }) {
           <Divider style={{ marginBottom:"3rem" }} />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {t.roles.map((r,i) => (
-              <div key={r} style={{ padding:"1rem 1.5rem", borderRight: (i+1)%4!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
+              <div key={r} style={{ padding:"1rem 1.5rem", borderRight: (i+1)%4!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
                 <span style={{ color:C.orange, fontSize:"0.7rem" }}>▸</span>{r}
               </div>
             ))}
@@ -1040,8 +1044,8 @@ function SectorPage({ lang, setPage, sector }) {
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", letterSpacing:"-0.01em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", letterSpacing:"-0.01em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -1053,8 +1057,8 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.6rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.03em", maxWidth:"580px", lineHeight:1.05 }}>{t.ctaH}</h2>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0 }}>{t.cta}</button>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em", maxWidth:"580px", lineHeight:1.05 }}>{t.ctaH}</h2>
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0 }}>{t.cta}</button>
         </div>
       </section>
     </div>
@@ -1141,7 +1145,7 @@ function FAQSection({ lang, type, setPage }) {
     <section style={{ background:C.paperDark, padding:"5rem 2rem" }}>
       <div style={{ maxWidth:"800px", margin:"0 auto" }}>
         <Eyebrow>{lang==="en"?"FAQ":"Foire aux questions"}</Eyebrow>
-        <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.8rem,3.5vw,2.5rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>
+        <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.8rem,3.5vw,2.5rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>
           {lang==="en"?"Common questions." : "Questions fréquentes."}
         </h2>
         <Divider style={{ marginBottom:"0" }} />
@@ -1151,7 +1155,7 @@ function FAQSection({ lang, type, setPage }) {
               width:"100%", display:"flex", justifyContent:"space-between", alignItems:"center",
               padding:"1.5rem 0", textAlign:"left", gap:"1.5rem",
             }}>
-              <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1rem", color:C.ink, letterSpacing:"-0.01em", lineHeight:1.3 }}>{faq.q}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.ink, letterSpacing:"-0.01em", lineHeight:1.3 }}>{faq.q}</span>
               <span style={{ color:C.orange, fontSize:"1.2rem", flexShrink:0, fontWeight:300, lineHeight:1, transition:"transform 0.2s", transform: open===i?"rotate(45deg)":"rotate(0deg)" }}>+</span>
             </button>
             {open===i && (
@@ -1162,7 +1166,7 @@ function FAQSection({ lang, type, setPage }) {
           </div>
         ))}
         <div style={{ marginTop:"3rem" }}>
-          <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", color:C.muted, marginBottom:"1rem" }}>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.muted, marginBottom:"1rem" }}>
             {lang==="en"?"Still have questions? We're easy to reach.":"Tu as encore des questions? On est faciles à joindre."}
           </p>
           <button className="btn-ink" onClick={() => setPage("contact")}>
@@ -1318,22 +1322,22 @@ function FeaturedCandidatesPage({ lang, setPage }) {
     const c = FEATURED.find(f => f.id === active);
     return (
       <div>
-        <section style={{ background:C.ink, padding:"8rem 2rem 4rem" }}>
+        <section style={{ background:C.ink, padding:"6rem 2rem 3.5rem" }}>
           <div style={{ maxWidth:"780px", margin:"0 auto" }}>
-            <button onClick={() => setActive(null)} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"rgba(255,255,255,0.4)", marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
+            <button onClick={() => setActive(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)", marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
               {t.back}
             </button>
             <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"1.5rem" }}>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>{c.sector[lang]}</span>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:"rgba(255,255,255,0.3)" }}>·</span>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.4)" }}>{c.tag[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{c.sector[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:"rgba(255,255,255,0.3)" }}>·</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)" }}>{c.tag[lang]}</span>
             </div>
-            <h1 style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{c.title[lang]}</h1>
+            <h1 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{c.title[lang]}</h1>
             <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"2rem" }}>
               {[[t.exp, c.exp[lang]], [t.market, c.market[lang]], [t.avail, c.avail[lang]], [t.recruiter, c.recruiter]].map(([label, val]) => (
                 <div key={label}>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)", marginBottom:"3px" }}>{label}</div>
-                  <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", color: label===t.avail && c.avail.en==="Actively looking" ? C.orange : "#fff", fontWeight:500 }}>{val}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)", marginBottom:"3px" }}>{label}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color: label===t.avail && c.avail.en==="Actively looking" ? C.orange : "#fff", fontWeight:500 }}>{val}</div>
                 </div>
               ))}
             </div>
@@ -1344,21 +1348,21 @@ function FeaturedCandidatesPage({ lang, setPage }) {
           <div style={{ maxWidth:"780px", margin:"0 auto" }}>
             <Divider style={{ marginBottom:"3rem" }} />
 
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"1.25rem" }}>{t.fullBio}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"1.25rem" }}>{t.fullBio}</h2>
             <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.05rem", lineHeight:1.85, color:C.muted, fontWeight:300, marginBottom:"3rem" }}>{c.summary[lang]}</p>
 
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"1.25rem" }}>{t.highlights}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"1.25rem" }}>{t.highlights}</h2>
             <div style={{ display:"flex", flexDirection:"column", gap:"0" }}>
               {c.highlights[lang].map((h, i) => (
                 <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"1rem", padding:"0.85rem 0", borderBottom:`1px solid ${C.rule}` }}>
                   <span style={{ color:C.orange, fontSize:"0.7rem", marginTop:"2px", flexShrink:0 }}>▸</span>
-                  <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, lineHeight:1.6 }}>{h}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.ink, lineHeight:1.6 }}>{h}</span>
                 </div>
               ))}
             </div>
 
             <div style={{ marginTop:"3.5rem", padding:"2.5rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
-              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
                 {lang==="en"
                   ? `This candidate is represented by ${c.recruiter}. To learn more or request an introduction, contact us directly.`
                   : `Ce candidat est représenté par ${c.recruiter}. Pour en savoir plus ou demander une introduction, contactez-nous directement.`}
@@ -1373,11 +1377,11 @@ function FeaturedCandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"55vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/talents.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"33vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/talents.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6.5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.8rem,4vw,4.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1388,7 +1392,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
           <div style={{ display:"flex", gap:"2rem", marginBottom:"3rem", flexWrap:"wrap" }}>
             {filters.map(([val, label]) => (
               <button key={val} onClick={() => setActiveFilter(val)} style={{
-                fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase",
+                fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
                 color: activeFilter===val ? C.orange : C.muted,
                 borderBottom: activeFilter===val ? `1px solid ${C.orange}` : "1px solid transparent",
                 paddingBottom:"2px", transition:"color 0.2s",
@@ -1397,7 +1401,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
           </div>
 
           <Divider style={{ marginBottom:"2rem" }} />
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", color:C.muted, marginBottom:"3rem" }}>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.1em", color:C.muted, marginBottom:"3rem" }}>
             {filtered.length} {lang==="en" ? "profiles available" : "profils disponibles"}
           </p>
 
@@ -1412,24 +1416,24 @@ function FeaturedCandidatesPage({ lang, setPage }) {
               >
                 {/* Sector tag */}
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.5rem" }}>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>{c.sector[lang]}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange }}>{c.sector[lang]}</span>
                   {c.avail.en === "Actively looking" && (
-                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, border:`1px solid ${C.orange}`, padding:"2px 8px" }}>
+                    <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, border:`1px solid ${C.orange}`, padding:"2px 8px" }}>
                       {lang==="en"?"Active":"Actif"}
                     </span>
                   )}
                 </div>
 
                 {/* Title */}
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.25rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.4rem" }}>{c.title[lang]}</h3>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted, letterSpacing:"0.06em", marginBottom:"1.25rem" }}>{c.tag[lang]}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.25rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.4rem" }}>{c.title[lang]}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted, letterSpacing:"0.06em", marginBottom:"1.25rem" }}>{c.tag[lang]}</div>
 
                 {/* Meta row */}
                 <div style={{ display:"flex", gap:"1.5rem", marginBottom:"1.5rem", flexWrap:"wrap" }}>
                   {[[t.exp, c.exp[lang]], [t.market, c.market[lang]]].map(([label, val]) => (
                     <div key={label}>
-                      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.muted, marginBottom:"2px" }}>{label}</div>
-                      <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:C.ink, fontWeight:500 }}>{val}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.02em", color:C.muted, marginBottom:"2px" }}>{label}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:C.ink, fontWeight:500 }}>{val}</div>
                     </div>
                   ))}
                 </div>
@@ -1439,12 +1443,12 @@ function FeaturedCandidatesPage({ lang, setPage }) {
                   {c.highlights[lang].slice(0,2).map((h,i) => (
                     <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"0.5rem", marginBottom:"0.4rem" }}>
                       <span style={{ color:C.orange, fontSize:"0.65rem", marginTop:"2px", flexShrink:0 }}>▸</span>
-                      <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:C.muted, lineHeight:1.5 }}>{h}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:C.muted, lineHeight:1.5 }}>{h}</span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginTop:"auto" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginTop:"auto" }}>
                   {lang==="en"?"View profile →":"Voir le profil →"}
                 </div>
               </button>
@@ -1453,7 +1457,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
 
           {/* Note */}
           <div style={{ marginTop:"4rem", padding:"2.5rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
-            <p style={{ fontFamily:"'DM Sans',sans-serif", color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{t.note}</p>
+            <p style={{ fontFamily:"'Archivo',sans-serif", color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{t.note}</p>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
           </div>
         </div>
@@ -1479,11 +1483,11 @@ function AboutPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1.05rem", lineHeight:1.8, maxWidth:"600px" }}>{t.story}</p>
         </div>
       </section>
@@ -1495,15 +1499,15 @@ function AboutPage({ lang }) {
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.v1h,t.v1p,"01"],[t.v2h,t.v2p,"02"],[t.v3h,t.v3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
           </div>
 
           <div style={{ marginTop:"4rem", padding:"3rem", background:C.paper, borderLeft:`3px solid ${C.orange}` }}>
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.guarH}</h3>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.guarH}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{t.guarP}</p>
           </div>
         </div>
@@ -1516,13 +1520,13 @@ function AboutPage({ lang }) {
 function TeamPage({ lang, setPage, setBlogPost }) {
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Our Team":"Notre équipe"}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,6.5rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"1.5rem" }}>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"1.5rem" }}>
             {lang==="en"?"Seven specialists." : "Sept spécialistes."}
           </h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95 }}>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95 }}>
             {lang==="en"?"No generalists." : "Aucun généraliste."}
           </h2>
         </div>
@@ -1545,13 +1549,13 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                     <Avatar m={m} full />
                   </div>
                   <div style={{ marginBottom:"1.5rem" }}>
-                    <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.15rem", color:C.ink, fontWeight:600 }}>{m.name}</div>
-                    <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginTop:"4px" }}>{m.title[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, fontWeight:600 }}>{m.name}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginTop:"4px" }}>{m.title[lang]}</div>
                   </div>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted, marginBottom:"1.25rem" }}>{m.sector[lang]}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted, marginBottom:"1.25rem" }}>{m.sector[lang]}</div>
                   <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{
                     display:"inline-flex", alignItems:"center", gap:"6px",
-                    fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase",
+                    fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase",
                     color:C.ink, borderBottom:`1px solid ${C.rule}`, paddingBottom:"2px", transition:"color 0.2s, border-color 0.2s",
                   }}
                     onMouseEnter={e => { e.currentTarget.style.color=C.orange; e.currentTarget.style.borderColor=C.orange; }}
@@ -1569,7 +1573,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                   ))}
                   {m.articles.length > 0 && (
                     <div>
-                      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.75rem" }}>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.75rem" }}>
                         {lang==="en"?"Articles":"Articles"}
                       </div>
                       <div style={{ display:"flex", flexDirection:"column", gap:"0" }}>
@@ -1583,9 +1587,9 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                             onMouseEnter={e => e.currentTarget.style.opacity="0.6"}
                             onMouseLeave={e => e.currentTarget.style.opacity="1"}
                           >
-                            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, flexShrink:0 }}>0{j+1}</span>
+                            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, flexShrink:0 }}>0{j+1}</span>
                             <span style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.ink }}>{post.title[lang]}</span>
-                            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, marginLeft:"auto", flexShrink:0 }}>{post.date}</span>
+                            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, marginLeft:"auto", flexShrink:0 }}>{post.date}</span>
                           </button>
                         ))}
                       </div>
@@ -1603,7 +1607,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
       <section style={{ background:C.paperDark, padding:"4.5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <div style={{ maxWidth:"540px" }}>
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "Proforce has been doing this since 2001." : "Proforce fait ça depuis 2001."}</h3>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "Proforce has been doing this since 2001." : "Proforce fait ça depuis 2001."}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Seven people is what the firm looks like today. If you want the rest of the story, how it started and what changed along the way, it is on the about page." : "Sept personnes, c'est ce que la firme est aujourd'hui. Si tu veux le reste de l'histoire, comment ça a commencé et ce qui a changé en chemin, c'est sur la page À propos."}</p>
           </div>
           <button className="btn-ink" onClick={() => setPage("about")} style={{ flexShrink:0 }}>{lang==="en" ? "About Proforce" : "À propos de Proforce"}</button>
@@ -1631,11 +1635,11 @@ function CandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6.5rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"0.5rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,6vw,5.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.5rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"500px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1645,15 +1649,15 @@ function CandidatesPage({ lang, setPage }) {
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
             {[[t.h1h,t.h1p,"01"],[t.h2h,t.h2p,"02"],[t.h3h,t.h3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
           </div>
 
           <div style={{ background:C.paper, padding:"3rem", borderLeft:`3px solid ${C.orange}` }}>
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.5rem", color:C.ink, marginBottom:"0.75rem" }}>{t.submitH}</h3>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.5rem", color:C.ink, marginBottom:"0.75rem" }}>{t.submitH}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8, maxWidth:"440px", marginBottom:"1.5rem" }}>{t.submitP}</p>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
           </div>
@@ -1743,22 +1747,22 @@ function EmployersPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"65vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/usine-discussion.webp)`, backgroundSize:"cover", backgroundPosition:"center" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/usine-discussion.webp)`, backgroundSize:"cover", backgroundPosition:"center" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>proforce.ca</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>proforce.ca</span>
           </div>
         </div>
         <div style={{ maxWidth:"900px" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
-            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.3)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s", cursor:"pointer", background:"transparent" }}
+            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.3)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s", cursor:"pointer", background:"transparent" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
               onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.3)"}
               onClick={() => setPage("food")}
@@ -1771,19 +1775,19 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{t.processLabel}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.processH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.processH}</h2>
           <Divider style={{ marginBottom:"0" }} />
           {t.steps.map((step, i) => (
             <div key={step.n} style={{ display:"grid", gridTemplateColumns:"80px 1fr", gap:"2rem", padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
-              <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1 }}>{step.n}</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1 }}>{step.n}</div>
               <div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.2rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{step.h[lang]}</h3>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.2rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{step.h[lang]}</h3>
                 <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{step.p[lang]}</p>
               </div>
             </div>
           ))}
           <div style={{ paddingTop:"2rem" }}>
-            <button onClick={() => setPage("howwework")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, borderBottom:`1px solid ${C.orange}`, paddingBottom:"2px" }}>
+            <button onClick={() => setPage("howwework")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}`, paddingBottom:"2px" }}>
               {t.processLink}
             </button>
           </div>
@@ -1794,7 +1798,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"],[t.w4h,t.w4p,"04"]].map(([h,p,n],i) => (
               <div key={n} style={{
@@ -1803,8 +1807,8 @@ function EmployersPage({ lang, setPage }) {
                 borderBottom: i<2 ? `1px solid ${C.rule}` : "none",
                 background:C.white,
               }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -1817,12 +1821,12 @@ function EmployersPage({ lang, setPage }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", background:C.rule }} className="two-col">
           <div style={{ background:C.white, padding:"3rem 2.5rem" }}>
             <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.guarH}</h3>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.guarH}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{t.guarP}</p>
           </div>
           <div style={{ background:C.white, padding:"3rem 2.5rem" }}>
             <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.feeH}</h3>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.feeH}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{t.feeP}</p>
           </div>
         </div>
@@ -1841,9 +1845,9 @@ function EmployersPage({ lang, setPage }) {
                 onMouseEnter={e => e.currentTarget.style.background="#1e4080"}
                 onMouseLeave={e => e.currentTarget.style.background=C.inkLight}
               >
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.orange, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{s.h}</h3>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.orange, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{s.h}</h3>
                 <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"0.86rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{s.p}</p>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.4)" }}>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)" }}>
                   {lang==="en"?"Learn more →":"En savoir plus →"}
                 </span>
               </button>
@@ -1856,10 +1860,10 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,5vw,3.5rem)", color:"#fff", letterSpacing:"-0.03em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
             onMouseLeave={e => e.currentTarget.style.opacity="1"}
           >{t.cta}</button>
@@ -1870,7 +1874,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"4.5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <div style={{ maxWidth:"540px" }}>
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "People we are talking to right now." : "Du monde à qui on parle en ce moment."}</h3>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "People we are talking to right now." : "Du monde à qui on parle en ce moment."}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Anonymous profiles of real candidates we know personally. If one of them looks like the person you need, tell us and we will make the introduction." : "Des profils anonymisés de vrais candidats qu'on connaît personnellement. Si un d'eux ressemble à la personne qu'il te faut, dis-le nous et on fait l'introduction."}</p>
           </div>
           <button className="btn-ink" onClick={() => setPage("featured")} style={{ flexShrink:0 }}>{lang==="en" ? "See the profiles" : "Voir les profils"}</button>
@@ -1894,11 +1898,11 @@ function JobListingsPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/emplois.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/emplois.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"500px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1912,10 +1916,10 @@ function JobListingsPage({ lang }) {
               padding:"1.75rem 0", borderBottom:`1px solid ${C.rule}`, flexWrap:"wrap", gap:"1rem",
             }}>
               <div>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em" }}>{r.title}</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.06em", color:C.muted, marginTop:"4px" }}>{r.co} · {r.loc}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em" }}>{r.title}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.06em", color:C.muted, marginTop:"4px" }}>{r.co} · {r.loc}</div>
               </div>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
             </div>
           ))}
 
@@ -1938,11 +1942,11 @@ function GivingPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/dons.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/dons.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"480px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1952,7 +1956,7 @@ function GivingPage({ lang }) {
           <Divider style={{ marginBottom:"0" }} />
           {CHARITIES.map(c => (
             <div key={c.name} style={{ display:"grid", gridTemplateColumns:"240px 1fr", gap:"3rem", padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }} className="two-col">
-              <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1rem", color:C.ink, fontWeight:600, paddingTop:"2px" }}>{c.name}</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.ink, fontWeight:600, paddingTop:"2px" }}>{c.name}</div>
               <div style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{c.desc[lang]}</div>
             </div>
           ))}
@@ -2013,7 +2017,7 @@ function NewsletterWidget({ lang, compact }) {
     return (
       <div style={{ padding: compact ? "1.5rem" : "2.5rem", background: C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
         <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
-        <p style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink }}>{t.done}</p>
+        <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink }}>{t.done}</p>
       </div>
     );
   }
@@ -2021,8 +2025,8 @@ function NewsletterWidget({ lang, compact }) {
   return (
     <div style={{ padding: compact ? "1.5rem 2rem" : "3rem", background: C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
       <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-      <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize: compact ? "1rem" : "1.3rem", color:C.ink, letterSpacing:"-0.01em", marginBottom: t.p ? "0.6rem" : "1.25rem" }}>{t.h}</h3>
-      {t.p && <p style={{ fontFamily:"'DM Sans',sans-serif", color:C.muted, fontSize:"0.88rem", lineHeight:1.7, marginBottom:"1.5rem", maxWidth:"420px" }}>{t.p}</p>}
+      <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize: compact ? "1rem" : "1.3rem", color:C.ink, letterSpacing:"-0.01em", marginBottom: t.p ? "0.6rem" : "1.25rem" }}>{t.h}</h3>
+      {t.p && <p style={{ fontFamily:"'Archivo',sans-serif", color:C.muted, fontSize:"0.88rem", lineHeight:1.7, marginBottom:"1.5rem", maxWidth:"420px" }}>{t.p}</p>}
 
       <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", alignItems:"flex-end" }}>
         <input
@@ -2034,7 +2038,7 @@ function NewsletterWidget({ lang, compact }) {
           style={{
             flex:"1 1 220px", padding:"10px 0", background:"transparent",
             border:"none", borderBottom:`1px solid ${C.rule}`,
-            fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink,
+            fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.ink,
             outline:"none", transition:"border-color 0.2s", minWidth:"180px",
           }}
           onFocus={e => e.target.style.borderColor=C.orange}
@@ -2045,7 +2049,7 @@ function NewsletterWidget({ lang, compact }) {
           <select value={prefLang} onChange={e => setPrefLang(e.target.value)} style={{
             padding:"10px 8px", background:"transparent",
             border:"none", borderBottom:`1px solid ${C.rule}`,
-            fontFamily:"'DM Mono',monospace", fontSize:"0.65rem",
+            fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem",
             letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted,
             outline:"none", cursor:"pointer",
           }}>
@@ -2065,7 +2069,7 @@ function NewsletterWidget({ lang, compact }) {
       </div>
 
       {status === "error" && (
-        <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", color:"#c0392b", marginTop:"0.75rem", letterSpacing:"0.06em" }}>{t.error}</p>
+        <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", color:"#c0392b", marginTop:"0.75rem", letterSpacing:"0.06em" }}>{t.error}</p>
       )}
     </div>
   );
@@ -2102,22 +2106,22 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
     const post = POSTS.find(p => p.id===activePost);
     return (
       <div>
-        <section style={{ background:C.paper, padding:"8rem 2rem 4rem" }}>
+        <section style={{ background:C.paper, padding:"6rem 2rem 3.5rem" }}>
           <div style={{ maxWidth:"720px", margin:"0 auto" }}>
-            <button onClick={() => setActivePost(null)} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.muted, marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
+            <button onClick={() => setActivePost(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.muted, marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
               ← {lang==="en"?"Back":"Retour"}
             </button>
             <div style={{ display:"flex", gap:"1.5rem", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap" }}>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>{post.cat[lang]}</span>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted }}>{post.date} · {post.read[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{post.cat[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted }}>{post.date} · {post.read[lang]}</span>
             </div>
-            <h1 style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.5rem)", letterSpacing:"-0.03em", color:C.ink, lineHeight:1.05, marginBottom:"2.5rem" }}>{post.title[lang]}</h1>
+            <h1 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(1.7rem,3.2vw,2.5rem)", letterSpacing:"-0.015em", color:C.ink, lineHeight:1.05, marginBottom:"2.5rem" }}>{post.title[lang]}</h1>
             {post.recruiter && (() => { const a = TEAM.find(t => t.name === post.recruiter); return a ? (
               <div style={{ display:"flex", alignItems:"center", gap:"0.85rem", marginTop:"-1rem", marginBottom:"2.5rem" }}>
                 <Avatar m={a} size={44} />
                 <div>
-                  <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", fontWeight:600, color:C.ink }}>{a.name}</div>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted }}>{a.title[lang]}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", fontWeight:600, color:C.ink }}>{a.name}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.muted }}>{a.title[lang]}</div>
                 </div>
               </div>
             ) : null; })()}
@@ -2158,13 +2162,13 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Proforce Blog":"Blogue Proforce"}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.92, marginBottom:"1rem" }}>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"1rem" }}>
             {lang==="en"?"Straight talk." : "Du vrai parler."}
           </h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
             {lang==="en"?"No fluff." : "Pas de remplissage."}
           </h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"480px" }}>
@@ -2180,7 +2184,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
             <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap" }}>
               {cats.map(([val,label]) => (
                 <button key={val} onClick={() => setFilter(val)} style={{
-                  fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase",
+                  fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
                   color: filter===val ? C.orange : C.muted,
                   borderBottom: filter===val ? `1px solid ${C.orange}` : "1px solid transparent",
                   paddingBottom:"2px", transition:"color 0.2s",
@@ -2196,7 +2200,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                 style={{
                   padding:"8px 32px 8px 12px", background:"transparent",
                   border:`1px solid ${C.rule}`, borderRadius:"0",
-                  fontFamily:"'DM Mono',monospace", fontSize:"0.65rem",
+                  fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem",
                   letterSpacing:"0.06em", color:C.ink, outline:"none",
                   width:"200px", transition:"border-color 0.2s",
                 }}
@@ -2214,7 +2218,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
               <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:C.muted, fontStyle:"italic" }}>
                 {lang==="en" ? `No articles found for "${query}".` : `Aucun article trouvé pour « ${query} ».`}
               </p>
-              <button onClick={() => { setQuery(""); setFilter("all"); }} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginTop:"1rem", borderBottom:`1px solid ${C.orange}` }}>
+              <button onClick={() => { setQuery(""); setFilter("all"); }} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, marginTop:"1rem", borderBottom:`1px solid ${C.orange}` }}>
                 {lang==="en" ? "Clear search" : "Effacer la recherche"}
               </button>
             </div>
@@ -2227,8 +2231,8 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
             const open = () => { openPost(post.id); window.scrollTo({top:0,behavior:"smooth"}); };
             const meta = (
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date}</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, marginTop:"4px" }}>{post.read[lang]}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, marginTop:"4px" }}>{post.read[lang]}</div>
               </div>
             );
             if (i === 0) {
@@ -2243,10 +2247,10 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                         style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                     </div>
                     <div style={{ display:"flex", gap:"1.25rem", alignItems:"center", flexWrap:"wrap", marginBottom:"0.9rem" }}>
-                      <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.12em", textTransform:"uppercase" }}>{post.cat[lang]}</span>
-                      <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date} · {post.read[lang]}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.02em" }}>{post.cat[lang]}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date} · {post.read[lang]}</span>
                     </div>
-                    <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.5rem,3.4vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", lineHeight:1.12, marginBottom:"0.8rem" }}>{post.title[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.5rem,3.4vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", lineHeight:1.12, marginBottom:"0.8rem" }}>{post.title[lang]}</div>
                     <div style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:C.muted, lineHeight:1.7, fontStyle:"italic", maxWidth:"620px" }}>{post.excerpt[lang]}</div>
                   </button>
                   <Divider />
@@ -2264,15 +2268,15 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}
                 >
                   <div>
-                    <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em" }}>{String(i+1).padStart(2,"0")}</div>
-                    <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted, letterSpacing:"0.06em", marginTop:"4px" }}>{post.cat[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em" }}>{String(i+1).padStart(2,"0")}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted, letterSpacing:"0.06em", marginTop:"4px" }}>{post.cat[lang]}</div>
                   </div>
                   <div className="post-thumb" style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
                     <Photo src={postCover(post.id).replace(".jpg", "-480.jpg")} w={480} h={262}
                       style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                   </div>
                   <div>
-                    <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1rem,2.5vw,1.35rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.5rem" }}>{post.title[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1rem,2.5vw,1.35rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.5rem" }}>{post.title[lang]}</div>
                     <div style={{ fontFamily:"'Spectral',serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.65, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
                   </div>
                   {meta}
@@ -2330,14 +2334,14 @@ function ContactPage({ lang }) {
          required:"Ça prend ton nom, un courriel valide et un message." },
   }[lang];
 
-  const inp = { width:"100%", padding:"11px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'DM Sans',sans-serif", fontSize:"0.95rem", outline:"none", transition:"border-color 0.2s" };
+  const inp = { width:"100%", padding:"11px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", outline:"none", transition:"border-color 0.2s" };
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3.5rem,10vw,9rem)", letterSpacing:"-0.03em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.4rem,6vw,4.4rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
         </div>
       </section>
 
@@ -2347,23 +2351,23 @@ function ContactPage({ lang }) {
           <div>
             {[{city:"Montréal",phone:"(514) 905-0606",addr:"500 Place d'Armes, #1800\nMontréal, QC H2Y 2W2"},{city:"Québec",phone:"(418) 431-1441",addr:"1020, rue Bouvier, Bureau 400\nQuébec, QC G2K 0K9"},{city:"Toronto",phone:"(647) 490-6626",addr:"197 Yonge Street, Unit 201\nToronto, ON M5B 0C1"}].map(o => (
               <div key={o.city} style={{ marginBottom:"3rem" }}>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"1.25rem" }}>{o.city}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"1.25rem" }}>{o.city}</div>
                 <Divider style={{ marginBottom:"1.25rem" }} />
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Phone":"Téléphone"}</div>
-                <a href={`tel:+1${o.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"1rem", textDecoration:"none" }}>{o.phone}</a>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Address":"Adresse"}</div>
-                <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.muted, lineHeight:1.7, whiteSpace:"pre-line" }}>{o.addr}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Phone":"Téléphone"}</div>
+                <a href={`tel:+1${o.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"1rem", textDecoration:"none" }}>{o.phone}</a>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Address":"Adresse"}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.muted, lineHeight:1.7, whiteSpace:"pre-line" }}>{o.addr}</div>
               </div>
             ))}
-            <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>Email</div>
-            <a href="mailto:info@proforce.ca" style={{ display:"block", fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"2.5rem", textDecoration:"none" }}>info@proforce.ca</a>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>Email</div>
+            <a href="mailto:info@proforce.ca" style={{ display:"block", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"2.5rem", textDecoration:"none" }}>info@proforce.ca</a>
 
             {/* Booking CTA */}
             <div style={{ padding:"1.75rem", background:C.ink, borderLeft:`3px solid ${C.orange}` }}>
-              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.6rem" }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Prefer to book directly?":"Tu préfères réserver directement?"}
               </div>
-              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:"rgba(255,255,255,0.65)", lineHeight:1.6, marginBottom:"1.25rem" }}>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:"rgba(255,255,255,0.65)", lineHeight:1.6, marginBottom:"1.25rem" }}>
                 {lang==="en"
                   ? "Pick a time that works for you. 15 minutes is usually enough to know if we're the right fit."
                   : "Choisis un moment qui te convient. 15 minutes suffit généralement pour savoir si on est le bon fit."}
@@ -2377,7 +2381,7 @@ function ContactPage({ lang }) {
               </a>
             </div>
 
-            <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.75rem" }}>{lang==="en"?"Follow Us":"Nous suivre"}</div>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.75rem" }}>{lang==="en"?"Follow Us":"Nous suivre"}</div>
             <div style={{ display:"flex", gap:"0.75rem" }}>
               {[
                 { href:"https://www.facebook.com/share/17YcPvUvNn/", title:"Facebook", icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
@@ -2417,10 +2421,10 @@ function ContactPage({ lang }) {
                   onBlur={e => e.target.style.borderColor=C.rule}
                 />
                 {touched && missing && (
-                  <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, margin:0 }}>{t.required}</p>
+                  <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.orange, margin:0 }}>{t.required}</p>
                 )}
                 {status === "error" && (
-                  <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, margin:0, lineHeight:1.6 }}>{t.errorMsg}</p>
+                  <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.orange, margin:0, lineHeight:1.6 }}>{t.errorMsg}</p>
                 )}
                 <button className="btn-ink" onClick={submit} disabled={status === "sending"}
                   style={{ alignSelf:"flex-start", opacity: status === "sending" ? 0.6 : 1 }}>
@@ -2533,11 +2537,11 @@ function CalculatorPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
@@ -2552,16 +2556,16 @@ function CalculatorPage({ lang, setPage }) {
             {sliders.map((sl, i) => (
               <div key={i} style={{ marginBottom:"2rem" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.6rem" }}>
-                  <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.ink, fontWeight:500 }}>{sl.label}</span>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.78rem", color:C.orange, fontWeight:600 }}>{sl.fmt(sl.value)}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink, fontWeight:500 }}>{sl.label}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:C.orange, fontWeight:600 }}>{sl.fmt(sl.value)}</span>
                 </div>
                 <input type="range" min={sl.min} max={sl.max} step={sl.step}
                   value={sl.value} onChange={e => sl.set(Number(e.target.value))}
                   style={sliderStyle}
                 />
                 <div style={{ display:"flex", justifyContent:"space-between", marginTop:"3px" }}>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.min)}</span>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.max)}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.min)}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.max)}</span>
                 </div>
               </div>
             ))}
@@ -2581,11 +2585,11 @@ function CalculatorPage({ lang, setPage }) {
                 paddingRight: row.type==="total" ? "0.5rem" : 0,
               }}>
                 <div>
-                  <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color: row.type==="total" ? C.ink : C.ink, fontWeight: row.type==="total" ? 700 : 400 }}>{row.label}</div>
-                  <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color: row.type==="total" ? C.ink : C.ink, fontWeight: row.type==="total" ? 700 : 400 }}>{row.label}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
                 </div>
                 <div style={{
-                  fontFamily:"'DM Mono',monospace", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
+                  fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
                   color: row.type==="cost"||row.type==="total" ? "#c0392b" : row.type==="fee" ? C.muted : "#27ae60",
                 }}>
                   {row.type==="saving" ? "+" : ""}{fmt(row.value)}
@@ -2596,8 +2600,8 @@ function CalculatorPage({ lang, setPage }) {
             {/* Le total du poste vacant: le seul chiffre mis en vedette, et il ne
                 parle pas de nous. */}
             <div style={{ marginTop:"1.5rem", padding:"1.75rem", background:C.ink, borderLeft:`4px solid ${C.orange}` }}>
-              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.5rem" }}>{t.r3}</div>
-              <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2.5rem", fontWeight:700, letterSpacing:"-0.03em", color:"#fff", lineHeight:1 }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.5rem" }}>{t.r3}</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, letterSpacing:"-0.015em", color:"#fff", lineHeight:1 }}>
                 {fmt(totalCost)}
               </div>
             </div>
@@ -2613,11 +2617,11 @@ function CalculatorPage({ lang, setPage }) {
                   padding:"0.9rem 0", borderBottom:`1px solid ${C.rule}`,
                 }}>
                   <div>
-                    <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.ink }}>{row.label}</div>
-                    <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink }}>{row.label}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
                   </div>
                   <div style={{
-                    fontFamily:"'DM Mono',monospace", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
+                    fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
                     color: row.type==="cost" ? "#c0392b" : row.type==="fee" ? C.muted : "#27ae60",
                   }}>
                     {row.type==="saving" && row.value > 0 ? "+" : ""}{fmt(row.value)}
@@ -2627,7 +2631,7 @@ function CalculatorPage({ lang, setPage }) {
             </div>
 
             <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"1.5rem" }}>{t.note}</p>
-            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.75rem", color:C.muted, lineHeight:1.6, marginTop:"1rem" }}>{t.disclaimer}</p>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.75rem", color:C.muted, lineHeight:1.6, marginTop:"1rem" }}>{t.disclaimer}</p>
           </div>
         </div>
       </section>
@@ -2635,10 +2639,10 @@ function CalculatorPage({ lang, setPage }) {
       {/* CTA */}
       <section style={{ background:C.orange, padding:"4rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.8rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.03em" }}>{t.cta}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.8rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em" }}>{t.cta}</h2>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
-            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.cta2}</button>
-            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
+            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.cta2}</button>
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
               {lang==="en"?"Book a Call":"Réserver un appel"}
             </a>
           </div>
@@ -2834,18 +2838,18 @@ function HowWeWorkPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
-        <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.05em" }}>09</div>
+        <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>09</div>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px" }}>{t.sub}</p>
         </div>
       </section>
@@ -2862,10 +2866,10 @@ function HowWeWorkPage({ lang, setPage }) {
                 width:"100%", display:"grid", gridTemplateColumns:"56px 1fr auto",
                 gap:"1.5rem", alignItems:"center", padding:"2rem 0", textAlign:"left",
               }}>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.8rem", fontWeight:700, color: openPhase===i ? C.orange : C.rule, letterSpacing:"-0.03em", lineHeight:1, transition:"color 0.2s" }}>{phase.n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.8rem", fontWeight:700, color: openPhase===i ? C.orange : C.rule, letterSpacing:"-0.015em", lineHeight:1, transition:"color 0.2s" }}>{phase.n}</div>
                 <div>
-                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.4rem" }}>{phase.phase}</div>
-                  <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1rem,2vw,1.2rem)", color:C.ink, letterSpacing:"-0.01em" }}>{phase.h}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{phase.phase}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1rem,2vw,1.2rem)", color:C.ink, letterSpacing:"-0.01em" }}>{phase.h}</div>
                 </div>
                 <span style={{ color:C.orange, fontSize:"1.3rem", fontWeight:300, transition:"transform 0.2s", transform: openPhase===i?"rotate(45deg)":"rotate(0deg)", flexShrink:0 }}>+</span>
               </button>
@@ -2877,12 +2881,12 @@ function HowWeWorkPage({ lang, setPage }) {
                   ))}
                   <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"1.5rem", paddingTop:"1.25rem", borderTop:`1px solid ${C.rule}` }}>
                     <div>
-                      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.3rem" }}>{lang==="en"?"Typical duration":"Durée typique"}</div>
-                      <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.ink }}>{phase.duration}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.3rem" }}>{lang==="en"?"Typical duration":"Durée typique"}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink }}>{phase.duration}</div>
                     </div>
                     <div>
-                      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.12em", textTransform:"uppercase", color:C.orange, marginBottom:"0.3rem" }}>{lang==="en"?"What you get":"Ce que tu reçois"}</div>
-                      <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.ink }}>{phase.deliverable}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.3rem" }}>{lang==="en"?"What you get":"Ce que tu reçois"}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink }}>{phase.deliverable}</div>
                     </div>
                   </div>
                 </div>
@@ -2910,7 +2914,7 @@ function HowWeWorkPage({ lang, setPage }) {
           <div style={{ padding:"4rem 2.5rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
             <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} />
             <p style={{
-              fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic",
+              fontFamily:"'Archivo',sans-serif", fontWeight:400,
               fontSize:"clamp(1.3rem,2.6vw,1.9rem)", lineHeight:1.5, color:"#fff", marginBottom:"1.5rem",
             }}>
               {lang==="en"
@@ -2918,7 +2922,7 @@ function HowWeWorkPage({ lang, setPage }) {
                 : "Le monde que ça vaut la peine d'embaucher travaille déjà. Y sont pas en train de rafraîchir un site d'emploi un mardi soir."}
             </p>
             <p style={{
-              fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.12em",
+              fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.03em",
               textTransform:"uppercase", color:"rgba(255,255,255,0.45)",
             }}>
               {lang==="en" ? "That is the whole method" : "C'est là que la méthode commence"}
@@ -2931,12 +2935,12 @@ function HowWeWorkPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Timelines":"Délais"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,2.8rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.timelineH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.timelineH}</h2>
           <Divider style={{ marginBottom:"0" }} />
           {t.timelines.map((tl, i) => (
             <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"1.5rem 0", borderBottom:`1px solid ${C.rule}`, flexWrap:"wrap", gap:"0.5rem" }}>
-              <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.92rem", color:C.ink }}>{tl.role}</span>
-              <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.06em", color:C.orange, flexShrink:0 }}>{tl.time}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.92rem", color:C.ink }}>{tl.role}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", letterSpacing:"0.06em", color:C.orange, flexShrink:0 }}>{tl.time}</span>
             </div>
           ))}
           <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.88rem", color:C.muted, fontStyle:"italic", marginTop:"1.5rem", lineHeight:1.7 }}>
@@ -2951,12 +2955,12 @@ function HowWeWorkPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Our Commitments":"Nos engagements"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,2.8rem)", letterSpacing:"-0.03em", color:"#fff", marginBottom:"3rem" }}>{t.commitH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.commitH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:"2px", background:"rgba(255,255,255,0.05)" }}>
             {[[t.commit1h,t.commit1p,"01"],[t.commit2h,t.commit2p,"02"],[t.commit3h,t.commit3p,"03"]].map(([h,p,n]) => (
               <div key={n} style={{ background:C.inkLight, padding:"2.5rem 2rem" }}>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2rem", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.05rem", color:"#fff", letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:"#fff", letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -2968,15 +2972,15 @@ function HowWeWorkPage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2.5rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.03em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
-            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"opacity 0.2s" }}
+            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"opacity 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
               onMouseLeave={e => e.currentTarget.style.opacity="1"}
             >{t.cta}</button>
-            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s" }}
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
               onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.5)"}
             >{t.cta2}</a>
@@ -3046,17 +3050,17 @@ function PressPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
         <div style={{ maxWidth:"900px" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,6.5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
@@ -3069,22 +3073,22 @@ function PressPage({ lang, setPage }) {
             <div key={item.id} style={{ padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1rem", flexWrap:"wrap", gap:"0.75rem" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", flexWrap:"wrap" }}>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.muted }}>{item.outlet}</span>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted }}>·</span>
-                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", color:C.muted }}>{item.date}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.muted }}>{item.outlet}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted }}>·</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted }}>{item.date}</span>
                   {item.featured && (
-                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, border:`1px solid ${C.orange}20`, background:C.orange+"10", padding:"2px 8px" }}>{t.featuredLabel}</span>
+                    <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}20`, background:C.orange+"10", padding:"2px 8px" }}>{t.featuredLabel}</span>
                   )}
                 </div>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange + "80" }}>{item.type[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange + "80" }}>{item.type[lang]}</span>
               </div>
 
-              <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{item.title[lang]}</h3>
+              <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{item.title[lang]}</h3>
               <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300, marginBottom:"1.25rem", maxWidth:"680px" }}>{item.desc[lang]}</p>
 
               {item.url && (
                 <a href={item.url} target="_blank" rel="noopener noreferrer" style={{
-                  fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase",
+                  fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
                   color:C.orange, borderBottom:`1px solid ${C.orange}30`, paddingBottom:"2px", transition:"border-color 0.2s",
                 }}
                   onMouseEnter={e => e.currentTarget.style.borderColor=C.orange}
@@ -3096,8 +3100,8 @@ function PressPage({ lang, setPage }) {
 
           {/* Placeholder pour futures mentions */}
           <div style={{ padding:"3rem", background:C.paperDark, marginTop:"2rem", borderLeft:`3px solid rgba(200,200,200,0.3)` }}>
-            <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1rem", color:C.muted, marginBottom:"0.5rem" }}>{t.emptyH}</h3>
-            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.muted, lineHeight:1.7 }}>{t.emptyP}</p>
+            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.muted, marginBottom:"0.5rem" }}>{t.emptyH}</h3>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.muted, lineHeight:1.7 }}>{t.emptyP}</p>
           </div>
         </div>
       </section>
@@ -3106,7 +3110,7 @@ function PressPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <div style={{ width:"36px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(1.8rem,3vw,2.5rem)", letterSpacing:"-0.03em", color:"#fff", marginBottom:"1rem" }}>{t.pitchH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.8rem,3vw,2.5rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"1rem" }}>{t.pitchH}</h2>
           <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:"rgba(255,255,255,0.6)", lineHeight:1.8, marginBottom:"2rem", maxWidth:"520px", fontWeight:300 }}>{t.pitchP}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -3223,17 +3227,17 @@ function ReferralPage({ lang, setPage }) {
     },
   }[lang];
 
-  const inp = { width:"100%", padding:"10px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", outline:"none", transition:"border-color 0.2s" };
+  const inp = { width:"100%", padding:"10px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", outline:"none", transition:"border-color 0.2s" };
 
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(6rem,18vw,16rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.05em" }}>1K$</div>
+      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(6rem,18vw,16rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>1K$</div>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,6rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"560px" }}>{t.sub}</p>
         </div>
       </section>
@@ -3242,7 +3246,7 @@ function ReferralPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The process":"Le processus"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.howH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.howH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))", gap:"2px", background:C.rule }}>
             {[
               [t.s1h, t.s1p, "01"],
@@ -3251,8 +3255,8 @@ function ReferralPage({ lang, setPage }) {
               [t.s4h, t.s4p, "04"],
             ].map(([h, p, n]) => (
               <div key={n} style={{ background:C.white, padding:"2.5rem 2rem" }}>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -3263,12 +3267,12 @@ function ReferralPage({ lang, setPage }) {
       {/* Why refer */}
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"3rem" }}>
             {[[t.why1h,t.why1p,"01"],[t.why2h,t.why2p,"02"],[t.why3h,t.why3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
                 <div style={{ width:"36px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>{h}</h3>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -3280,7 +3284,7 @@ function ReferralPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Submit a referral":"Soumettre une référence"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,2.8rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"0.5rem" }}>{t.formH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"0.5rem" }}>{t.formH}</h2>
           <p style={{ color:C.muted, fontSize:"0.9rem", marginBottom:"3rem" }}>{t.formSub}</p>
 
           {sent ? (
@@ -3292,7 +3296,7 @@ function ReferralPage({ lang, setPage }) {
             <div>
               {/* Your info */}
               <div style={{ marginBottom:"3rem" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.orange, marginBottom:"1.5rem" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"1.5rem" }}>
                   {lang==="en"?"Your information":"Tes informations"}
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.5rem 2rem" }} className="two-col">
@@ -3309,7 +3313,7 @@ function ReferralPage({ lang, setPage }) {
 
               {/* Their info */}
               <div style={{ marginBottom:"2rem" }}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.orange, marginBottom:"1.5rem" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"1.5rem" }}>
                   {lang==="en"?"Who you're referring":"Qui tu réfères"}
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.5rem 2rem", marginBottom:"1.5rem" }} className="two-col">
@@ -3331,10 +3335,10 @@ function ReferralPage({ lang, setPage }) {
               </div>
 
               {touched && missing && (
-                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, marginBottom:"1rem" }}>{msg.required}</p>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.orange, marginBottom:"1rem" }}>{msg.required}</p>
               )}
               {status === "error" && (
-                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.orange, marginBottom:"1rem", lineHeight:1.6 }}>{msg.errorMsg}</p>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.orange, marginBottom:"1rem", lineHeight:1.6 }}>{msg.errorMsg}</p>
               )}
               <button className="btn-orange" onClick={submit} disabled={status === "sending"}
                 style={{ opacity: status === "sending" ? 0.6 : 1 }}>
@@ -3353,7 +3357,7 @@ function ReferralPage({ lang, setPage }) {
           {t.terms.map((term, i) => (
             <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"1rem", padding:"1rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <span style={{ color:C.orange, fontSize:"0.7rem", marginTop:"3px", flexShrink:0 }}>▸</span>
-              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", color:C.muted, lineHeight:1.7 }}>{term}</p>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.muted, lineHeight:1.7 }}>{term}</p>
             </div>
           ))}
         </div>
@@ -3388,21 +3392,21 @@ function FooterNewsletter({ lang }) {
     } catch { setStatus("error"); }
   };
 
-  if (status === "done" || status === "mail") return <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>{t.done}</p>;
+  if (status === "done" || status === "mail") return <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>{t.done}</p>;
 
   return (
     <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", alignItems:"flex-end" }}>
       <input type="email" placeholder={t.placeholder} value={email} onChange={e => setEmail(e.target.value)}
         onKeyDown={e => e.key==="Enter" && handleSubmit()}
-        style={{ flex:"1 1 180px", padding:"9px 0", background:"transparent", border:"none", borderBottom:"1px solid rgba(255,255,255,0.2)", color:"#fff", fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", outline:"none" }}
+        style={{ flex:"1 1 180px", padding:"9px 0", background:"transparent", border:"none", borderBottom:"1px solid rgba(255,255,255,0.2)", color:"#fff", fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", outline:"none" }}
       />
       <button onClick={handleSubmit} disabled={status==="sending"} style={{
         background:C.orange, color:"#fff", padding:"9px 20px",
-        fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:"0.75rem",
+        fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.75rem",
         letterSpacing:"0.08em", textTransform:"uppercase", cursor:"pointer", flexShrink:0,
         opacity: status==="sending" ? 0.6 : 1,
       }}>{status==="sending" ? t.sending : t.cta}</button>
-      {status==="error" && <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:"#e74c3c", width:"100%" }}>{t.error}</p>}
+      {status==="error" && <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"#e74c3c", width:"100%" }}>{t.error}</p>}
     </div>
   );
 }
@@ -3418,27 +3422,27 @@ function Footer({ lang, setPage }) {
       <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
         <div style={{ marginBottom:"3rem", borderLeft:`3px solid ${C.orange}`, padding:"1.5rem 2rem", background:"rgba(255,255,255,0.04)" }}>
           <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
-          <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"0.95rem", color:"#fff", marginBottom:"1rem" }}>
+          <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:"#fff", marginBottom:"1rem" }}>
             {lang==="en"?"Get new articles in your inbox.":"Reçois les nouveaux articles par courriel."}
           </h3>
           <FooterNewsletter lang={lang} />
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:"3rem", marginBottom:"3rem" }}>
           <div>
-            <button onClick={() => setPage("home")} style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"1.3rem", color:C.paper, letterSpacing:"-0.01em", display:"flex", alignItems:"center", gap:"3px", marginBottom:"1rem" }}>
+            <button onClick={() => setPage("home")} style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"1.3rem", color:C.paper, letterSpacing:"-0.01em", display:"flex", alignItems:"center", gap:"3px", marginBottom:"1rem" }}>
               PROFORCE<span style={{ color:C.orange }}>.</span>
             </button>
-            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.4)", lineHeight:1.7, maxWidth:"220px" }}>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.4)", lineHeight:1.7, maxWidth:"220px" }}>
               {lang==="en"?"Specialist recruitment. Food, CPG & Fashion. Montreal, Quebec City & Toronto. Since 2001.":"Recrutement spécialisé. Alimentaire, CPG & Mode. Montréal, Québec & Toronto. Depuis 2001."}
             </p>
           </div>
 
           <div style={{ display:"flex", gap:"4rem", flexWrap:"wrap" }}>
             <div>
-              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.orange, marginBottom:"1rem" }}>Pages</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"1rem" }}>Pages</div>
               <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
                 {links.map(([k,l]) => (
-                  <PageLink key={k} to={k} setPage={setPage} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s" }}
+                  <PageLink key={k} to={k} setPage={setPage} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.color=C.paper}
                     onMouseLeave={e => e.currentTarget.style.color="rgba(244,241,235,0.45)"}
                   >{l}</PageLink>
@@ -3446,8 +3450,8 @@ function Footer({ lang, setPage }) {
               </div>
             </div>
             <div>
-              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.orange, marginBottom:"1rem" }}>Contact</div>
-              <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", lineHeight:2 }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"1rem" }}>Contact</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", lineHeight:2 }}>
                 <a href="tel:+15149050606" style={{ color:"inherit", textDecoration:"none" }}>(514) 905-0606</a><br/>
                 <a href="tel:+14184311441" style={{ color:"inherit", textDecoration:"none" }}>(418) 431-1441</a><br/>
                 <a href="tel:+16474906626" style={{ color:"inherit", textDecoration:"none" }}>(647) 490-6626</a><br/>
@@ -3490,12 +3494,12 @@ function Footer({ lang, setPage }) {
         </div>
 
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:"1.5rem", display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:"0.75rem", alignItems:"center" }}>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)" }}>© {new Date().getFullYear()} Proforce Personnel Inc.</p>
-          <button onClick={() => setPage("privacy")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)", transition:"color 0.2s" }}
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)" }}>© {new Date().getFullYear()} Proforce Personnel Inc.</p>
+          <button onClick={() => setPage("privacy")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)", transition:"color 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.color="rgba(255,255,255,0.5)"}
             onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.2)"}
           >{lang==="en"?"Privacy Policy":"Politique de confidentialité"}</button>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)" }}>proforce.ca</p>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)" }}>proforce.ca</p>
         </div>
       </div>
     </footer>
@@ -3715,14 +3719,14 @@ const track = {
 function NotFoundPage({ lang, setPage }) {
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(12rem,30vw,28rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", pointerEvents:"none", letterSpacing:"-0.05em" }}>404</div>
+      <section style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(12rem,30vw,28rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", pointerEvents:"none", letterSpacing:"-0.025em" }}>404</div>
         <div style={{ maxWidth:"600px", margin:"0 auto", textAlign:"center", position:"relative" }}>
-          <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.orange, marginBottom:"2rem" }}>404</div>
-          <h1 style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,7vw,5rem)", color:"#fff", letterSpacing:"-0.03em", lineHeight:0.95, marginBottom:"1rem" }}>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.orange, marginBottom:"2rem" }}>404</div>
+          <h1 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,4.6vw,3.4rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>
             {lang==="en" ? "This page doesn't exist." : "Cette page n'existe pas."}
           </h1>
-          <h2 style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.5rem,4vw,3rem)", color:C.orange, lineHeight:1, marginBottom:"3rem" }}>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,4vw,3rem)", color:C.orange, lineHeight:1, marginBottom:"3rem" }}>
             {lang==="en" ? "But we can still help." : "Mais on peut quand même aider."}
           </h2>
           <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"1rem", lineHeight:1.75, marginBottom:"3rem" }}>
@@ -3734,7 +3738,7 @@ function NotFoundPage({ lang, setPage }) {
             <button className="btn-orange" onClick={() => setPage("home")}>
               {lang==="en" ? "Back to Home" : "Retour à l'accueil"}
             </button>
-            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.25)", color:"#fff", padding:"11px 28px", fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", background:"transparent", cursor:"pointer", transition:"border-color 0.2s" }}
+            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.25)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", background:"transparent", cursor:"pointer", transition:"border-color 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
               onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.25)"}
               onClick={() => setPage("contact")}
@@ -3744,7 +3748,7 @@ function NotFoundPage({ lang, setPage }) {
           </div>
           <div style={{ marginTop:"4rem", display:"flex", gap:"2rem", justifyContent:"center", flexWrap:"wrap" }}>
             {[["food", lang==="en"?"Food & CPG":"Alimentaire & CPG"],["fashion", lang==="en"?"Fashion":"Mode"],["blog", lang==="en"?"Blog":"Blogue"],["team", lang==="en"?"Team":"Équipe"]].map(([k,l]) => (
-              <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.4)", borderBottom:`1px solid rgba(255,255,255,0.15)`, paddingBottom:"2px", transition:"color 0.2s" }}
+              <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)", borderBottom:`1px solid rgba(255,255,255,0.15)`, paddingBottom:"2px", transition:"color 0.2s" }}
                 onMouseEnter={e => e.currentTarget.style.color=C.orange}
                 onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.4)"}
               >{l}</button>
@@ -3795,11 +3799,11 @@ function PrivacyPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"780px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"1rem" }}>{t.h1}</h1>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", color:"rgba(255,255,255,0.35)", marginTop:"1rem" }}>{t.updated}</p>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"1rem" }}>{t.h1}</h1>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:"rgba(255,255,255,0.35)", marginTop:"1rem" }}>{t.updated}</p>
         </div>
       </section>
 
@@ -3808,7 +3812,7 @@ function PrivacyPage({ lang, setPage }) {
           <Divider style={{ marginBottom:"0" }} />
           {t.sections.map((s, i) => (
             <div key={i} style={{ padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
-              <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{s.h}</h2>
+              <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{s.h}</h2>
               <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{s.p}</p>
             </div>
           ))}
@@ -4422,13 +4426,13 @@ function GlossaryPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"50vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Industry Glossary":"Glossaire de l'industrie"}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,6.5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>
+          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>
             {lang==="en" ? "Know the language." : "Connaître le vocabulaire."}
           </h1>
-          <h2 className="fu2" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
+          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
             {lang==="en" ? "Food, CPG & Fashion." : "Alimentaire, CPG et mode."}
           </h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>
@@ -4444,18 +4448,18 @@ function GlossaryPage({ lang, setPage }) {
           {/* Filters + search */}
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2.5rem", flexWrap:"wrap", gap:"1.5rem" }}>
             <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap" }}>
-              <button onClick={() => setActiveFilter("all")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color: activeFilter==="all" ? C.orange : C.muted, borderBottom: activeFilter==="all" ? `1px solid ${C.orange}` : "1px solid transparent", paddingBottom:"2px" }}>
+              <button onClick={() => setActiveFilter("all")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color: activeFilter==="all" ? C.orange : C.muted, borderBottom: activeFilter==="all" ? `1px solid ${C.orange}` : "1px solid transparent", paddingBottom:"2px" }}>
                 {lang==="en"?"All":"Tout"}
               </button>
               {cats.map(cat => (
-                <button key={cat} onClick={() => setActiveFilter(cat)} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color: activeFilter===cat ? C.orange : C.muted, borderBottom: activeFilter===cat ? `1px solid ${C.orange}` : "1px solid transparent", paddingBottom:"2px" }}>
+                <button key={cat} onClick={() => setActiveFilter(cat)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color: activeFilter===cat ? C.orange : C.muted, borderBottom: activeFilter===cat ? `1px solid ${C.orange}` : "1px solid transparent", paddingBottom:"2px" }}>
                   {cat}
                 </button>
               ))}
             </div>
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder={lang==="en"?"Search terms...":"Rechercher..."}
-              style={{ padding:"7px 12px", border:`1px solid ${C.rule}`, fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.06em", color:C.ink, outline:"none", background:"transparent", width:"180px" }}
+              style={{ padding:"7px 12px", border:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.06em", color:C.ink, outline:"none", background:"transparent", width:"180px" }}
               onFocus={e => e.target.style.borderColor=C.orange}
               onBlur={e => e.target.style.borderColor=C.rule}
             />
@@ -4474,15 +4478,15 @@ function GlossaryPage({ lang, setPage }) {
           {filtered.map((item, i) => (
             <div key={item.term} style={{ padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1rem", flexWrap:"wrap", gap:"0.5rem" }}>
-                <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em" }}>{item.term}</h2>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, border:`1px solid ${C.orange}20`, padding:"3px 8px", background:C.orange+"10", flexShrink:0 }}>{item.cat[lang]}</span>
+                <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em" }}>{item.term}</h2>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}20`, padding:"3px 8px", background:C.orange+"10", flexShrink:0 }}>{item.cat[lang]}</span>
               </div>
               <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{item.def[lang]}</p>
             </div>
           ))}
 
           <div style={{ marginTop:"4rem", padding:"2.5rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
-            <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.25rem" }}>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.25rem" }}>
               {lang==="en"
                 ? "Have a term you'd like us to add? Or want to talk about a role that requires any of this expertise?"
                 : "Un terme que tu aimerais qu'on ajoute? Ou tu veux parler d'un rôle qui exige une de ces expertises?"}
@@ -4513,17 +4517,17 @@ function MarketPage({ lang, setPage, market }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(${marketPhoto.replace(".jpg", ".webp")})`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(${marketPhoto.replace(".jpg", ".webp")})`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
         <div style={{ maxWidth:"900px" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,6.5rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(1.8rem,4vw,4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -4541,36 +4545,36 @@ function MarketPage({ lang, setPage, market }) {
                 onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
                 onMouseLeave={e => e.currentTarget.style.background=C.white}
               >
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{s.h}</h3>
-                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", color:C.muted, lineHeight:1.75, marginBottom:"1.5rem" }}>{s.p}</p>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange }}>{lang==="en"?"Learn more →":"En savoir plus →"}</span>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{s.h}</h3>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.muted, lineHeight:1.75, marginBottom:"1.5rem" }}>{s.p}</p>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{lang==="en"?"Learn more →":"En savoir plus →"}</span>
               </button>
             ))}
           </div>
 
           {/* Recruiters */}
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"2rem" }}>{t.recruiterH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"2rem" }}>{t.recruiterH}</h2>
           <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap", marginBottom:"4rem" }}>
             {recruiters.map(m => (
               <div key={m.name} style={{ background:C.ink, padding:"1.75rem", borderTop:`3px solid ${C.orange}`, flex:"1 1 220px" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:"1rem", marginBottom:"1rem" }}>
                   <Avatar m={m} size={56} />
                   <div>
-                    <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"0.9rem", color:"#fff" }}>{m.name}</div>
-                    <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginTop:"2px" }}>{m.title[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:"#fff" }}>{m.name}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginTop:"2px" }}>{m.title[lang]}</div>
                   </div>
                 </div>
-                <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", color:"rgba(255,255,255,0.55)", lineHeight:1.6 }}>{m.sector[lang]}</p>
-                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"5px", fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginTop:"1rem", borderBottom:`1px solid rgba(255,255,255,0.15)`, paddingBottom:"2px" }}><LinkedInIcon />LinkedIn</a>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(255,255,255,0.55)", lineHeight:1.6 }}>{m.sector[lang]}</p>
+                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"5px", fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginTop:"1rem", borderBottom:`1px solid rgba(255,255,255,0.15)`, paddingBottom:"2px" }}><LinkedInIcon />LinkedIn</a>
               </div>
             ))}
           </div>
 
           {/* Contact */}
           <div style={{ background:C.paperDark, padding:"2.5rem", borderLeft:`3px solid ${C.orange}` }}>
-            <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginBottom:"0.5rem" }}>{lang==="en"?"Office":"Bureau"}</div>
-            <a href={`tel:+1${t.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'DM Sans',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"0.35rem", fontWeight:500, textDecoration:"none" }}>{t.phone}</a>
-            <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.85rem", color:C.muted, marginBottom:"1.5rem" }}>{t.addr}</div>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.5rem" }}>{lang==="en"?"Office":"Bureau"}</div>
+            <a href={`tel:+1${t.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.ink, marginBottom:"0.35rem", fontWeight:500, textDecoration:"none" }}>{t.phone}</a>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.muted, marginBottom:"1.5rem" }}>{t.addr}</div>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
           </div>
         </div>
@@ -4679,20 +4683,20 @@ function StartupPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"70vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/startup.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/startup.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
         {/* Background number */}
-        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.05em" }}>01</div>
+        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>01</div>
 
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -4702,7 +4706,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The challenge":"Le défi"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.diffH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.diffH}</h2>
           <Divider style={{ marginBottom:"0" }} />
           {[
             [t.diff1h, t.diff1p, "01"],
@@ -4711,9 +4715,9 @@ function StartupPage({ lang, setPage }) {
             [t.diff4h, t.diff4p, "04"],
           ].map(([h, p, n]) => (
             <div key={n} style={{ display:"grid", gridTemplateColumns:"60px 1fr", gap:"2rem", padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
-              <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2rem", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1 }}>{n}</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1 }}>{n}</div>
               <div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{p}</p>
               </div>
             </div>
@@ -4725,7 +4729,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Our clients":"Nos clients"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.whoH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whoH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"2px", background:C.rule }}>
             {[
               [t.who1h, t.who1p],
@@ -4734,7 +4738,7 @@ function StartupPage({ lang, setPage }) {
             ].map(([h, p]) => (
               <div key={h} style={{ background:C.white, padding:"2.5rem 2rem" }}>
                 <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -4746,10 +4750,10 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"What we fill":"Ce qu'on comble"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.rolesH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.rolesH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {t.roles.map((r, i) => (
-              <div key={r} style={{ padding:"1rem 1.5rem", borderRight:(i+1)%3!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
+              <div key={r} style={{ padding:"1rem 1.5rem", borderRight:(i+1)%3!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
                 <span style={{ color:C.orange, fontSize:"0.7rem", flexShrink:0 }}>▸</span>{r}
               </div>
             ))}
@@ -4761,12 +4765,12 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"2px", background:"rgba(255,255,255,0.05)" }}>
             {t.steps.map(s => (
               <div key={s.n} style={{ background:C.inkLight, padding:"2.5rem 2rem" }}>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.03em", lineHeight:1, marginBottom:"1.5rem" }}>{s.n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1rem", color:"#fff", letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{s.h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1, marginBottom:"1.5rem" }}>{s.n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:"#fff", letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{s.h}</h3>
                 <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.85rem", lineHeight:1.75 }}>{s.p}</p>
               </div>
             ))}
@@ -4789,9 +4793,9 @@ function StartupPage({ lang, setPage }) {
                 onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
               >
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange }}>0{i+1}</span>
-                <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(0.95rem,2vw,1.1rem)", color:C.ink, letterSpacing:"-0.01em" }}>{post.title[lang]}</span>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange }}>0{i+1}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(0.95rem,2vw,1.1rem)", color:C.ink, letterSpacing:"-0.01em" }}>{post.title[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
               </button>
               <Divider />
             </div>
@@ -4803,10 +4807,10 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,5vw,3.5rem)", color:"#fff", letterSpacing:"-0.03em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
             onMouseLeave={e => e.currentTarget.style.opacity="1"}
           >{t.cta}</button>
@@ -4864,19 +4868,19 @@ function SimonPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"75vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"8rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
+      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
-        <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.05em" }}>SS</div>
+        <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>SS</div>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Clash Display',sans-serif", fontWeight:700, fontSize:"clamp(3rem,8vw,7rem)", letterSpacing:"-0.03em", color:"#fff", lineHeight:0.9, marginBottom:"0.5rem" }}>{t.h1}</h1>
-          <h2 style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:"rgba(255,255,255,0.45)", lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
-          <h2 style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontStyle:"italic", fontSize:"clamp(2rem,5vw,5rem)", color:C.orange, lineHeight:0.95 }}>{t.h1ii}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.9, marginBottom:"0.5rem" }}>{t.h1}</h1>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:"rgba(255,255,255,0.45)", lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95 }}>{t.h1ii}</h2>
         </div>
       </section>
 
@@ -4894,12 +4898,12 @@ function SimonPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Philosophy":"Philosophie"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:C.ink, marginBottom:"3rem" }}>{t.philH}</h2>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.philH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"3rem" }}>
             {[[t.p1h,t.p1p,"01"],[t.p2h,t.p2p,"02"],[t.p3h,t.p3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.62rem", letterSpacing:"0.15em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
-                <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
@@ -4911,23 +4915,23 @@ function SimonPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The people who shaped me":"Les gens qui m'ont formé"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(2rem,4vw,3rem)", letterSpacing:"-0.03em", color:"#fff", marginBottom:"4rem" }}>
+          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"4rem" }}>
             {lang==="en" ? "Nobody does this alone." : "Personne ne fait ça seul."}
           </h2>
 
           {/* Christopher Livingstone */}
           <div style={{ borderLeft:`3px solid ${C.orange}`, paddingLeft:"2rem", marginBottom:"3.5rem" }}>
             <div style={{ display:"flex", alignItems:"center", gap:"1rem", marginBottom:"1.25rem", flexWrap:"wrap" }}>
-              <div style={{ width:"44px", height:"44px", background:C.orange, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Clash Display',sans-serif", fontSize:"0.9rem", color:"#fff", fontWeight:700, flexShrink:0 }}>CL</div>
+              <div style={{ width:"44px", height:"44px", background:C.orange, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:"#fff", fontWeight:700, flexShrink:0 }}>CL</div>
               <div>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.05rem", color:"#fff" }}>Christopher Livingstone</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, marginTop:"2px" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:"#fff" }}>Christopher Livingstone</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginTop:"2px" }}>
                   {lang==="en"?"Recruitment Mentor":"Mentor en recrutement"}
                 </div>
               </div>
               <a href="https://www.linkedin.com/in/chrislivingstone" target="_blank" rel="noopener noreferrer" style={{
                 marginLeft:"auto", display:"inline-flex", alignItems:"center", gap:"5px",
-                fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase",
+                fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase",
                 color:"rgba(255,255,255,0.35)", borderBottom:"1px solid rgba(255,255,255,0.15)", paddingBottom:"2px", transition:"color 0.2s",
               }}
                 onMouseEnter={e => e.currentTarget.style.color=C.orange}
@@ -4945,10 +4949,10 @@ function SimonPage({ lang, setPage }) {
           {/* David Inzlicht */}
           <div style={{ borderLeft:`3px solid rgba(255,255,255,0.15)`, paddingLeft:"2rem" }}>
             <div style={{ display:"flex", alignItems:"center", gap:"1rem", marginBottom:"1.25rem", flexWrap:"wrap" }}>
-              <div style={{ width:"44px", height:"44px", background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Clash Display',sans-serif", fontSize:"0.9rem", color:"rgba(255,255,255,0.6)", fontWeight:700, flexShrink:0 }}>DI</div>
+              <div style={{ width:"44px", height:"44px", background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:"rgba(255,255,255,0.6)", fontWeight:700, flexShrink:0 }}>DI</div>
               <div>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.05rem", color:"#fff" }}>David Inzlicht</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"rgba(255,255,255,0.4)", marginTop:"2px" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:"#fff" }}>David Inzlicht</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)", marginTop:"2px" }}>
                   {lang==="en"?"Business Mentor, Founder, Proforce Personnel":"Mentor en affaires, Fondateur, Proforce Personnel"}
                 </div>
               </div>
@@ -4972,18 +4976,18 @@ function SimonPage({ lang, setPage }) {
             <div key={item.id} style={{ display:"grid", gridTemplateColumns:"auto 1fr auto", gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <span style={{ width:"18px", height:"2px", background:C.orange, display:"block" }} />
               <div>
-                <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{item.title[lang]}</div>
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.muted }}>{item.outlet} · {item.date}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{item.title[lang]}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted }}>{item.outlet} · {item.date}</div>
               </div>
               {item.url && (
-                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, whiteSpace:"nowrap" }}>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, whiteSpace:"nowrap" }}>
                   {lang==="en"?"Listen →":"Écouter →"}
                 </a>
               )}
             </div>
           ))}
           <div style={{ marginTop:"1.5rem" }}>
-            <button onClick={() => setPage("press")} style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("press")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"All media mentions →":"Toutes les mentions médias →"}
             </button>
           </div>
@@ -4998,7 +5002,7 @@ function SimonPage({ lang, setPage }) {
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3rem" }} className="two-col">
             <div>
               <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-              <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>
+              <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Coach, Football & Softball":"Coach, Football & Balle-molle"}
               </h3>
               <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300 }}>
@@ -5009,7 +5013,7 @@ function SimonPage({ lang, setPage }) {
             </div>
             <div>
               <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-              <h3 style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>
+              <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Father of three":"Père de trois filles"}
               </h3>
               <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300 }}>
@@ -5036,12 +5040,12 @@ function SimonPage({ lang, setPage }) {
                 onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
               >
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", color:C.orange }}>0{i+1}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange }}>0{i+1}</span>
                 <div>
-                  <div style={{ fontFamily:"'Clash Display',sans-serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{post.title[lang]}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{post.title[lang]}</div>
                   <div style={{ fontFamily:"'Spectral',serif", fontSize:"0.83rem", color:C.muted, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
                 </div>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.58rem", color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
               </button>
               <Divider />
             </div>
@@ -5063,7 +5067,7 @@ function SimonPage({ lang, setPage }) {
           </div>
           <a href="https://www.linkedin.com/in/simonstamand" target="_blank" rel="noopener noreferrer" style={{
             display:"inline-flex", alignItems:"center", gap:"8px",
-            fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textTransform:"uppercase",
+            fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
             color:"rgba(255,255,255,0.4)", borderBottom:"1px solid rgba(255,255,255,0.15)", paddingBottom:"2px", transition:"color 0.2s",
           }}
             onMouseEnter={e => e.currentTarget.style.color=C.orange}
@@ -5122,7 +5126,7 @@ function SimonPage({ lang, setPage }) {
           position:"fixed", bottom:"2rem", right:"2rem", zIndex:150,
           background:C.orange, color:"#fff",
           padding:"12px 20px",
-          fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:"0.75rem",
+          fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.75rem",
           letterSpacing:"0.08em", textTransform:"uppercase",
           boxShadow:"0 4px 20px rgba(232,93,26,0.4)",
           display:"flex", alignItems:"center", gap:"8px",
