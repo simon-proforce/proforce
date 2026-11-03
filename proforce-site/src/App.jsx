@@ -149,6 +149,27 @@ const G = `
   /* <picture> ne doit pas casser les grilles: il disparait de la mise en page. */
   picture { display:contents; }
 
+  /* ── Listes numerotees ────────────────────────────────────────────────
+     Un filet orange a gauche de chaque item et le chiffre en serif. Le
+     meme traitement tient en trois colonnes et une fois empile sur
+     telephone, donc il n'y a qu'une seule regle a maintenir. */
+  .num-list { gap:2rem !important; border:none !important; }
+  .num-list > * {
+    border:none !important;
+    border-left:3px solid ${C.orange} !important;
+    padding:0.15rem 0 0.15rem 1.3rem !important;
+    background:transparent !important;
+  }
+  .num-list > * > div:first-child {
+    font-family:'Playfair Display',serif !important;
+    font-size:1rem !important;
+    font-weight:600 !important;
+    letter-spacing:0 !important;
+    color:#c24a10 !important;
+    margin-bottom:0.65rem !important;
+  }
+  .num-list > * > h3 { margin-bottom:0.7rem !important; }
+
   @media(max-width:768px){
     /* Les chiffres debordaient de leur colonne et se chevauchaient:
        MTL+TOR a 2.5rem demande plus de largeur qu'une demi colonne de 390px. */
@@ -180,26 +201,7 @@ const G = `
        avant meme qu'on voie le nom de la personne. */
     .team-photo { max-width:190px !important; }
 
-    /* ── Listes numerotees ──────────────────────────────────────────────
-       En trois colonnes, l'espace entre les blocs se lit comme des colonnes.
-       Empilees sur telephone, le meme espace se lit comme du vide. On
-       remplace l'ecart par un filet: ca redevient une liste. */
-    .stack-rule { gap:0 !important; }
-    .stack-rule > * {
-      padding:1.9rem 0 !important;
-      border-top:1px solid ${C.rule} !important;
-    }
-    .stack-rule > *:first-child { border-top:none !important; padding-top:0 !important; }
-    .stack-rule > *:last-child  { padding-bottom:0 !important; }
-
-    /* Grilles encadrees: les filets verticaux n'ont plus de sens une fois
-       les cases empilees, ils laissaient une barre orpheline a droite. */
-    .box-grid > * {
-      border-right:none !important;
-      border-bottom:1px solid ${C.rule} !important;
-      padding:1.9rem 1.5rem !important;
-    }
-    .box-grid > *:last-child { border-bottom:none !important; }
+    .num-list { gap:1.9rem !important; }
 
     /* Bandeau d'equipe de l'accueil: la vignette et le nom cote a cote
        plutot qu'une petite photo perdue dans la largeur. */
@@ -867,7 +869,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col stack-rule" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
+          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
@@ -1076,7 +1078,7 @@ function SectorPage({ lang, setPage, sector }) {
 
       {/* Bande photo pleine largeur entre les postes et les trois arguments */}
       {sector === "food" && (
-        <section style={{ background:C.ink, overflow:"hidden" }}>
+        <section className="band-full" style={{ background:C.ink, overflow:"hidden" }}>
           <div style={{ width:"100%", height:"clamp(200px,28vw,360px)", position:"relative" }}>
             <Photo
               src="/photos/ligne-fromage.jpg" w={1600} h={900}
@@ -1092,7 +1094,7 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.paper, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col box-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1547,7 +1549,7 @@ function AboutPage({ lang }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"What We Stand For":"Ce qu'on défend"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col box-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.v1h,t.v1p,"01"],[t.v2h,t.v2p,"02"],[t.v3h,t.v3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1706,7 +1708,7 @@ function CandidatesPage({ lang, setPage }) {
 
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col box-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
+          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
             {[[t.h1h,t.h1p,"01"],[t.h2h,t.h2p,"02"],[t.h3h,t.h3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1868,7 +1870,7 @@ function EmployersPage({ lang, setPage }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
-          <div className="box-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="num-list" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"],[t.w4h,t.w4p,"04"]].map(([h,p,n],i) => (
               <div key={n} style={{
                 padding:"2.5rem 2rem",
