@@ -668,14 +668,14 @@ function HomePage({ lang, setPage }) {
            Chaque image vit dans son propre bloc: <picture> est en display:contents
            dans la feuille globale, donc l'image seule ne tient pas sa case. ── */}
       <section className="photo-band-3" style={{ display:"flex", gap:"4px", background:"#fff" }}>
-        {[["/photos/usine-vue-ensemble.jpg", 2,
-           lang==="en" ? "Wide view of a food processing plant" : "Vue d'ensemble d'une usine de transformation alimentaire"],
-          ["/photos/panneau-controle.jpg", 1,
-           lang==="en" ? "Operator at a production line control panel" : "Opérateur devant un panneau de contrôle sur une ligne de production"],
-          ["/photos/usine-discussion.jpg", 1,
-           lang==="en" ? "Two people talking on a production floor" : "Deux personnes qui discutent sur un plancher de production"]].map(([src,grow,alt]) => (
+        {[["/photos/rte-equipe.jpg", 2, 1600, 900,
+           lang==="en" ? "Packing lines in a ready-to-eat plant, workers along both sides" : "Lignes d'emballage dans une usine de prêt-à-manger, du monde des deux côtés"],
+          ["/photos/controle-emballage.jpg", 1, 900, 900,
+           lang==="en" ? "Quality technician checking product on a packaging line" : "Technicienne qualité qui vérifie un produit sur une ligne d'emballage"],
+          ["/photos/atelier-patrons.jpg", 1, 900, 900,
+           lang==="en" ? "Pattern room in an apparel studio, dress form and fabric rolls" : "Salle de patrons dans un atelier de vêtements, mannequin et rouleaux de tissu"]].map(([src,grow,w,h,alt]) => (
           <div key={src} style={{ flex:`${grow} 1 0`, minWidth:0, height:"clamp(190px,24vw,300px)", overflow:"hidden" }}>
-            <Photo src={src} w={1600} h={1067} alt={alt}
+            <Photo src={src} w={w} h={h} alt={alt}
               style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
           </div>
         ))}
@@ -714,12 +714,12 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1150px", margin:"0 auto" }}>
           <Eyebrow>{t.secLabel}</Eyebrow>
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.75rem" }}>
-            {[["food", "/photos/affinage-fromage.jpg", t.foodH, t.foodP,
-               lang==="en" ? "Cheese ageing room" : "Chambre d'affinage de fromage"],
-              ["fashion", "/photos/entrepot-vetements.jpg", t.fashH, t.fashP,
-               lang==="en" ? "Apparel warehouse aisle" : "Allée d'un entrepôt de vêtements"]].map(([pg,img,h,txt,alt]) => (
+            {[["food", "/photos/fromagerie-cuve.jpg", t.foodH, t.foodP,
+               lang==="en" ? "Two cheesemakers lifting curd from a copper vat" : "Deux fromagers qui sortent le caillé d'une cuve de cuivre"],
+              ["fashion", "/photos/atelier-couture.jpg", t.fashH, t.fashP,
+               lang==="en" ? "Designer pinning a garment on a dress form in an apparel studio" : "Designer qui épingle un vêtement sur un mannequin dans un atelier"]].map(([pg,img,h,txt,alt]) => (
               <button key={pg} onClick={() => setPage(pg)} style={{ textAlign:"left", display:"block", width:"100%" }}>
-                <Photo src={img} w={1600} h={1067} alt={alt}
+                <Photo src={img} w={1400} h={700} alt={alt}
                   style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{h}</h3>
                 <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{txt}</p>
