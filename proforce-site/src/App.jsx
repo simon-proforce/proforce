@@ -672,8 +672,8 @@ function HomePage({ lang, setPage }) {
            lang==="en" ? "Sorting line, workers grading apples behind the belt" : "Ligne de triage, des employés qui classent des pommes derrière le convoyeur"],
           ["/photos/chocolat-mains.jpg", 1, 900, 900,
            lang==="en" ? "Worker checking coated chocolate coming out of a panning drum" : "Employée qui vérifie des dragées de chocolat à la sortie de la turbine"],
-          ["/photos/boulangerie-fournee.jpg", 1, 900, 900,
-           lang==="en" ? "Braided loaves coming out of a bakery deck oven" : "Pains tressés qui sortent d'un four de boulangerie"]].map(([src,grow,w,h,alt]) => (
+          ["/photos/atelier-patrons.jpg", 1, 900, 900,
+           lang==="en" ? "Pattern room in an apparel studio, dress form and fabric rolls" : "Salle de patrons dans un atelier de vêtements, mannequin et rouleaux de tissu"]].map(([src,grow,w,h,alt]) => (
           <div key={src} style={{ flex:`${grow} 1 0`, minWidth:0, height:"clamp(190px,24vw,300px)", overflow:"hidden" }}>
             <Photo src={src} w={w} h={h} alt={alt}
               style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
@@ -722,14 +722,10 @@ function HomePage({ lang, setPage }) {
               <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.foodP}</p>
             </button>
 
-            {/* Carte Mode: bloc marine en attendant une vraie photo d'atelier.
-                Pas d'image AI, pas d'image empruntee a une autre page. */}
             <button onClick={() => setPage("fashion")} style={{ textAlign:"left", display:"block", width:"100%" }}>
-              <div style={{ height:"170px", background:C.ink, display:"flex", alignItems:"flex-end", padding:"1.4rem 1.5rem", marginBottom:"1rem" }}>
-                <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.25rem", lineHeight:1.3, color:"#fff" }}>
-                  {lang==="en" ? "From the pattern room to the buying office." : "De la salle de patrons au bureau des achats."}
-                </p>
-              </div>
+              <Photo src="/photos/atelier-couture.jpg" w={1400} h={700}
+                alt={lang==="en" ? "Designer pinning a garment on a dress form in an apparel studio" : "Designer qui épingle un vêtement sur un mannequin dans un atelier"}
+                style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.fashH}</h3>
               <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.fashP}</p>
             </button>
