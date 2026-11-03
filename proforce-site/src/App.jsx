@@ -62,11 +62,12 @@ const C = {
 };
 
 // ─── FONTS ────────────────────────────────────────────────────────────────────
-// Deux familles, pas quatre. Archivo porte tout le sans, des titres jusqu'aux
-// etiquettes; Spectral reste pour les moments editoriaux. Quatre familles,
-// c'est une habitude de generateur; deux, c'est une marque.
+// Deux familles. Playfair Display, un serif a fort contraste, porte les titres
+// et les phrases qui doivent peser. Archivo porte le reste: menu, corps de
+// texte, etiquettes, boutons. Le contraste entre les deux est le dispositif
+// principal de la mise en page, a la place des blocs de couleur.
 const fonts = `
-  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Archivo:wght@400;500;600;700&display=swap');
 `;
 
 // ─── GLOBAL ───────────────────────────────────────────────────────────────────
@@ -76,24 +77,25 @@ const G = `
   html { scroll-behavior:smooth; }
   body { font-family:'Archivo',sans-serif; background:${C.paper}; color:${C.ink}; }
 
-  h1,h2,h3 { font-family:'Archivo',sans-serif; font-weight:600; letter-spacing:-0.012em; }
+  h1,h2,h3 { font-family:'Playfair Display',serif; font-weight:500; letter-spacing:-0.005em; }
 
   /* Règle typographique */
   .rule { display:block; width:100%; height:1px; background:${C.rule}; }
   .rule-orange { display:block; height:2px; background:${C.orange}; }
 
   /* Label de section */
-  /* L'etiquette etait en monospace majuscules espacee a 0.18em, 41 fois sur le
-     site. C'est le tic le plus copie des pages generees. Elle redevient une
-     ligne de texte ordinaire. */
+  /* Le libelle de section, pose sur un filet qui traverse la largeur. Le filet
+     fait le travail que faisait le gros titre: il ouvre la section. */
   .eyebrow {
-    font-family:'Archivo',sans-serif; font-size:0.82rem; font-weight:500;
-    letter-spacing:0; text-transform:none; color:${C.muted};
-    display:flex; align-items:center; gap:10px;
+    font-family:'Archivo',sans-serif; font-size:0.72rem; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase; color:#c24a10;
+    display:block; padding-bottom:0.7rem; margin-bottom:1.4rem;
+    border-bottom:2px solid ${C.orange};
   }
-  .eyebrow::before { content:''; display:inline-block; width:20px; height:1px; background:${C.orange}; }
 
   /* Boutons */
+  .btn-ink::after, .btn-orange::after, .btn-ghost::after { content:'\\00a0\\00a0↗'; }
+
   .btn-ink {
     display:inline-block; background:${C.ink}; color:#fff;
     padding:12px 28px; font-family:'Archivo',sans-serif; font-weight:600;
@@ -103,12 +105,12 @@ const G = `
   .btn-ink:hover { background:${C.inkLight}; transform:translateY(-2px); }
 
   .btn-orange {
-    display:inline-block; background:${C.orange}; color:#fff;
+    display:inline-block; background:#c24a10; color:#fff;
     padding:12px 28px; font-family:'Archivo',sans-serif; font-weight:600;
     font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
     transition:background 0.2s, transform 0.15s;
   }
-  .btn-orange:hover { background:${C.orangeHov}; transform:translateY(-2px); }
+  .btn-orange:hover { background:#a33d0c; transform:translateY(-2px); }
 
   .btn-ghost {
     display:inline-block; border:1.5px solid ${C.ink}; color:${C.ink};
@@ -558,6 +560,7 @@ function HomePage({ lang, setPage }) {
   const t = {
     en:{
       issue:"Vol. 25, Specialist Recruitment",
+      heroLabel:"Specialist recruitment in food, CPG and fashion",
       h1:"We know\nyour industry.",
       h1em:"Not just the job.",
       sub:"Proforce Personnel places food, CPG, and fashion professionals across Montreal, Quebec City, and Toronto. No generalists. No job boards. A network built over 25 years.",
@@ -585,6 +588,7 @@ function HomePage({ lang, setPage }) {
     },
     fr:{
       issue:"Vol. 25, Recrutement spécialisé",
+      heroLabel:"Recrutement spécialisé en alimentaire, CPG et mode",
       h1:"On connaît\nton industrie.",
       h1em:"Pas juste le poste.",
       sub:"Proforce Personnel place des professionnels de l'alimentaire, du CPG et de la mode à Montréal, Québec et Toronto. Pas de généralistes. Pas de babillards. Un réseau bâti sur 25 ans.",
@@ -619,7 +623,7 @@ function HomePage({ lang, setPage }) {
         {/* Large issue number watermark */}
         <div className="hero-mark" style={{
           position:"absolute", top:"56px", right:"2rem",
-          fontFamily:"'Archivo',sans-serif", fontSize:"clamp(6rem,20vw,18rem)",
+          fontFamily:"'Playfair Display',serif", fontSize:"clamp(6rem,20vw,18rem)",
           fontWeight:700, color:"rgba(255,255,255,0.04)", lineHeight:1,
           userSelect:"none", pointerEvents:"none", letterSpacing:"-0.02em",
         }}>2001</div>
@@ -633,23 +637,30 @@ function HomePage({ lang, setPage }) {
           </div>
         </div>
 
-        <div style={{ maxWidth:"900px" }}>
-          {/* Orange accent */}
-          <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
+        <div style={{ maxWidth:"1060px", width:"100%" }}>
+          <div className="fu" style={{ marginBottom:"2rem" }}>
+            <div style={{
+              fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600,
+              letterSpacing:"0.08em", textTransform:"uppercase", color:"#f0803f",
+              paddingBottom:"0.7rem",
+            }}>{t.heroLabel}</div>
+            <div style={{ height:"2px", background:C.orange }} />
+          </div>
 
           <h1 className="fu2" style={{
-            fontFamily:"'Archivo',sans-serif", fontWeight:700,
-            fontSize:"clamp(2.4rem,6vw,4.4rem)", lineHeight:0.92,
-            letterSpacing:"-0.015em", color:"#fff", whiteSpace:"pre-line",
-            marginBottom:"1rem",
+            fontFamily:"'Playfair Display',serif", fontWeight:500,
+            fontSize:"clamp(2.2rem,5.4vw,4.1rem)", lineHeight:1.05,
+            letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff",
+            whiteSpace:"pre-line", marginBottom:"0.6rem",
           }}>
             {t.h1}
           </h1>
           {/* Suite du titre, en div: un seul H1 par page pour le referencement */}
           <div className="fu2" style={{
-            fontFamily:"'Archivo',sans-serif", fontWeight:400,
-            fontSize:"clamp(2rem,5vw,3.8rem)", lineHeight:0.95,
-            letterSpacing:"-0.01em", color:C.orange, marginBottom:"3rem",
+            fontFamily:"'Playfair Display',serif", fontWeight:500,
+            fontSize:"clamp(2.2rem,5.4vw,4.1rem)", lineHeight:1.05,
+            letterSpacing:"-0.005em", textTransform:"uppercase",
+            color:C.orange, marginBottom:"2.6rem",
           }}>
             {t.h1em}
           </div>
@@ -714,7 +725,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:"3rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow>{lang==="en"?"Specialties":"Spécialités"}</Eyebrow>
-            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,4vw,3rem)", letterSpacing:"-0.015em", color:C.ink }}>{t.s2label}</h2>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,4vw,3rem)", letterSpacing:"-0.015em", color:C.ink }}>{t.s2label}</h2>
           </div>
           <Divider style={{ marginBottom:"3rem" }} />
           <p style={{ color:C.muted, fontSize:"1rem", lineHeight:1.7, maxWidth:"480px", marginBottom:"4rem" }}>{t.s2p}</p>
@@ -733,7 +744,7 @@ function HomePage({ lang, setPage }) {
                 </div>
                 <div style={{ padding:"2.5rem 2.5rem 3rem" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{s.n}</div>
-                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.4rem,3vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"1rem" }}>{s.h}</h3>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.4rem,3vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"1rem" }}>{s.h}</h3>
                 <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"2rem" }}>{s.p}</p>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange }}>
                   {lang==="en"?"Read more →":"En savoir plus →"}
@@ -752,12 +763,12 @@ function HomePage({ lang, setPage }) {
           {/* Le chiffre en vedette, avec sa phrase */}
           <div className="two-col" style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:"3rem", alignItems:"baseline", marginBottom:"4rem" }}>
             <div className="proof-hero" style={{
-              fontFamily:"'Archivo',sans-serif", fontWeight:700, color:C.orange,
+              fontFamily:"'Playfair Display',serif", fontWeight:700, color:C.orange,
               fontSize:"clamp(4.5rem,11vw,9rem)", lineHeight:0.85, letterSpacing:"-0.02em", whiteSpace:"nowrap",
             }}>{t.p1n}</div>
             <div style={{ maxWidth:"460px" }}>
               <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
-              <p style={{ fontFamily:"'Spectral',serif", fontWeight:300, fontSize:"clamp(1.1rem,2vw,1.5rem)", lineHeight:1.55, color:"#fff", marginBottom:"0.75rem" }}>{t.p1h}</p>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:300, fontSize:"clamp(1.1rem,2vw,1.5rem)", lineHeight:1.55, color:"#fff", marginBottom:"0.75rem" }}>{t.p1h}</p>
               <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.5)" }}>{t.p1p}</p>
             </div>
           </div>
@@ -769,7 +780,7 @@ function HomePage({ lang, setPage }) {
             {[[t.p2n,t.p2p],[t.p3n,t.p3p],[t.p4n,t.p4p]].map(([n,p]) => (
               <div key={p}>
                 <div className="proof-num" style={{
-                  fontFamily:"'Archivo',sans-serif", fontWeight:700, color:C.orange,
+                  fontFamily:"'Playfair Display',serif", fontWeight:700, color:C.orange,
                   fontSize:"clamp(2rem,3.4vw,3.2rem)", lineHeight:1, letterSpacing:"-0.015em", marginBottom:"0.85rem",
                 }}>{n}</div>
                 <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.62)" }}>{p}</p>
@@ -787,7 +798,7 @@ function HomePage({ lang, setPage }) {
           <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
             <Eyebrow>{lang==="en"?"Clients":"Clients"}</Eyebrow>
             <h2 style={{
-              fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3.4vw,2.6rem)",
+              fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3.4vw,2.6rem)",
               letterSpacing:"-0.015em", color:C.ink, lineHeight:1.15, margin:"1.25rem 0 0.9rem", maxWidth:"620px",
             }}>{t.cliH}</h2>
             <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.7, maxWidth:"520px", marginBottom:"3.5rem" }}>{t.cliP}</p>
@@ -876,7 +887,7 @@ function HomePage({ lang, setPage }) {
             >
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em", width:"28px" }}>0{i+1}</span>
               <div>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
+                <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"rgba(255,255,255,0.35)", marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
               </div>
               <div style={{ textAlign:"right" }}>
@@ -911,7 +922,7 @@ function HomePage({ lang, setPage }) {
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
               >
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:C.orange }}>0{i+1}</span>
-                <span style={{ fontFamily:"'Spectral',serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:C.ink, fontWeight:400 }}>{p.title[lang]}</span>
+                <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:C.ink, fontWeight:400 }}>{p.title[lang]}</span>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>{p.date}</span>
               </button>
               <Divider />
@@ -925,7 +936,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2.5rem" }} />
           <p style={{
-            fontFamily:"'Archivo',sans-serif", fontWeight:400,
+            fontFamily:"'Playfair Display',serif", fontWeight:400,
             fontSize:"clamp(1.5rem,3.4vw,2.6rem)", lineHeight:1.3, color:"#fff",
             whiteSpace:"pre-line", marginBottom:"2.5rem",
           }}>{t.noH}</p>
@@ -943,7 +954,7 @@ function HomePage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.7rem,3.4vw,2.6rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.7rem,3.4vw,2.6rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", lineHeight:1.7, maxWidth:"420px" }}>{t.ctaP}</p>
           </div>
           <button onClick={() => setPage("contact")} style={{
@@ -1002,8 +1013,8 @@ function SectorPage({ lang, setPage, sector }) {
       }}>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.01em", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.01em", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.72)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px", marginBottom:"2rem" }}>{t.sub}</p>
           <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -1057,7 +1068,7 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em", maxWidth:"580px", lineHeight:1.05 }}>{t.ctaH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em", maxWidth:"580px", lineHeight:1.05 }}>{t.ctaH}</h2>
           <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0 }}>{t.cta}</button>
         </div>
       </section>
@@ -1145,7 +1156,7 @@ function FAQSection({ lang, type, setPage }) {
     <section style={{ background:C.paperDark, padding:"5rem 2rem" }}>
       <div style={{ maxWidth:"800px", margin:"0 auto" }}>
         <Eyebrow>{lang==="en"?"FAQ":"Foire aux questions"}</Eyebrow>
-        <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.8rem,3.5vw,2.5rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>
+        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,3.5vw,2.5rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>
           {lang==="en"?"Common questions." : "Questions fréquentes."}
         </h2>
         <Divider style={{ marginBottom:"0" }} />
@@ -1160,7 +1171,7 @@ function FAQSection({ lang, type, setPage }) {
             </button>
             {open===i && (
               <div style={{ paddingBottom:"1.5rem" }}>
-                <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{faq.a}</p>
+                <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{faq.a}</p>
               </div>
             )}
           </div>
@@ -1332,7 +1343,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:"rgba(255,255,255,0.3)" }}>·</span>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)" }}>{c.tag[lang]}</span>
             </div>
-            <h1 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{c.title[lang]}</h1>
+            <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{c.title[lang]}</h1>
             <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"2rem" }}>
               {[[t.exp, c.exp[lang]], [t.market, c.market[lang]], [t.avail, c.avail[lang]], [t.recruiter, c.recruiter]].map(([label, val]) => (
                 <div key={label}>
@@ -1349,7 +1360,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
             <Divider style={{ marginBottom:"3rem" }} />
 
             <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"1.25rem" }}>{t.fullBio}</h2>
-            <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.05rem", lineHeight:1.85, color:C.muted, fontWeight:300, marginBottom:"3rem" }}>{c.summary[lang]}</p>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.05rem", lineHeight:1.85, color:C.muted, fontWeight:300, marginBottom:"3rem" }}>{c.summary[lang]}</p>
 
             <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"1.25rem" }}>{t.highlights}</h2>
             <div style={{ display:"flex", flexDirection:"column", gap:"0" }}>
@@ -1380,8 +1391,8 @@ function FeaturedCandidatesPage({ lang, setPage }) {
       <section style={{ background:C.ink, minHeight:"33vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/talents.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.8rem,4vw,4.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.8rem,4vw,4.5rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1486,8 +1497,8 @@ function AboutPage({ lang }) {
       <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1.05rem", lineHeight:1.8, maxWidth:"600px" }}>{t.story}</p>
         </div>
       </section>
@@ -1523,10 +1534,10 @@ function TeamPage({ lang, setPage, setBlogPost }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Our Team":"Notre équipe"}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"1.5rem" }}>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"1.5rem" }}>
             {lang==="en"?"Seven specialists." : "Sept spécialistes."}
           </h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95 }}>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95 }}>
             {lang==="en"?"No generalists." : "Aucun généraliste."}
           </h2>
         </div>
@@ -1588,7 +1599,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                             onMouseLeave={e => e.currentTarget.style.opacity="1"}
                           >
                             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, flexShrink:0 }}>0{j+1}</span>
-                            <span style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.ink }}>{post.title[lang]}</span>
+                            <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.ink }}>{post.title[lang]}</span>
                             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, marginLeft:"auto", flexShrink:0 }}>{post.date}</span>
                           </button>
                         ))}
@@ -1607,7 +1618,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
       <section style={{ background:C.paperDark, padding:"4.5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <div style={{ maxWidth:"540px" }}>
-            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "Proforce has been doing this since 2001." : "Proforce fait ça depuis 2001."}</h3>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "Proforce has been doing this since 2001." : "Proforce fait ça depuis 2001."}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Seven people is what the firm looks like today. If you want the rest of the story, how it started and what changed along the way, it is on the about page." : "Sept personnes, c'est ce que la firme est aujourd'hui. Si tu veux le reste de l'histoire, comment ça a commencé et ce qui a changé en chemin, c'est sur la page À propos."}</p>
           </div>
           <button className="btn-ink" onClick={() => setPage("about")} style={{ flexShrink:0 }}>{lang==="en" ? "About Proforce" : "À propos de Proforce"}</button>
@@ -1638,8 +1649,8 @@ function CandidatesPage({ lang, setPage }) {
       <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.5rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"0.5rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"3rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"500px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1757,8 +1768,8 @@ function EmployersPage({ lang, setPage }) {
         </div>
         <div style={{ maxWidth:"900px" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
@@ -1775,7 +1786,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{t.processLabel}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.processH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.processH}</h2>
           <Divider style={{ marginBottom:"0" }} />
           {t.steps.map((step, i) => (
             <div key={step.n} style={{ display:"grid", gridTemplateColumns:"80px 1fr", gap:"2rem", padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
@@ -1798,7 +1809,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"],[t.w4h,t.w4p,"04"]].map(([h,p,n],i) => (
               <div key={n} style={{
@@ -1860,7 +1871,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
           <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
@@ -1874,7 +1885,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"4.5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <div style={{ maxWidth:"540px" }}>
-            <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "People we are talking to right now." : "Du monde à qui on parle en ce moment."}</h3>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "People we are talking to right now." : "Du monde à qui on parle en ce moment."}</h3>
             <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Anonymous profiles of real candidates we know personally. If one of them looks like the person you need, tell us and we will make the introduction." : "Des profils anonymisés de vrais candidats qu'on connaît personnellement. Si un d'eux ressemble à la personne qu'il te faut, dis-le nous et on fait l'introduction."}</p>
           </div>
           <button className="btn-ink" onClick={() => setPage("featured")} style={{ flexShrink:0 }}>{lang==="en" ? "See the profiles" : "Voir les profils"}</button>
@@ -1901,8 +1912,8 @@ function JobListingsPage({ lang }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/emplois.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"500px" }}>{t.sub}</p>
         </div>
       </section>
@@ -1945,8 +1956,8 @@ function GivingPage({ lang }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/dons.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"480px" }}>{t.sub}</p>
         </div>
       </section>
@@ -2115,7 +2126,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{post.cat[lang]}</span>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:C.muted }}>{post.date} · {post.read[lang]}</span>
             </div>
-            <h1 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(1.7rem,3.2vw,2.5rem)", letterSpacing:"-0.015em", color:C.ink, lineHeight:1.05, marginBottom:"2.5rem" }}>{post.title[lang]}</h1>
+            <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(1.7rem,3.2vw,2.5rem)", letterSpacing:"-0.015em", color:C.ink, lineHeight:1.05, marginBottom:"2.5rem" }}>{post.title[lang]}</h1>
             {post.recruiter && (() => { const a = TEAM.find(t => t.name === post.recruiter); return a ? (
               <div style={{ display:"flex", alignItems:"center", gap:"0.85rem", marginTop:"-1rem", marginBottom:"2.5rem" }}>
                 <Avatar m={a} size={44} />
@@ -2142,7 +2153,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
           <div style={{ maxWidth:"680px", margin:"0 auto" }}>
             <Divider style={{ marginBottom:"3rem" }} />
             {post.body[lang].split("\n\n").map((para,i) => (
-              <p key={i} style={{ fontFamily:"'Spectral',serif", fontSize:"1.05rem", lineHeight:1.9, color:C.inkLight, marginBottom:"1.75rem", fontWeight:300 }}>{para}</p>
+              <p key={i} style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.05rem", lineHeight:1.9, color:C.inkLight, marginBottom:"1.75rem", fontWeight:300 }}>{para}</p>
             ))}
             <Divider style={{ marginTop:"3rem", marginBottom:"2rem" }} />
             <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"3rem" }}>
@@ -2165,10 +2176,10 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Proforce Blog":"Blogue Proforce"}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"1rem" }}>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92, marginBottom:"1rem" }}>
             {lang==="en"?"Straight talk." : "Du vrai parler."}
           </h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
             {lang==="en"?"No fluff." : "Pas de remplissage."}
           </h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"480px" }}>
@@ -2215,7 +2226,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 
           {filtered.length === 0 && (
             <div style={{ padding:"4rem 0", textAlign:"center" }}>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:C.muted, fontStyle:"italic" }}>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", color:C.muted, fontStyle:"italic" }}>
                 {lang==="en" ? `No articles found for "${query}".` : `Aucun article trouvé pour « ${query} ».`}
               </p>
               <button onClick={() => { setQuery(""); setFilter("all"); }} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, marginTop:"1rem", borderBottom:`1px solid ${C.orange}` }}>
@@ -2250,8 +2261,8 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                       <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.02em" }}>{post.cat[lang]}</span>
                       <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, letterSpacing:"0.06em" }}>{post.date} · {post.read[lang]}</span>
                     </div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.5rem,3.4vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", lineHeight:1.12, marginBottom:"0.8rem" }}>{post.title[lang]}</div>
-                    <div style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:C.muted, lineHeight:1.7, fontStyle:"italic", maxWidth:"620px" }}>{post.excerpt[lang]}</div>
+                    <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.5rem,3.4vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", lineHeight:1.12, marginBottom:"0.8rem" }}>{post.title[lang]}</div>
+                    <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:C.muted, lineHeight:1.7, fontStyle:"italic", maxWidth:"620px" }}>{post.excerpt[lang]}</div>
                   </button>
                   <Divider />
                 </div>
@@ -2276,8 +2287,8 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                       style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                   </div>
                   <div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1rem,2.5vw,1.35rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.5rem" }}>{post.title[lang]}</div>
-                    <div style={{ fontFamily:"'Spectral',serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.65, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
+                    <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1rem,2.5vw,1.35rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.5rem" }}>{post.title[lang]}</div>
+                    <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.65, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
                   </div>
                   {meta}
                 </button>
@@ -2341,7 +2352,7 @@ function ContactPage({ lang }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.4rem,6vw,4.4rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.4rem,6vw,4.4rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
         </div>
       </section>
 
@@ -2402,7 +2413,7 @@ function ContactPage({ lang }) {
             {sent ? (
               <div style={{ padding:"4rem 0" }}>
                 <div style={{ width:"32px", height:"2px", background:C.orange, marginBottom:"1.5rem" }} />
-                <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.2rem", color:C.ink, fontStyle:"italic", lineHeight:1.6 }}>
+                <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.2rem", color:C.ink, fontStyle:"italic", lineHeight:1.6 }}>
                   {status === "mail" ? t.sentMail : t.sent}
                 </p>
               </div>
@@ -2540,8 +2551,8 @@ function CalculatorPage({ lang, setPage }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
@@ -2630,7 +2641,7 @@ function CalculatorPage({ lang, setPage }) {
               ))}
             </div>
 
-            <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"1.5rem" }}>{t.note}</p>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"1.5rem" }}>{t.note}</p>
             <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.75rem", color:C.muted, lineHeight:1.6, marginTop:"1rem" }}>{t.disclaimer}</p>
           </div>
         </div>
@@ -2639,7 +2650,7 @@ function CalculatorPage({ lang, setPage }) {
       {/* CTA */}
       <section style={{ background:C.orange, padding:"4rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.8rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em" }}>{t.cta}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em" }}>{t.cta}</h2>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.cta2}</button>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
@@ -2845,11 +2856,11 @@ function HowWeWorkPage({ lang, setPage }) {
             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
-        <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>09</div>
+        <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>09</div>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px" }}>{t.sub}</p>
         </div>
       </section>
@@ -2869,7 +2880,7 @@ function HowWeWorkPage({ lang, setPage }) {
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.8rem", fontWeight:700, color: openPhase===i ? C.orange : C.rule, letterSpacing:"-0.015em", lineHeight:1, transition:"color 0.2s" }}>{phase.n}</div>
                 <div>
                   <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{phase.phase}</div>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1rem,2vw,1.2rem)", color:C.ink, letterSpacing:"-0.01em" }}>{phase.h}</div>
+                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1rem,2vw,1.2rem)", color:C.ink, letterSpacing:"-0.01em" }}>{phase.h}</div>
                 </div>
                 <span style={{ color:C.orange, fontSize:"1.3rem", fontWeight:300, transition:"transform 0.2s", transform: openPhase===i?"rotate(45deg)":"rotate(0deg)", flexShrink:0 }}>+</span>
               </button>
@@ -2877,7 +2888,7 @@ function HowWeWorkPage({ lang, setPage }) {
               {openPhase === i && (
                 <div style={{ paddingBottom:"2.5rem", paddingLeft:"calc(56px + 1.5rem)" }}>
                   {phase.p.split("\n\n").map((para, j) => (
-                    <p key={j} style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300, marginBottom:"1.25rem" }}>{para}</p>
+                    <p key={j} style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300, marginBottom:"1.25rem" }}>{para}</p>
                   ))}
                   <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"1.5rem", paddingTop:"1.25rem", borderTop:`1px solid ${C.rule}` }}>
                     <div>
@@ -2914,7 +2925,7 @@ function HowWeWorkPage({ lang, setPage }) {
           <div style={{ padding:"4rem 2.5rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
             <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} />
             <p style={{
-              fontFamily:"'Archivo',sans-serif", fontWeight:400,
+              fontFamily:"'Playfair Display',serif", fontWeight:400,
               fontSize:"clamp(1.3rem,2.6vw,1.9rem)", lineHeight:1.5, color:"#fff", marginBottom:"1.5rem",
             }}>
               {lang==="en"
@@ -2935,7 +2946,7 @@ function HowWeWorkPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Timelines":"Délais"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.timelineH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.timelineH}</h2>
           <Divider style={{ marginBottom:"0" }} />
           {t.timelines.map((tl, i) => (
             <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"1.5rem 0", borderBottom:`1px solid ${C.rule}`, flexWrap:"wrap", gap:"0.5rem" }}>
@@ -2943,7 +2954,7 @@ function HowWeWorkPage({ lang, setPage }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", letterSpacing:"0.06em", color:C.orange, flexShrink:0 }}>{tl.time}</span>
             </div>
           ))}
-          <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.88rem", color:C.muted, fontStyle:"italic", marginTop:"1.5rem", lineHeight:1.7 }}>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", color:C.muted, fontStyle:"italic", marginTop:"1.5rem", lineHeight:1.7 }}>
             {lang==="en"
               ? "These are typical ranges based on current market conditions. Timelines vary based on role complexity, candidate availability, and interview speed on the client side."
               : "Ce sont des fourchettes typiques basées sur les conditions actuelles du marché. Les délais varient selon la complexité du rôle, la disponibilité des candidats et la vitesse des entrevues du côté client."}
@@ -2955,7 +2966,7 @@ function HowWeWorkPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Our Commitments":"Nos engagements"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.commitH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.commitH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:"2px", background:"rgba(255,255,255,0.05)" }}>
             {[[t.commit1h,t.commit1p,"01"],[t.commit2h,t.commit2p,"02"],[t.commit3h,t.commit3p,"03"]].map(([h,p,n]) => (
               <div key={n} style={{ background:C.inkLight, padding:"2.5rem 2rem" }}>
@@ -2972,7 +2983,7 @@ function HowWeWorkPage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2.5rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
@@ -3059,8 +3070,8 @@ function PressPage({ lang, setPage }) {
         </div>
         <div style={{ maxWidth:"900px" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
@@ -3084,7 +3095,7 @@ function PressPage({ lang, setPage }) {
               </div>
 
               <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{item.title[lang]}</h3>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300, marginBottom:"1.25rem", maxWidth:"680px" }}>{item.desc[lang]}</p>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300, marginBottom:"1.25rem", maxWidth:"680px" }}>{item.desc[lang]}</p>
 
               {item.url && (
                 <a href={item.url} target="_blank" rel="noopener noreferrer" style={{
@@ -3110,8 +3121,8 @@ function PressPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <div style={{ width:"36px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.8rem,3vw,2.5rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"1rem" }}>{t.pitchH}</h2>
-          <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:"rgba(255,255,255,0.6)", lineHeight:1.8, marginBottom:"2rem", maxWidth:"520px", fontWeight:300 }}>{t.pitchP}</p>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,3vw,2.5rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"1rem" }}>{t.pitchH}</h2>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"rgba(255,255,255,0.6)", lineHeight:1.8, marginBottom:"2rem", maxWidth:"520px", fontWeight:300 }}>{t.pitchP}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
       </section>
@@ -3233,11 +3244,11 @@ function ReferralPage({ lang, setPage }) {
     <div>
       {/* Hero */}
       <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(6rem,18vw,16rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>1K$</div>
+        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(6rem,18vw,16rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>1K$</div>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"560px" }}>{t.sub}</p>
         </div>
       </section>
@@ -3246,7 +3257,7 @@ function ReferralPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The process":"Le processus"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.howH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.howH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))", gap:"2px", background:C.rule }}>
             {[
               [t.s1h, t.s1p, "01"],
@@ -3267,7 +3278,7 @@ function ReferralPage({ lang, setPage }) {
       {/* Why refer */}
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"3rem" }}>
             {[[t.why1h,t.why1p,"01"],[t.why2h,t.why2p,"02"],[t.why3h,t.why3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
@@ -3284,13 +3295,13 @@ function ReferralPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Submit a referral":"Soumettre une référence"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"0.5rem" }}>{t.formH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"0.5rem" }}>{t.formH}</h2>
           <p style={{ color:C.muted, fontSize:"0.9rem", marginBottom:"3rem" }}>{t.formSub}</p>
 
           {sent ? (
             <div style={{ padding:"3rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
               <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:C.ink, fontStyle:"italic", lineHeight:1.6 }}>{status === "mail" ? msg.sentMail : t.sent}</p>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", color:C.ink, fontStyle:"italic", lineHeight:1.6 }}>{status === "mail" ? msg.sentMail : t.sent}</p>
             </div>
           ) : (
             <div>
@@ -3720,13 +3731,13 @@ function NotFoundPage({ lang, setPage }) {
   return (
     <div>
       <section style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(12rem,30vw,28rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", pointerEvents:"none", letterSpacing:"-0.025em" }}>404</div>
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", fontFamily:"'Playfair Display',serif", fontSize:"clamp(12rem,30vw,28rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", pointerEvents:"none", letterSpacing:"-0.025em" }}>404</div>
         <div style={{ maxWidth:"600px", margin:"0 auto", textAlign:"center", position:"relative" }}>
           <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.orange, marginBottom:"2rem" }}>404</div>
-          <h1 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2rem,4.6vw,3.4rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>
+          <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2rem,4.6vw,3.4rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>
             {lang==="en" ? "This page doesn't exist." : "Cette page n'existe pas."}
           </h1>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,4vw,3rem)", color:C.orange, lineHeight:1, marginBottom:"3rem" }}>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,4vw,3rem)", color:C.orange, lineHeight:1, marginBottom:"3rem" }}>
             {lang==="en" ? "But we can still help." : "Mais on peut quand même aider."}
           </h2>
           <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"1rem", lineHeight:1.75, marginBottom:"3rem" }}>
@@ -3802,7 +3813,7 @@ function PrivacyPage({ lang, setPage }) {
       <section style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"780px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"1rem" }}>{t.h1}</h1>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"1rem" }}>{t.h1}</h1>
           <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:"rgba(255,255,255,0.35)", marginTop:"1rem" }}>{t.updated}</p>
         </div>
       </section>
@@ -3813,7 +3824,7 @@ function PrivacyPage({ lang, setPage }) {
           {t.sections.map((s, i) => (
             <div key={i} style={{ padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{s.h}</h2>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{s.p}</p>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{s.p}</p>
             </div>
           ))}
           <div style={{ paddingTop:"3rem" }}>
@@ -4429,10 +4440,10 @@ function GlossaryPage({ lang, setPage }) {
       <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 3.5rem" }}>
         <div style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Industry Glossary":"Glossaire de l'industrie"}</Eyebrow>
-          <h1 className="fu" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>
+          <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>
             {lang==="en" ? "Know the language." : "Connaître le vocabulaire."}
           </h1>
-          <h2 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
+          <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2rem" }}>
             {lang==="en" ? "Food, CPG & Fashion." : "Alimentaire, CPG et mode."}
           </h2>
           <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>
@@ -4469,7 +4480,7 @@ function GlossaryPage({ lang, setPage }) {
 
           {filtered.length === 0 && (
             <div style={{ padding:"4rem 0", textAlign:"center" }}>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:C.muted, fontStyle:"italic" }}>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:C.muted, fontStyle:"italic" }}>
                 {lang==="en" ? `No terms found for "${search}".` : `Aucun terme trouvé pour « ${search} ».`}
               </p>
             </div>
@@ -4481,7 +4492,7 @@ function GlossaryPage({ lang, setPage }) {
                 <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em" }}>{item.term}</h2>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}20`, padding:"3px 8px", background:C.orange+"10", flexShrink:0 }}>{item.cat[lang]}</span>
               </div>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{item.def[lang]}</p>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{item.def[lang]}</p>
             </div>
           ))}
 
@@ -4526,8 +4537,8 @@ function MarketPage({ lang, setPage, market }) {
         </div>
         <div style={{ maxWidth:"900px" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.5rem,3vw,2.4rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -4537,7 +4548,7 @@ function MarketPage({ lang, setPage, market }) {
       <section style={{ background:C.white, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
           <Divider style={{ marginBottom:"3rem" }} />
-          <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.05rem", color:C.muted, lineHeight:1.9, fontWeight:300, marginBottom:"4rem" }}>{t.about}</p>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.05rem", color:C.muted, lineHeight:1.9, fontWeight:300, marginBottom:"4rem" }}>{t.about}</p>
 
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", background:C.rule, marginBottom:"4rem" }} className="two-col">
             {[{h:t.foodH,p:t.foodP,pg:"food"},{h:t.fashH,p:t.fashP,pg:"fashion"}].map(s => (
@@ -4691,12 +4702,12 @@ function StartupPage({ lang, setPage }) {
           </div>
         </div>
         {/* Background number */}
-        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>01</div>
+        <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>01</div>
 
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
-          <h2 className="fu3" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.92, marginBottom:"0.75rem" }}>{t.h1}</h1>
+          <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95, marginBottom:"2.5rem" }}>{t.h1i}</h2>
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
@@ -4706,7 +4717,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The challenge":"Le défi"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.diffH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.diffH}</h2>
           <Divider style={{ marginBottom:"0" }} />
           {[
             [t.diff1h, t.diff1p, "01"],
@@ -4718,7 +4729,7 @@ function StartupPage({ lang, setPage }) {
               <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1 }}>{n}</div>
               <div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.15rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{p}</p>
+                <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.85, fontWeight:300 }}>{p}</p>
               </div>
             </div>
           ))}
@@ -4729,7 +4740,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Our clients":"Nos clients"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whoH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whoH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"2px", background:C.rule }}>
             {[
               [t.who1h, t.who1p],
@@ -4750,7 +4761,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"What we fill":"Ce qu'on comble"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.rolesH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.rolesH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {t.roles.map((r, i) => (
               <div key={r} style={{ padding:"1rem 1.5rem", borderRight:(i+1)%3!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
@@ -4765,7 +4776,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"2px", background:"rgba(255,255,255,0.05)" }}>
             {t.steps.map(s => (
               <div key={s.n} style={{ background:C.inkLight, padding:"2.5rem 2rem" }}>
@@ -4794,7 +4805,7 @@ function StartupPage({ lang, setPage }) {
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
               >
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange }}>0{i+1}</span>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(0.95rem,2vw,1.1rem)", color:C.ink, letterSpacing:"-0.01em" }}>{post.title[lang]}</span>
+                <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.95rem,2vw,1.1rem)", color:C.ink, letterSpacing:"-0.01em" }}>{post.title[lang]}</span>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
               </button>
               <Divider />
@@ -4807,7 +4818,7 @@ function StartupPage({ lang, setPage }) {
       <section style={{ background:C.orange, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
-            <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
           <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
@@ -4875,12 +4886,12 @@ function SimonPage({ lang, setPage }) {
             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
-        <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Archivo',sans-serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>SS</div>
+        <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>SS</div>
         <div style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2rem" }} className="fu" />
-          <h1 className="fu2" style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.9, marginBottom:"0.5rem" }}>{t.h1}</h1>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:"rgba(255,255,255,0.45)", lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95 }}>{t.h1ii}</h2>
+          <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:"#fff", lineHeight:0.9, marginBottom:"0.5rem" }}>{t.h1}</h1>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:"rgba(255,255,255,0.45)", lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:C.orange, lineHeight:0.95 }}>{t.h1ii}</h2>
         </div>
       </section>
 
@@ -4889,7 +4900,7 @@ function SimonPage({ lang, setPage }) {
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <Divider style={{ marginBottom:"3rem" }} />
           {[t.story1, t.story2, t.story3, t.story4, t.story5].map((para, i) => (
-            <p key={i} style={{ fontFamily:"'Spectral',serif", fontSize:"1.05rem", lineHeight:1.9, color:C.inkLight, fontWeight:300, marginBottom:"1.75rem" }}>{para}</p>
+            <p key={i} style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.05rem", lineHeight:1.9, color:C.inkLight, fontWeight:300, marginBottom:"1.75rem" }}>{para}</p>
           ))}
         </div>
       </section>
@@ -4898,7 +4909,7 @@ function SimonPage({ lang, setPage }) {
       <section style={{ background:C.paperDark, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Philosophy":"Philosophie"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.philH}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.philH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"3rem" }}>
             {[[t.p1h,t.p1p,"01"],[t.p2h,t.p2p,"02"],[t.p3h,t.p3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
@@ -4915,7 +4926,7 @@ function SimonPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The people who shaped me":"Les gens qui m'ont formé"}</Eyebrow>
-          <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"4rem" }}>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"4rem" }}>
             {lang==="en" ? "Nobody does this alone." : "Personne ne fait ça seul."}
           </h2>
 
@@ -4938,7 +4949,7 @@ function SimonPage({ lang, setPage }) {
                 onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.35)"}
               ><LinkedInIcon />LinkedIn</a>
             </div>
-            <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.85, fontWeight:300 }}>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.85, fontWeight:300 }}>
               {lang==="en"
                 ? "Christopher hired me. He's the one who took a chance on me when I didn't have a recruitment background, and he taught me everything about this business, how to build relationships, how to have the right conversations, how to actually help people instead of just filling roles. Everything I know about recruiting, I learned from watching him and listening to him. I don't take that lightly."
                 : "C'est Christopher qui m'a embauché. C'est lui qui a pris une chance sur moi quand j'avais pas de background en recrutement, et c'est lui qui m'a tout appris sur ce métier, comment bâtir des relations, comment avoir les bonnes conversations, comment vraiment aider des gens plutôt que juste combler des postes. Tout ce que je sais sur le recrutement, je l'ai appris en le regardant faire et en l'écoutant. Je prends pas ça à la légère."
@@ -4957,7 +4968,7 @@ function SimonPage({ lang, setPage }) {
                 </div>
               </div>
             </div>
-            <p style={{ fontFamily:"'Spectral',serif", fontSize:"1rem", color:"rgba(255,255,255,0.55)", lineHeight:1.85, fontWeight:300 }}>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"rgba(255,255,255,0.55)", lineHeight:1.85, fontWeight:300 }}>
               {lang==="en"
                 ? "David founded Proforce in 2001 and built it into what it was when I joined. When he handed me the keys in 2018, he didn't just give me a company, he gave me a model for how to run a business with integrity. David taught me that the way you treat people, clients and candidates alike, is the business. Not a value. The business. I think about that a lot."
                 : "David a fondé Proforce en 2001 et l'a bâtie pour en faire ce qu'elle était quand je l'ai rejointe. Quand il m'a remis les clés en 2018, il m'a pas juste donné une compagnie, il m'a donné un modèle pour diriger un business avec intégrité. David m'a appris que la façon dont tu traites les gens, clients et candidats pareil, c'est le business. Pas une valeur. Le business. Je pense à ça souvent."
@@ -5005,7 +5016,7 @@ function SimonPage({ lang, setPage }) {
               <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Coach, Football & Softball":"Coach, Football & Balle-molle"}
               </h3>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300 }}>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300 }}>
                 {lang==="en"
                   ? "Simon coached high school football for five years and won two Bols d'Or, provincial championships. He's been coaching softball for ten years. The same things that make a good team make a good recruitment: clear roles, honest feedback, and people who show up when it counts."
                   : "Simon a coaché le football au secondaire pendant cinq ans et remporté deux Bols d'Or, des championnats provinciaux. Il coache la balle-molle depuis dix ans. Ce qui fait une bonne équipe, c'est ce qui fait un bon recrutement : des rôles clairs, du feedback honnête et des gens qui se présentent quand ça compte."}
@@ -5016,7 +5027,7 @@ function SimonPage({ lang, setPage }) {
               <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Father of three":"Père de trois filles"}
               </h3>
-              <p style={{ fontFamily:"'Spectral',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300 }}>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, fontWeight:300 }}>
                 {lang==="en"
                   ? "Simon had his first daughter at 19. He learned quickly what it means to be responsible for someone else. She's 17 now and competes in softball and flag football at a high level. He has two more daughters, one is four, one is five weeks old. He built his career the same way he built his family: with urgency, with intention, and without shortcuts."
                   : "Simon a eu sa première fille à 19 ans. Il a appris rapidement ce que ça veut dire d'être responsable de quelqu'un d'autre. Elle a 17 ans maintenant et compétitionne en balle-molle et flag football à un niveau élevé. Il a deux autres filles, une de 4 ans et une de 5 semaines. Il a bâti sa carrière comme il a bâti sa famille : avec urgence, avec intention, et sans raccourcis."}
@@ -5042,8 +5053,8 @@ function SimonPage({ lang, setPage }) {
               >
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange }}>0{i+1}</span>
                 <div>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{post.title[lang]}</div>
-                  <div style={{ fontFamily:"'Spectral',serif", fontSize:"0.83rem", color:C.muted, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
+                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{post.title[lang]}</div>
+                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.83rem", color:C.muted, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
                 </div>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
               </button>
@@ -5057,7 +5068,7 @@ function SimonPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <Eyebrow>{t.conH}</Eyebrow>
-          <p style={{ fontFamily:"'Spectral',serif", fontSize:"1.1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.8, marginBottom:"3rem", maxWidth:"520px" }}>{t.conP}</p>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.8, marginBottom:"3rem", maxWidth:"520px" }}>{t.conP}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", alignItems:"center", marginBottom:"2.5rem" }}>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="btn-orange" onClick={() => track.contactClick()}>{t.cta}</a>
             <button className="btn-ghost" onClick={() => setPage("contact")} style={{ borderColor:"rgba(255,255,255,0.25)", color:"#fff" }}
