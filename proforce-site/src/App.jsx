@@ -156,6 +156,7 @@ const G = `
     .proof-row  { grid-template-columns:1fr !important; gap:2.25rem !important; }
     .proof-hero { font-size:4rem !important; }
     .client-grid{ grid-template-columns:repeat(2,1fr) !important; }
+    .photo-band-3 { flex-direction:column !important; }
 
     /* Sur telephone un carre de 280px mangeait les trois quarts de l'ecran
        avant meme qu'on voie le nom de la personne. */
@@ -439,21 +440,20 @@ function Nav({ page, setPage, lang, setLang }) {
     <>
       <nav style={{
         position:"fixed", top:0, left:0, right:0, zIndex:200,
-        background: scrolled ? C.ink : "rgba(13,37,69,0.92)",
-        borderBottom: scrolled ? `1px solid rgba(255,255,255,0.1)` : "none",
-        backdropFilter:"blur(8px)",
+        background:"#fff",
+        borderBottom:`1px solid ${scrolled ? C.ink : C.rule}`,
         transition:"background 0.3s",
         padding:"0 2rem", height:"56px",
         display:"flex", alignItems:"center", justifyContent:"space-between",
       }}>
         {/* Wordmark */}
         <PageLink to="home" setPage={setPage} style={{
-          fontFamily:"'Archivo',sans-serif", fontWeight:600,
-          fontSize:"1.15rem", color:"#fff", letterSpacing:"-0.01em",
-          display:"flex", alignItems:"center", gap:"4px",
+          fontFamily:"'Playfair Display',serif", fontWeight:600,
+          fontSize:"1.35rem", color:C.ink, letterSpacing:"-0.005em",
+          display:"flex", alignItems:"center", gap:"3px",
         }}>
-          PROFORCE
-          <span style={{ color:C.orange, fontSize:"1.4rem", lineHeight:1 }}>.</span>
+          Proforce
+          <span style={{ color:C.orange, fontSize:"1.5rem", lineHeight:1 }}>.</span>
         </PageLink>
 
         {/* Desktop links */}
@@ -462,7 +462,7 @@ function Nav({ page, setPage, lang, setLang }) {
             <PageLink key={k} to={k} setPage={setPage} style={{
               fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
-              color: page===k ? C.orange : "rgba(255,255,255,0.65)",
+              color: page===k ? "#c24a10" : C.ink,
               borderBottom: page===k ? `1px solid ${C.orange}` : "1px solid transparent",
               paddingBottom:"1px", transition:"color 0.2s",
             }}>{l}</PageLink>
@@ -470,7 +470,7 @@ function Nav({ page, setPage, lang, setLang }) {
           <button onClick={() => setLang(lang==="en"?"fr":"en")} style={{
             fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem",
             letterSpacing:"0.08em", textTransform:"uppercase",
-            color:C.orange, borderBottom:`1px solid ${C.orange}`,
+            color:"#c24a10", borderBottom:`1px solid #c24a10`,
             paddingBottom:"1px",
           }}>{lang==="en"?"FR":"EN"}</button>
 
@@ -478,7 +478,7 @@ function Nav({ page, setPage, lang, setLang }) {
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
             onClick={() => track.contactClick()}
             style={{
-              background:C.orange, color:"#fff", padding:"7px 16px",
+              background:"#c24a10", color:"#fff", padding:"7px 16px",
               fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.72rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
               transition:"background 0.2s", whiteSpace:"nowrap",
@@ -492,7 +492,7 @@ function Nav({ page, setPage, lang, setLang }) {
 
         {/* Mobile burger */}
         <button className="show-mobile" onClick={() => setOpen(!open)} style={{
-          display:"none", color:"#fff", fontSize:"1.2rem",
+          display:"none", color:C.ink, fontSize:"1.2rem",
           fontFamily:"'Archivo',sans-serif",
         }}>{open?"✕":"☰"}</button>
       </nav>
@@ -584,6 +584,14 @@ function HomePage({ lang, setPage }) {
       w3h:"Placement guarantee", w3p:"Every permanent placement is guaranteed. We stand behind who we send you.",
       noH:"We will tell you no before taking a search we cannot deliver.\nIt costs us searches.\nIt saves you three months.",
       noSrc:"Simon St-Amand, President", noLink:"Read his page",
+      heroCta1:"Let's talk about your role", heroCta2:"Meet the team",
+      proofLabel:"The number we watch",
+      proofH:"Eighty-three percent of our placements come from clients who had already called us once.",
+      proofP:"Seventy-six companies out of a hundred and forty-four have given us two searches or more. Nobody gives a second search to a firm that got the first one wrong.",
+      f1n:"400", f1p:"permanent placements since 2019",
+      f2n:"144", f2p:"client companies",
+      f3n:"24", f3p:"clients at five searches or more",
+      secLabel:"Our two industries",
       ctaH:"Ready to talk?", ctaP:"One call is usually enough to know if we're the right fit.", cta3:"Get in Touch",
     },
     fr:{
@@ -612,185 +620,123 @@ function HomePage({ lang, setPage }) {
       w3h:"Garantie de placement", w3p:"Chaque placement permanent est garanti. On se tient derrière les gens qu'on t'envoie.",
       noH:"On va te dire non avant de prendre un mandat qu'on ne peut pas livrer.\nÇa nous coûte des mandats.\nÇa t'évite trois mois perdus.",
       noSrc:"Simon St-Amand, président", noLink:"Lire sa page",
+      heroCta1:"Parlons de ton poste", heroCta2:"Voir l'équipe",
+      proofLabel:"Le chiffre qu'on regarde",
+      proofH:"Quatre-vingt-trois pour cent de nos placements viennent de clients qui nous avaient déjà appelés une première fois.",
+      proofP:"Soixante-seize entreprises sur cent quarante-quatre nous ont confié deux mandats ou plus. Personne ne donne une deuxième recherche à une firme qui a manqué la première.",
+      f1n:"400", f1p:"placements permanents depuis 2019",
+      f2n:"144", f2p:"entreprises clientes",
+      f3n:"24", f3p:"clients à cinq mandats ou plus",
+      secLabel:"Nos deux industries",
       ctaH:"Prêt à jaser?", ctaP:"Un appel suffit généralement pour savoir si on est le bon fit.", cta3:"Nous contacter",
     },
   }[lang];
 
   return (
     <div>
-      {/* ── HERO ── */}
-      <section className="hero-section" style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"6rem 2rem 4rem", position:"relative", overflow:"hidden" }}>
-        {/* Large issue number watermark */}
-        <div className="hero-mark" style={{
-          position:"absolute", top:"56px", right:"2rem",
-          fontFamily:"'Playfair Display',serif", fontSize:"clamp(6rem,20vw,18rem)",
-          fontWeight:700, color:"rgba(255,255,255,0.04)", lineHeight:1,
-          userSelect:"none", pointerEvents:"none", letterSpacing:"-0.02em",
-        }}>2001</div>
-
-        {/* Top rule + issue label */}
-        <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.15)" }} />
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"0.75rem", gap:"1rem" }}>
-            <span className="hero-meta" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>{t.issue}</span>
-            <span className="hero-meta hide-narrow" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.35)", whiteSpace:"nowrap" }}>proforce.ca</span>
-          </div>
-        </div>
-
-        <div style={{ maxWidth:"1060px", width:"100%" }}>
-          <div className="fu" style={{ marginBottom:"2rem" }}>
-            <div style={{
-              fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600,
-              letterSpacing:"0.08em", textTransform:"uppercase", color:"#f0803f",
-              paddingBottom:"0.7rem",
-            }}>{t.heroLabel}</div>
-            <div style={{ height:"2px", background:C.orange }} />
-          </div>
+      {/* ── HERO ── blanc, un libelle pose sur un filet orange, un seul titre ── */}
+      <section style={{ background:"#fff", padding:"7.5rem 2rem 3.5rem" }}>
+        <div style={{ maxWidth:"1150px", margin:"0 auto" }}>
+          <div className="fu" style={{
+            fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600,
+            letterSpacing:"0.08em", textTransform:"uppercase", color:"#c24a10",
+            paddingBottom:"0.7rem",
+          }}>{t.heroLabel}</div>
+          <div className="fu" style={{ height:"2px", background:C.orange, marginBottom:"1.8rem" }} />
 
           <h1 className="fu2" style={{
             fontFamily:"'Playfair Display',serif", fontWeight:500,
-            fontSize:"clamp(2.2rem,5.4vw,4.1rem)", lineHeight:1.15,
-            letterSpacing:"-0.012em", color:"#fff",
-            whiteSpace:"pre-line", marginBottom:"0.6rem",
+            fontSize:"clamp(2.2rem,5.4vw,4.1rem)", lineHeight:1.06,
+            letterSpacing:"-0.005em", textTransform:"uppercase", color:C.ink,
+            marginBottom:"2.2rem", maxWidth:"1000px",
           }}>
-            {t.h1}
+            {lang==="en" ? "We know your industry" : "On connaît ton industrie"}
+            <span style={{ color:C.orange }}>{lang==="en" ? ", not just the job" : ", pas juste le poste"}</span>
           </h1>
-          {/* Suite du titre, en div: un seul H1 par page pour le referencement */}
-          <div className="fu2" style={{
-            fontFamily:"'Playfair Display',serif", fontWeight:500,
-            fontSize:"clamp(2.2rem,5.4vw,4.1rem)", lineHeight:1.15,
-            letterSpacing:"-0.012em", textTransform:"uppercase",
-            color:C.orange, marginBottom:"2.6rem",
-          }}>
-            {t.h1em}
-          </div>
 
-          <div className="fu3" style={{ display:"flex", alignItems:"flex-start", gap:"4rem", flexWrap:"wrap" }}>
-            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", lineHeight:1.7, color:"rgba(255,255,255,0.6)", maxWidth:"440px" }}>{t.sub}</p>
-            <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem", paddingTop:"0.25rem" }}>
-              <button className="btn-orange" onClick={() => setPage("food")}>{t.cta1}</button>
-              <button style={{
-                display:"inline-block", border:"1.5px solid rgba(255,255,255,0.3)", color:"#fff",
-                padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600,
-                fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase",
-                transition:"border-color 0.2s, background 0.2s", cursor:"pointer", background:"transparent",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor="#fff"; e.currentTarget.style.background="rgba(255,255,255,0.08)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.3)"; e.currentTarget.style.background="transparent"; }}
-                onClick={() => setPage("contact")}
-              >{t.cta2}</button>
+          <div className="fu3 two-col" style={{ display:"grid", gridTemplateColumns:"minmax(0,460px) 1fr", gap:"3.5rem", alignItems:"start" }}>
+            <p style={{ fontSize:"1rem", lineHeight:1.8, color:C.inkLight }}>{t.sub}</p>
+            <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", paddingTop:"0.2rem" }}>
+              <button className="btn-orange" onClick={() => setPage("contact")}>{t.heroCta1}</button>
+              <button className="btn-ghost" onClick={() => setPage("team")}>{t.heroCta2}</button>
             </div>
           </div>
         </div>
-
-        {/* Bottom rule */}
-        <div style={{ position:"absolute", bottom:"2rem", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.15)" }} />
-        </div>
       </section>
 
-      <Ticker lang={lang} />
+      {/* ── BANDE PHOTO ── trois images bord a bord, aucun texte par-dessus ──
+           Chaque image vit dans son propre bloc: <picture> est en display:contents
+           dans la feuille globale, donc l'image seule ne tient pas sa case. ── */}
+      <section className="photo-band-3" style={{ display:"flex", gap:"4px", background:"#fff" }}>
+        {[["/photos/usine-vue-ensemble.jpg", 2,
+           lang==="en" ? "Wide view of a food processing plant" : "Vue d'ensemble d'une usine de transformation alimentaire"],
+          ["/photos/panneau-controle.jpg", 1,
+           lang==="en" ? "Operator at a production line control panel" : "Opérateur devant un panneau de contrôle sur une ligne de production"],
+          ["/photos/usine-discussion.jpg", 1,
+           lang==="en" ? "Two people talking on a production floor" : "Deux personnes qui discutent sur un plancher de production"]].map(([src,grow,alt]) => (
+          <div key={src} style={{ flex:`${grow} 1 0`, minWidth:0, height:"clamp(190px,24vw,300px)", overflow:"hidden" }}>
+            <Photo src={src} w={1600} h={1067} alt={alt}
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+          </div>
+        ))}
+      </section>
 
-      {/* ── BANDE PHOTO ── ferme le premier ecran, pleine largeur ── */}
-      <section style={{ position:"relative", background:C.ink, overflow:"hidden" }}>
-        <div className="photo-band" style={{ width:"100%", height:"clamp(240px,38vw,460px)", position:"relative" }}>
-          <Photo
-            src="/photos/parc-industriel.jpg" w={2200} h={933}
-            alt={lang==="en"
-              ? "Food plants and distribution centres along a river in Quebec, seen from the air in autumn"
-              : "Usines alimentaires et centres de distribution le long d'une rivière au Québec, vus des airs à l'automne"}
-            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-          />
-          {/* voile marine pour garder la legende lisible */}
-          <div style={{
-            position:"absolute", inset:0,
-            background:"linear-gradient(to top, rgba(13,37,69,0.88) 0%, rgba(13,37,69,0.25) 45%, rgba(13,37,69,0.08) 100%)",
-          }} />
-          <div style={{ position:"absolute", left:"2rem", right:"2rem", bottom:"1.75rem" }}>
-            <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
-            <p className="band-caption" style={{
-              fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem", letterSpacing:"0.03em",
-              color:"rgba(255,255,255,0.78)", maxWidth:"540px", lineHeight:1.7,
-            }}>
-              {lang==="en"
-                ? "Québec · Ontario · Atlantic Canada"
-                : "Québec · Ontario · Provinces atlantiques"}
-            </p>
+      {/* ── PREUVE ── bande marine, la phrase en serif, les chiffres a cote ── */}
+      <section style={{ background:C.ink, padding:"4.5rem 2rem" }}>
+        <div className="two-col" style={{ maxWidth:"1150px", margin:"0 auto", display:"grid", gridTemplateColumns:"minmax(0,540px) 1fr", gap:"3.5rem", alignItems:"start" }}>
+          <div>
+            <div style={{
+              fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600,
+              letterSpacing:"0.08em", textTransform:"uppercase", color:"#f0803f", marginBottom:"0.9rem",
+            }}>{t.proofLabel}</div>
+            <p style={{
+              fontFamily:"'Playfair Display',serif", fontWeight:500,
+              fontSize:"clamp(1.5rem,2.8vw,2.2rem)", lineHeight:1.32, color:"#fff",
+            }}>{t.proofH}</p>
+          </div>
+          <div style={{ paddingTop:"2rem" }}>
+            <p style={{ fontSize:"0.95rem", lineHeight:1.85, color:"rgba(255,255,255,0.78)", marginBottom:"2rem" }}>{t.proofP}</p>
+            <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.5rem" }}>
+              {[[t.f1n,t.f1p],[t.f2n,t.f2p],[t.f3n,t.f3p]].map(([n,l]) => (
+                <div key={l}>
+                  <div style={{ fontFamily:"'Playfair Display',serif", fontWeight:600, fontSize:"1.8rem", color:"#f0803f", marginBottom:"0.2rem" }}>{n}</div>
+                  <div style={{ fontSize:"0.78rem", lineHeight:1.55, color:"rgba(255,255,255,0.72)" }}>{l}</div>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.4)", marginTop:"1.5rem" }}>{t.psrc}</p>
           </div>
         </div>
       </section>
 
-      {/* ── SECTORS ── */}
-      <section style={{ background:C.white, padding:"6rem 2rem" }}>
-        <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:"3rem", flexWrap:"wrap", gap:"1rem" }}>
-            <Eyebrow>{lang==="en"?"Specialties":"Spécialités"}</Eyebrow>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,4vw,3rem)", letterSpacing:"-0.015em", color:C.ink }}>{t.s2label}</h2>
-          </div>
-          <Divider style={{ marginBottom:"3rem" }} />
-          <p style={{ color:C.muted, fontSize:"1rem", lineHeight:1.7, maxWidth:"480px", marginBottom:"4rem" }}>{t.s2p}</p>
-
-          <div className="two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1px", background:C.rule }}>
-            {[{pg:"food",h:t.foodH,p:t.foodP,n:"01",img:"/photos/ligne-emballage.jpg"},{pg:"fashion",h:t.fashH,p:t.fashP,n:"02",img:"/photos/entrepot-vetements.jpg"}].map(s => (
-              <button key={s.pg} onClick={() => setPage(s.pg)} style={{
-                background:C.paper, padding:"0", textAlign:"left",
-                transition:"background 0.2s", width:"100%",
-              }}
-                onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
-                onMouseLeave={e => e.currentTarget.style.background=C.paper}
-              >
-                <div style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
-                  <Photo src={s.img} w={1600} h={1073} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-                </div>
-                <div style={{ padding:"2.5rem 2.5rem 3rem" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{s.n}</div>
-                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.4rem,3vw,2.2rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"1rem" }}>{s.h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"2rem" }}>{s.p}</p>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange }}>
-                  {lang==="en"?"Read more →":"En savoir plus →"}
-                </div>
-                </div>
+      {/* ── SECTEURS ── deux cartes photo et un bloc orange qui porte la phrase ── */}
+      <section style={{ background:"#fff", padding:"4rem 2rem 5.5rem" }}>
+        <div style={{ maxWidth:"1150px", margin:"0 auto" }}>
+          <Eyebrow>{t.secLabel}</Eyebrow>
+          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.75rem" }}>
+            {[["food", "/photos/affinage-fromage.jpg", t.foodH, t.foodP,
+               lang==="en" ? "Cheese ageing room" : "Chambre d'affinage de fromage"],
+              ["fashion", "/photos/entrepot-vetements.jpg", t.fashH, t.fashP,
+               lang==="en" ? "Apparel warehouse aisle" : "Allée d'un entrepôt de vêtements"]].map(([pg,img,h,txt,alt]) => (
+              <button key={pg} onClick={() => setPage(pg)} style={{ textAlign:"left", display:"block", width:"100%" }}>
+                <Photo src={img} w={1600} h={1067} alt={alt}
+                  style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{h}</h3>
+                <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{txt}</p>
               </button>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PREUVE ── chiffres verifies sur l'export JobAdder, pas de tuiles ── */}
-      <section className="stat-band" style={{ background:C.ink, padding:"5.5rem 2rem" }}>
-        <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-
-          {/* Le chiffre en vedette, avec sa phrase */}
-          <div className="two-col" style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:"3rem", alignItems:"baseline", marginBottom:"4rem" }}>
-            <div className="proof-hero" style={{
-              fontFamily:"'Playfair Display',serif", fontWeight:700, color:C.orange,
-              fontSize:"clamp(4.5rem,11vw,9rem)", lineHeight:0.85, letterSpacing:"-0.02em", whiteSpace:"nowrap",
-            }}>{t.p1n}</div>
-            <div style={{ maxWidth:"460px" }}>
-              <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
-              <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:300, fontSize:"clamp(1.1rem,2vw,1.5rem)", lineHeight:1.55, color:"#fff", marginBottom:"0.75rem" }}>{t.p1h}</p>
-              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.5)" }}>{t.p1p}</p>
+            <div style={{ background:"#c24a10", padding:"1.75rem 1.9rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.5rem", lineHeight:1.28, color:"#fff", marginBottom:"0.8rem" }}>
+                {lang==="en" ? "We will tell you no when the search makes no sense." : "On va te dire non quand le mandat n'a pas de bon sens."}
+              </p>
+              <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:"#fff" }}>
+                {lang==="en" ? "It costs us searches. It saves you three months." : "Ça nous coûte des mandats. Ça t'évite trois mois perdus."}
+              </p>
             </div>
           </div>
-
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.12)", marginBottom:"3rem" }} />
-
-          {/* Les trois autres, en ligne ragged plutot qu'en tuiles egales */}
-          <div className="proof-row" style={{ display:"grid", gridTemplateColumns:"1.1fr 1fr 1fr", gap:"3rem" }}>
-            {[[t.p2n,t.p2p],[t.p3n,t.p3p],[t.p4n,t.p4p]].map(([n,p]) => (
-              <div key={p}>
-                <div className="proof-num" style={{
-                  fontFamily:"'Playfair Display',serif", fontWeight:700, color:C.orange,
-                  fontSize:"clamp(2rem,3.4vw,3.2rem)", lineHeight:1, letterSpacing:"-0.015em", marginBottom:"0.85rem",
-                }}>{n}</div>
-                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", lineHeight:1.7, color:"rgba(255,255,255,0.62)" }}>{p}</p>
-              </div>
-            ))}
-          </div>
-
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.28)", marginTop:"3rem" }}>{t.psrc}</p>
         </div>
       </section>
+
 
       {/* ── LOGOS CLIENTS ── ne s'affiche que si on a des permissions ── */}
       {CLIENTS.length > 0 && (
@@ -928,25 +874,6 @@ function HomePage({ lang, setPage }) {
               <Divider />
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* ── LA PHRASE ── */}
-      <section style={{ background:C.ink, padding:"7rem 2rem" }}>
-        <div style={{ maxWidth:"900px", margin:"0 auto" }}>
-          <div style={{ width:"40px", height:"3px", background:C.orange, marginBottom:"2.5rem" }} />
-          <p style={{
-            fontFamily:"'Playfair Display',serif", fontWeight:400,
-            fontSize:"clamp(1.5rem,3.4vw,2.6rem)", lineHeight:1.3, color:"#fff",
-            whiteSpace:"pre-line", marginBottom:"2.5rem",
-          }}>{t.noH}</p>
-          <div style={{ display:"flex", alignItems:"center", gap:"1.25rem", flexWrap:"wrap" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.45)" }}>{t.noSrc}</span>
-            <button onClick={() => setPage("simon")} style={{
-              fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em",
-              color:C.orange, borderBottom:`1px solid ${C.orange}`, paddingBottom:"2px",
-            }}>{t.noLink} →</button>
-          </div>
         </div>
       </section>
 
