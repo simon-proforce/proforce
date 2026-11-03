@@ -156,11 +156,68 @@ const G = `
     .proof-row  { grid-template-columns:1fr !important; gap:2.25rem !important; }
     .proof-hero { font-size:4rem !important; }
     .client-grid{ grid-template-columns:repeat(2,1fr) !important; }
+    /* En colonne, le flex-basis:0 des images ramenait leur hauteur a zero et
+       la bande disparaissait completement du telephone. */
     .photo-band-3 { flex-direction:column !important; }
+    .photo-band-3 > * { flex:0 0 auto !important; height:200px !important; }
+
+    /* ── Respiration ────────────────────────────────────────────────────
+       6rem en haut et en bas, c'est juste sur un ecran large. Empile sur
+       un telephone, ca fait presque 200px de blanc entre deux blocs et la
+       page a l'air vide. On exclut les heros, qui ont besoin de leur
+       degagement sous le bandeau fixe, et les bandes photo pleine largeur
+       qui doivent rester bord a bord. */
+    section:not([style*="min-height"]):not(.photo-band-3):not(.band-full) {
+      padding-top:3.75rem !important;
+      padding-bottom:3.75rem !important;
+    }
+    /* Meme logique pour les filets: 4rem sous une etiquette, c'est un trou. */
+    .rule[style*="margin-bottom: 4rem"],
+    .rule[style*="margin-bottom: 3rem"],
+    .rule[style*="margin-bottom: 2.5rem"] { margin-bottom:1.75rem !important; }
 
     /* Sur telephone un carre de 280px mangeait les trois quarts de l'ecran
        avant meme qu'on voie le nom de la personne. */
     .team-photo { max-width:190px !important; }
+
+    /* ── Listes numerotees ──────────────────────────────────────────────
+       En trois colonnes, l'espace entre les blocs se lit comme des colonnes.
+       Empilees sur telephone, le meme espace se lit comme du vide. On
+       remplace l'ecart par un filet: ca redevient une liste. */
+    .stack-rule { gap:0 !important; }
+    .stack-rule > * {
+      padding:1.9rem 0 !important;
+      border-top:1px solid ${C.rule} !important;
+    }
+    .stack-rule > *:first-child { border-top:none !important; padding-top:0 !important; }
+    .stack-rule > *:last-child  { padding-bottom:0 !important; }
+
+    /* Grilles encadrees: les filets verticaux n'ont plus de sens une fois
+       les cases empilees, ils laissaient une barre orpheline a droite. */
+    .box-grid > * {
+      border-right:none !important;
+      border-bottom:1px solid ${C.rule} !important;
+      padding:1.9rem 1.5rem !important;
+    }
+    .box-grid > *:last-child { border-bottom:none !important; }
+
+    /* Bandeau d'equipe de l'accueil: la vignette et le nom cote a cote
+       plutot qu'une petite photo perdue dans la largeur. */
+    .team-strip { flex-direction:column !important; }
+    .team-strip > * {
+      border-right:none !important;
+      border-bottom:1px solid ${C.rule} !important;
+      display:flex !important; align-items:center !important; gap:1rem !important;
+      padding:1.1rem 0 !important;
+    }
+    .team-strip > *:last-child { border-bottom:none !important; }
+    .team-strip .av { margin-bottom:0 !important; }
+
+    /* Fiches d'equipe: photo et identite sur la meme ligne. */
+    .team-identity { display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:1.1rem !important; }
+    .team-identity > .team-photo { flex:0 0 112px !important; max-width:112px !important; margin-bottom:0 !important; }
+    .team-identity > div:nth-child(2) { flex:1 1 150px !important; margin-bottom:0 !important; }
+    .team-identity > div:nth-child(3) { flex:1 0 100% !important; margin-bottom:0.25rem !important; }
 
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
@@ -168,6 +225,9 @@ const G = `
     .post-thumb  { display:none !important; }
 
     .two-col     { grid-template-columns:1fr !important; }
+    /* Une fois empile, ce retrait s'ajoutait a l'ecart de la grille et
+       creusait un trou entre le titre et le paragraphe. */
+    .pt-desk     { padding-top:0 !important; }
     .three-col   { grid-template-columns:1fr !important; }
     /* Sur telephone le filigrane 2001 tombait pile sur l'etiquette du haut. */
     .hero-mark   { top:20vh !important; font-size:7rem !important; }
@@ -380,18 +440,18 @@ function PhotoBand({ items, h = "clamp(190px,24vw,300px)" }) {
   );
 }
 
-function Avatar({ m, size, full, style }) {
+function Avatar({ m, size, full, style, className }) {
   const box = full ? { width:"100%", aspectRatio:"1 / 1" } : { width:size, height:size };
   if (m.photo) {
     return (
-      <Photo src={m.photo} alt={m.name} w={760} h={760} style={{
+      <Photo src={m.photo} alt={m.name} w={760} h={760} className={className} style={{
         ...box, objectFit:"cover", objectPosition:"center 22%", display:"block",
         background:C.paperDark, flexShrink:0, ...style,
       }} />
     );
   }
   return (
-    <div style={{
+    <div className={className} style={{
       ...box, background:C.orange, display:"flex", alignItems:"center", justifyContent:"center",
       fontFamily:"'Archivo',sans-serif", fontSize: full ? "2rem" : (size >= 56 ? "1rem" : "0.8rem"),
       color:"#fff", fontWeight:700, flexShrink:0, ...style,
@@ -703,7 +763,7 @@ function HomePage({ lang, setPage }) {
               fontSize:"clamp(1.5rem,2.8vw,2.2rem)", lineHeight:1.32, color:"#fff",
             }}>{t.proofH}</p>
           </div>
-          <div style={{ paddingTop:"2rem" }}>
+          <div className="pt-desk" style={{ paddingTop:"2rem" }}>
             <p style={{ fontSize:"0.95rem", lineHeight:1.85, color:"rgba(255,255,255,0.78)", marginBottom:"2rem" }}>{t.proofP}</p>
             <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.5rem" }}>
               {[[t.f1n,t.f1p],[t.f2n,t.f2p],[t.f3n,t.f3p]].map(([n,l]) => (
@@ -720,7 +780,7 @@ function HomePage({ lang, setPage }) {
 
       {/* Bande pleine largeur sur le marine de la marque. Elle fait le pont
           entre la section bleue des chiffres et la section blanche des secteurs. */}
-      <section style={{ background:C.ink, overflow:"hidden" }}>
+      <section className="band-full" style={{ background:C.ink, overflow:"hidden" }}>
         <div style={{ width:"100%", height:"clamp(170px,22vw,300px)" }}>
           <Photo src="/photos/biscuits-bleu.jpg" w={1600} h={900}
             alt={lang==="en" ? "Overhead view of filled biscuits in rows on a navy conveyor belt" : "Vue de haut de biscuits fourrés alignés sur une courroie marine"}
@@ -797,7 +857,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
+          <div className="three-col stack-rule" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
@@ -819,15 +879,17 @@ function HomePage({ lang, setPage }) {
             </button>
           </div>
           <Divider style={{ marginBottom:"2.5rem" }} />
-          <div style={{ display:"flex", gap:"0", flexWrap:"wrap" }}>
+          <div className="team-strip" style={{ display:"flex", gap:"0", flexWrap:"wrap" }}>
             {TEAM.map((m,i) => (
               <div key={m.name} style={{
                 flex:"1 1 180px", padding:"1.5rem",
                 borderRight: i<TEAM.length-1 ? `1px solid ${C.rule}` : "none",
               }}>
-                <Avatar m={m} size={56} style={{ marginBottom:"1rem" }} />
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:600, color:C.ink, marginBottom:"0.2rem" }}>{m.name}</div>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", color:C.muted }}>{m.title[lang]}</div>
+                <Avatar m={m} size={56} className="av" style={{ marginBottom:"1rem" }} />
+                <div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:600, color:C.ink, marginBottom:"0.2rem" }}>{m.name}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", color:C.muted }}>{m.title[lang]}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -1020,7 +1082,7 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.paper, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col box-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1475,7 +1537,7 @@ function AboutPage({ lang }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"What We Stand For":"Ce qu'on défend"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col box-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.v1h,t.v1p,"01"],[t.v2h,t.v2p,"02"],[t.v3h,t.v3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1523,7 +1585,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                 className="two-col"
               >
                 {/* Left: identity */}
-                <div>
+                <div className="team-identity">
                   <div className="team-photo" style={{ marginBottom:"1.5rem", maxWidth:"280px" }}>
                     <Avatar m={m} full />
                   </div>
@@ -1634,7 +1696,7 @@ function CandidatesPage({ lang, setPage }) {
 
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
+          <div className="three-col box-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
             {[[t.h1h,t.h1p,"01"],[t.h2h,t.h2p,"02"],[t.h3h,t.h3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1783,7 +1845,7 @@ function EmployersPage({ lang, setPage }) {
               </div>
             </div>
           ))}
-          <div style={{ paddingTop:"2rem" }}>
+          <div className="pt-desk" style={{ paddingTop:"2rem" }}>
             <button onClick={() => setPage("howwework")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}`, paddingBottom:"2px" }}>
               {t.processLink}
             </button>
@@ -1796,7 +1858,7 @@ function EmployersPage({ lang, setPage }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"3rem" }}>{t.whyH}</h2>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="box-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"],[t.w4h,t.w4p,"04"]].map(([h,p,n],i) => (
               <div key={n} style={{
                 padding:"2.5rem 2rem",
