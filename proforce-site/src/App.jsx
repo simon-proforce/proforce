@@ -211,6 +211,9 @@ const G = `
       padding:1.1rem 0 !important;
     }
     .team-strip > *:last-child { border-bottom:none !important; }
+    /* Meme piege que la bande photo: en colonne, le flex-basis de 180px
+       devient une hauteur minimale et laisse un trou sous chaque nom. */
+    .team-strip > * { flex:0 0 auto !important; }
     .team-strip .av { margin-bottom:0 !important; }
 
     /* Fiches d'equipe: photo et identite sur la meme ligne. */
@@ -221,7 +224,14 @@ const G = `
 
     /* Sur telephone la vignette d'article rendait la ligne trop serree:
        l'article en vedette garde sa grande image, les autres non. */
-    .post-row    { grid-template-columns:60px 1fr 90px !important; gap:1rem !important; }
+    /* Sur telephone, trois colonnes laissaient environ 180px au titre, qui
+       se cassait tous les trois mots. On empile, et les deux lignes de
+       metadonnees passent a l'horizontale. */
+    .post-row    { grid-template-columns:1fr !important; gap:0.55rem !important; padding:1.6rem 0 !important; }
+    .post-row > :first-child,
+    .post-row > :last-child { display:flex !important; align-items:center !important; gap:0.7rem !important; text-align:left !important; }
+    .post-row > :first-child > div,
+    .post-row > :last-child  > div { margin-top:0 !important; }
     .post-thumb  { display:none !important; }
 
     .two-col     { grid-template-columns:1fr !important; }
