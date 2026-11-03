@@ -364,6 +364,22 @@ function Photo({ src, alt = "", w, h, eager, style, className }) {
   );
 }
 
+/* Bande photo pleine largeur. Chaque image vit dans son propre bloc parce que
+   <picture> est en display:contents dans la feuille globale: l'image seule ne
+   tiendrait pas sa case. items = [[src, poids, largeur, hauteur, alt], ...] */
+function PhotoBand({ items, h = "clamp(190px,24vw,300px)" }) {
+  return (
+    <section className="photo-band-3" style={{ display:"flex", gap:"4px", background:"#fff" }}>
+      {items.map(([src, grow, w, ht, alt]) => (
+        <div key={src} style={{ flex:`${grow} 1 0`, minWidth:0, height:h, overflow:"hidden" }}>
+          <Photo src={src} w={w} h={ht} alt={alt}
+            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function Avatar({ m, size, full, style }) {
   const box = full ? { width:"100%", aspectRatio:"1 / 1" } : { width:size, height:size };
   if (m.photo) {
@@ -664,22 +680,15 @@ function HomePage({ lang, setPage }) {
         </div>
       </section>
 
-      {/* ── BANDE PHOTO ── trois images bord a bord, aucun texte par-dessus ──
-           Chaque image vit dans son propre bloc: <picture> est en display:contents
-           dans la feuille globale, donc l'image seule ne tient pas sa case. ── */}
-      <section className="photo-band-3" style={{ display:"flex", gap:"4px", background:"#fff" }}>
-        {[["/photos/pommes-ligne.jpg", 2, 1600, 899,
-           lang==="en" ? "Sorting line, workers grading apples behind the belt" : "Ligne de triage, des employés qui classent des pommes derrière le convoyeur"],
-          ["/photos/chocolat-mains.jpg", 1, 900, 900,
-           lang==="en" ? "Worker checking coated chocolate coming out of a panning drum" : "Employée qui vérifie des dragées de chocolat à la sortie de la turbine"],
-          ["/photos/atelier-patrons.jpg", 1, 900, 900,
-           lang==="en" ? "Pattern room in an apparel studio, dress form and fabric rolls" : "Salle de patrons dans un atelier de vêtements, mannequin et rouleaux de tissu"]].map(([src,grow,w,h,alt]) => (
-          <div key={src} style={{ flex:`${grow} 1 0`, minWidth:0, height:"clamp(190px,24vw,300px)", overflow:"hidden" }}>
-            <Photo src={src} w={w} h={h} alt={alt}
-              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-          </div>
-        ))}
-      </section>
+      {/* ── BANDE PHOTO ── trois images bord a bord, aucun texte par-dessus ── */}
+      <PhotoBand items={[
+        ["/photos/petits-fruits-triage.jpg", 2, 1600, 900,
+         lang==="en" ? "Workers sorting berries along a processing line" : "Des employées qui trient des petits fruits sur une ligne de transformation"],
+        ["/photos/qualite-panneau.jpg", 1, 900, 900,
+         lang==="en" ? "Quality technician at a production line control panel" : "Technicienne qualité devant un panneau de contrôle"],
+        ["/photos/mode-echantillons.jpg", 1, 900, 900,
+         lang==="en" ? "Production coordinator checking a rack of sample garments" : "Coordonnatrice de production qui vérifie un support d'échantillons"],
+      ]} />
 
       {/* ── PREUVE ── bande marine, la phrase en serif, les chiffres a cote ── */}
       <section style={{ background:C.ink, padding:"4.5rem 2rem" }}>
@@ -709,22 +718,32 @@ function HomePage({ lang, setPage }) {
         </div>
       </section>
 
+      {/* Bande pleine largeur sur le marine de la marque. Elle fait le pont
+          entre la section bleue des chiffres et la section blanche des secteurs. */}
+      <section style={{ background:C.ink, overflow:"hidden" }}>
+        <div style={{ width:"100%", height:"clamp(170px,22vw,300px)" }}>
+          <Photo src="/photos/biscuits-bleu.jpg" w={1600} h={900}
+            alt={lang==="en" ? "Overhead view of filled biscuits in rows on a navy conveyor belt" : "Vue de haut de biscuits fourrés alignés sur une courroie marine"}
+            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+        </div>
+      </section>
+
       {/* ── SECTEURS ── deux cartes photo et un bloc orange qui porte la phrase ── */}
       <section style={{ background:"#fff", padding:"4rem 2rem 5.5rem" }}>
         <div style={{ maxWidth:"1150px", margin:"0 auto" }}>
           <Eyebrow>{t.secLabel}</Eyebrow>
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.75rem" }}>
             <button onClick={() => setPage("food")} style={{ textAlign:"left", display:"block", width:"100%" }}>
-              <Photo src="/photos/fromagerie-cuve.jpg" w={1400} h={700}
-                alt={lang==="en" ? "Two cheesemakers lifting curd from a copper vat" : "Deux fromagers qui sortent le caillé d'une cuve de cuivre"}
+              <Photo src="/photos/usine-emballage-equipe.jpg" w={1600} h={900}
+                alt={lang==="en" ? "Packing lines in a meat plant, workers along both sides" : "Lignes d'emballage dans une usine de viande, du monde des deux côtés"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.foodH}</h3>
               <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.foodP}</p>
             </button>
 
             <button onClick={() => setPage("fashion")} style={{ textAlign:"left", display:"block", width:"100%" }}>
-              <Photo src="/photos/atelier-couture.jpg" w={1400} h={700}
-                alt={lang==="en" ? "Designer pinning a garment on a dress form in an apparel studio" : "Designer qui épingle un vêtement sur un mannequin dans un atelier"}
+              <Photo src="/photos/atelier-couture-usine.jpg" w={1600} h={900}
+                alt={lang==="en" ? "Rows of industrial sewing machines on an apparel production floor" : "Rangées de machines à coudre industrielles dans une usine de vêtements"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.fashH}</h3>
               <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.fashP}</p>
@@ -951,6 +970,24 @@ function SectorPage({ lang, setPage, sector }) {
         </div>
       </section>
 
+      {sector === "food" ? (
+        <PhotoBand items={[
+          ["/photos/ligne-charcuterie.jpg", 2, 1600, 900,
+           lang==="en" ? "Slicer laying bacon into trays on a packaging line" : "Trancheuse qui dépose du bacon dans des barquettes sur une ligne d'emballage"],
+          ["/photos/fromagerie-cuve.jpg", 1, 1400, 700,
+           lang==="en" ? "Two cheesemakers lifting curd from a copper vat" : "Deux fromagers qui sortent le caillé d'une cuve de cuivre"],
+          ["/photos/ligne-yogourt.jpg", 1, 1600, 900,
+           lang==="en" ? "Nozzles filling yogurt cups on a dairy line" : "Buses qui remplissent des pots de yogourt sur une ligne laitière"],
+        ]} />
+      ) : (
+        <PhotoBand items={[
+          ["/photos/atelier-couture.jpg", 2, 1400, 700,
+           lang==="en" ? "Designer pinning a garment on a dress form" : "Designer qui épingle un vêtement sur un mannequin"],
+          ["/photos/atelier-patrons.jpg", 1, 900, 900,
+           lang==="en" ? "Pattern room, dress form and rolls of fabric" : "Salle de patrons, mannequin et rouleaux de tissu"],
+        ]} />
+      )}
+
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Roles We Fill":"Postes qu'on comble"}</Eyebrow>
@@ -970,10 +1007,10 @@ function SectorPage({ lang, setPage, sector }) {
         <section style={{ background:C.ink, overflow:"hidden" }}>
           <div style={{ width:"100%", height:"clamp(200px,28vw,360px)", position:"relative" }}>
             <Photo
-              src="/photos/affinage-fromage.jpg" w={1600} h={1073}
+              src="/photos/ligne-fromage.jpg" w={1600} h={900}
               alt={lang==="en"
-                ? "A cheesemaker turning wheels in an aging room"
-                : "Un fromager retourne des meules dans une cave d'affinage"}
+                ? "Automated slicer fanning cheese slices onto a belt"
+                : "Trancheuse automatisée qui étale des tranches de fromage sur une courroie"}
               style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
             />
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(13,37,69,0.72) 0%, rgba(13,37,69,0.05) 60%)" }} />
@@ -1586,6 +1623,15 @@ function CandidatesPage({ lang, setPage }) {
         </div>
       </section>
 
+      <PhotoBand items={[
+        ["/photos/emballage-sourire.jpg", 2, 1600, 900,
+         lang==="en" ? "Worker packing trays at the end of a meat packaging line" : "Employé qui emboîte des barquettes au bout d'une ligne d'emballage"],
+        ["/photos/chocolat-mains.jpg", 1, 900, 900,
+         lang==="en" ? "Worker checking coated chocolate at a panning drum" : "Employée qui vérifie des dragées de chocolat à la sortie de la turbine"],
+        ["/photos/boulangerie-fournee.jpg", 1, 900, 900,
+         lang==="en" ? "Braided loaves coming out of a bakery oven" : "Pains tressés qui sortent d'un four de boulangerie"],
+      ]} />
+
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
@@ -1712,6 +1758,15 @@ function EmployersPage({ lang, setPage }) {
           </div>
         </div>
       </section>
+
+      <PhotoBand items={[
+        ["/photos/supervision-ligne.jpg", 2, 1600, 900,
+         lang==="en" ? "Two supervisors reviewing a clipboard beside a bottling line" : "Deux superviseurs qui regardent un presse-papiers à côté d'une ligne d'embouteillage"],
+        ["/photos/pesee-etiquetage.jpg", 1, 1600, 900,
+         lang==="en" ? "Worker at a weighing and labelling station" : "Employé à un poste de pesée et d'étiquetage"],
+        ["/photos/robot-emballage.jpg", 1, 1600, 900,
+         lang==="en" ? "Pick and place robot over a sausage packaging line" : "Robot d'emballage au-dessus d'une ligne de saucisses"],
+      ]} />
 
       {/* Process */}
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
@@ -2795,6 +2850,15 @@ function HowWeWorkPage({ lang, setPage }) {
           <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px" }}>{t.sub}</p>
         </div>
       </section>
+
+      <PhotoBand items={[
+        ["/photos/ligne-bouteilles.jpg", 2, 1600, 900,
+         lang==="en" ? "Capping head above juice bottles on a bottling line" : "Tête de capsulage au-dessus de bouteilles de jus sur une ligne d'embouteillage"],
+        ["/photos/ligne-brioches.jpg", 1, 1600, 900,
+         lang==="en" ? "Automated bagger closing packs of buns" : "Ensacheuse automatisée qui ferme des paquets de pains"],
+        ["/photos/biscuits-confiture.jpg", 1, 900, 900,
+         lang==="en" ? "Depositing head laying jam onto rows of biscuits" : "Tête de dosage qui dépose de la confiture sur des rangées de biscuits"],
+      ]} />
 
       {/* Process steps, accordion */}
       <section style={{ background:C.white, padding:"5rem 2rem" }}>
