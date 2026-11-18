@@ -4,11 +4,6 @@ import { useState, useEffect } from "react";
 const CALENDLY = "https://calendly.com/simonstamand/proforce";
 const CONTACT_EMAIL = "info@proforce.ca";
 
-// ─── ENVOI DES FORMULAIRES ────────────────────────────────────────────────────
-// Remplir les quatre valeurs ci dessous active l'envoi silencieux par EmailJS.
-// Tant qu'elles commencent par YOUR_, les formulaires ouvrent plutot le logiciel
-// de courriel du visiteur avec le message deja ecrit. Dans les deux cas le
-// message part pour vrai: on n'affiche jamais une confirmation sans envoi.
 // Proforce a ete fondee en 2001. L'anciennete se calcule au lieu d'etre ecrite
 // en dur: un "25 ans" fige dans le texte devient faux le 1er janvier suivant,
 // et plus personne ne pense a le corriger. Ailleurs sur le site on dit plutot
@@ -16,41 +11,55 @@ const CONTACT_EMAIL = "info@proforce.ca";
 const FONDATION = 2001;
 const ANS = new Date().getFullYear() - FONDATION;
 
+// ─── ENVOI DES FORMULAIRES ────────────────────────────────────────────────────
+// Remplir les trois valeurs ci dessous active l'envoi silencieux par EmailJS.
+// Tant qu'elles commencent par YOUR_, les formulaires ouvrent plutot le logiciel
+// de courriel du visiteur avec le message deja ecrit. Dans les deux cas le
+// message part pour vrai: on n'affiche jamais une confirmation sans envoi.
+//
+// Un seul gabarit sert les trois formulaires (contact, reference, infolettre).
+// Le plan gratuit d'EmailJS en autorise deux au total, et surtout: c'est le site
+// qui met le courriel en forme, pas EmailJS. Le gabarit n'a que trois variables
+// a afficher, {{sujet}}, {{corps}} et {{reply_to}}, donc ajouter un champ a un
+// formulaire ne demande plus d'aller modifier un gabarit en ligne.
 const EMAILJS = {
-  serviceId:          "YOUR_SERVICE_ID",
-  publicKey:          "YOUR_PUBLIC_KEY",
-  contactTemplate:    "YOUR_CONTACT_TEMPLATE_ID",
-  referralTemplate:   "YOUR_REFERRAL_TEMPLATE_ID",
-  newsletterTemplate: "YOUR_NEWSLETTER_TEMPLATE_ID",
+  serviceId:  "YOUR_SERVICE_ID",
+  publicKey:  "YOUR_PUBLIC_KEY",
+  template:   "YOUR_TEMPLATE_ID",
 };
 
 const isSet = v => !!v && !String(v).startsWith("YOUR_");
-const emailjsReady = template =>
-  isSet(EMAILJS.serviceId) && isSet(EMAILJS.publicKey) && isSet(template);
+const emailjsReady = () =>
+  isSet(EMAILJS.serviceId) && isSet(EMAILJS.publicKey) && isSet(EMAILJS.template);
 
 const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v).trim());
 
 // Retourne "sent" si EmailJS a confirme, "mail" si on a bascule sur le logiciel
 // de courriel du visiteur. Leve une erreur si EmailJS refuse, pour qu'on puisse
 // le dire au visiteur au lieu de pretendre que c'est parti.
-async function sendForm(template, params, fallback) {
-  if (emailjsReady(template)) {
+// mail: { subject, body }, replyTo: l'adresse du visiteur quand on l'a.
+async function sendForm(mail, replyTo) {
+  if (emailjsReady()) {
     const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         service_id: EMAILJS.serviceId,
-        template_id: template,
+        template_id: EMAILJS.template,
         user_id: EMAILJS.publicKey,
-        template_params: params,
+        template_params: {
+          sujet: mail.subject,
+          corps: mail.body,
+          reply_to: replyTo || CONTACT_EMAIL,
+        },
       }),
     });
     if (!res.ok) throw new Error(`EmailJS ${res.status}`);
     return "sent";
   }
   const href = `mailto:${CONTACT_EMAIL}`
-    + `?subject=${encodeURIComponent(fallback.subject)}`
-    + `&body=${encodeURIComponent(fallback.body)}`;
+    + `?subject=${encodeURIComponent(mail.subject)}`
+    + `&body=${encodeURIComponent(mail.body)}`;
   window.location.href = href;
   return "mail";
 }
@@ -2448,14 +2457,10 @@ function NewsletterWidget({ lang, compact }) {
     if (!validEmail(email)) return;
     setStatus("sending");
     try {
-      const r = await sendForm(EMAILJS.newsletterTemplate, {
-        subscriber_email: email,
-        preferred_lang: prefLang === "fr" ? "Français" : "English",
-        source: "proforce.ca blog",
-      }, {
+      const r = await sendForm({
         subject: "Inscription à l'infolettre",
         body: `Courriel: ${email}\nLangue: ${prefLang === "fr" ? "Français" : "English"}\nSource: blogue`,
-      });
+      }, email);
       setStatus(r === "mail" ? "mail" : "done");
     } catch {
       setStatus("error");
@@ -2759,13 +2764,10 @@ function ContactPage({ lang }) {
     if (missing || status === "sending") return;
     setStatus("sending");
     try {
-      const r = await sendForm(EMAILJS.contactTemplate, {
-        from_name: form.name, reply_to: form.email,
-        company: form.company, message: form.message,
-      }, {
+      const r = await sendForm({
         subject: `Demande du site, ${form.name}`,
         body: `Nom: ${form.name}\nCourriel: ${form.email}\nCompagnie: ${form.company || "non precisee"}\n\n${form.message}`,
-      });
+      }, form.email);
       setStatus(r);
       track.formSubmit();
     } catch {
@@ -3591,17 +3593,13 @@ function ReferralPage({ lang, setPage }) {
     if (missing || status === "sending") return;
     setStatus("sending");
     try {
-      const r = await sendForm(EMAILJS.referralTemplate, {
-        from_name: form.yourName, reply_to: form.yourEmail, your_company: form.yourCompany,
-        ref_name: form.refName, ref_company: form.refCompany,
-        ref_email: form.refEmail, ref_phone: form.refPhone, context: form.context,
-      }, {
+      const r = await sendForm({
         subject: `Référence du site, ${form.refName}`,
         body: `De la part de: ${form.yourName}\nCourriel: ${form.yourEmail}\nCompagnie: ${form.yourCompany || "non precisee"}\n\n`
             + `Personne référée: ${form.refName}\nCompagnie: ${form.refCompany || "non precisee"}\n`
             + `Courriel: ${form.refEmail || "non precise"}\nTéléphone: ${form.refPhone || "non precise"}\n\n`
             + `Contexte: ${form.context || "aucun"}`,
-      });
+      }, form.yourEmail);
       setStatus(r);
       track.formSubmit();
     } catch {
@@ -3838,14 +3836,10 @@ function FooterNewsletter({ lang }) {
     if (!validEmail(email)) return;
     setStatus("sending");
     try {
-      const r = await sendForm(EMAILJS.newsletterTemplate, {
-        subscriber_email: email,
-        preferred_lang: lang === "fr" ? "Français" : "English",
-        source: "proforce.ca footer",
-      }, {
+      const r = await sendForm({
         subject: "Inscription à l'infolettre",
         body: `Courriel: ${email}\nLangue: ${lang === "fr" ? "Français" : "English"}\nSource: pied de page`,
-      });
+      }, email);
       setStatus(r === "mail" ? "mail" : "done");
     } catch { setStatus("error"); }
   };
