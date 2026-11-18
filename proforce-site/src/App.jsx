@@ -2094,7 +2094,7 @@ function CandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section className="hero-open" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/fromagerie-employee.webp)`, backgroundSize:"cover", backgroundPosition:"center 32%", position:"relative", }}>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"0.5rem" }}>{t.h1}</h1>
