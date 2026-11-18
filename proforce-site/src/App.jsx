@@ -76,7 +76,11 @@ const C = {
   orange:    "#e85d1a",
   orangeHov: "#d04e10",
   rule:      "#c8d4e3",       // filet bleu clair
-  muted:     "#5a7a9a",       // bleu-gris pour texte secondaire
+  muted:     "#46637f",       // bleu-gris pour texte secondaire
+                              // Le #5a7a9a d'avant donnait 4,48 de contraste sur blanc,
+                              // juste sous le seuil de 4,5 pour du texte normal. Un texte
+                              // sous le seuil ne se lit pas comme une faute, il se ressent
+                              // comme un inconfort flou. Celui-ci donne 6,27.
   white:     "#ffffff",
 };
 
@@ -110,7 +114,7 @@ const G = `
      fait le travail que faisait le gros titre: il ouvre la section. */
   .eyebrow {
     font-family:'Archivo',sans-serif; font-size:0.72rem; font-weight:600;
-    letter-spacing:0.08em; text-transform:uppercase; color:#c24a10;
+    letter-spacing:0.08em; text-transform:uppercase; color:#b8440c;
     display:block; padding-bottom:0.7rem; margin-bottom:1.4rem;
     border-bottom:2px solid ${C.orange};
   }
@@ -1187,7 +1191,7 @@ function HomePage({ lang, setPage }) {
                 alt={lang==="en" ? "Prepared meal trays moving along a filling line" : "Barquettes de repas prêts sur une ligne de remplissage"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.foodH}</h3>
-              <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.foodP}</p>
+              <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted }}>{t.foodP}</p>
             </button>
 
             <button onClick={() => setPage("fashion")} style={{ textAlign:"left", display:"block", width:"100%" }}>
@@ -1195,7 +1199,7 @@ function HomePage({ lang, setPage }) {
                 alt={lang==="en" ? "Aisles of folded garments in an apparel distribution warehouse" : "Allées de vêtements pliés dans un entrepôt de distribution"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.fashH}</h3>
-              <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.fashP}</p>
+              <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted }}>{t.fashP}</p>
             </button>
             <div style={{ background:"#c24a10", padding:"1.75rem 1.9rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
               <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.5rem", lineHeight:1.28, color:"#fff", marginBottom:"0.8rem" }}>
@@ -1251,7 +1255,7 @@ function HomePage({ lang, setPage }) {
               <div key={n}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", letterSpacing:"-0.02em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -1491,7 +1495,7 @@ function SectorPage({ lang, setPage, sector }) {
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", letterSpacing:"-0.01em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -1611,7 +1615,7 @@ function FAQSection({ lang, type, setPage }) {
           </div>
         ))}
         <div style={{ marginTop:"3rem" }}>
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.muted, marginBottom:"1rem" }}>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, marginBottom:"1rem" }}>
             {lang==="en"?"Still have questions? We're easy to reach.":"Tu as encore des questions? On est faciles à joindre."}
           </p>
           <button className="btn-ink" onClick={() => setPage("contact")}>
@@ -1807,7 +1811,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
             </div>
 
             <div style={{ marginTop:"3.5rem", padding:"2.5rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
-              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, marginBottom:"1.5rem" }}>
                 {lang==="en"
                   ? `This candidate is represented by ${c.recruiter}. To learn more or request an introduction, contact us directly.`
                   : `Ce candidat est représenté par ${c.recruiter}. Pour en savoir plus ou demander une introduction, contactez-nous directement.`}
@@ -1846,7 +1850,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
           </div>
 
           <Divider style={{ marginBottom:"2rem" }} />
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.1em", color:C.muted, marginBottom:"3rem" }}>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", letterSpacing:"0.1em", color:C.muted, marginBottom:"3rem" }}>
             {filtered.length} {lang==="en" ? "profiles available" : "profils disponibles"}
           </p>
 
@@ -1902,7 +1906,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
 
           {/* Note */}
           <div style={{ marginTop:"4rem", padding:"2.5rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
-            <p style={{ fontFamily:"'Archivo',sans-serif", color:C.muted, fontSize:"0.9rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{t.note}</p>
+            <p style={{ fontFamily:"'Archivo',sans-serif", color:C.muted, fontSize:"0.95rem", lineHeight:1.8, marginBottom:"1.25rem" }}>{t.note}</p>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
           </div>
         </div>
@@ -1946,14 +1950,14 @@ function AboutPage({ lang }) {
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
 
           <div style={{ marginTop:"4rem", padding:"3rem", background:C.paper, borderLeft:`3px solid ${C.orange}` }}>
             <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.guarH}</h3>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{t.guarP}</p>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{t.guarP}</p>
           </div>
         </div>
       </section>
@@ -2063,7 +2067,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <div style={{ maxWidth:"540px" }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "Proforce has been doing this since 2001." : "Proforce fait ça depuis 2001."}</h3>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Seven people is what the firm looks like today. If you want the rest of the story, how it started and what changed along the way, it is on the about page." : "Sept personnes, c'est ce que la firme est aujourd'hui. Si tu veux le reste de l'histoire, comment ça a commencé et ce qui a changé en chemin, c'est sur la page À propos."}</p>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{lang==="en" ? "Seven people is what the firm looks like today. If you want the rest of the story, how it started and what changed along the way, it is on the about page." : "Sept personnes, c'est ce que la firme est aujourd'hui. Si tu veux le reste de l'histoire, comment ça a commencé et ce qui a changé en chemin, c'est sur la page À propos."}</p>
           </div>
           <button className="btn-ink" onClick={() => setPage("about")} style={{ flexShrink:0 }}>{lang==="en" ? "About Proforce" : "À propos de Proforce"}</button>
         </div>
@@ -2115,14 +2119,14 @@ function CandidatesPage({ lang, setPage }) {
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
 
           <div style={{ background:C.paper, padding:"3rem", borderLeft:`3px solid ${C.orange}` }}>
             <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.5rem", color:C.ink, marginBottom:"0.75rem" }}>{t.submitH}</h3>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8, maxWidth:"440px", marginBottom:"1.5rem" }}>{t.submitP}</p>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8, maxWidth:"440px", marginBottom:"1.5rem" }}>{t.submitP}</p>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
           </div>
         </div>
@@ -2255,7 +2259,7 @@ function EmployersPage({ lang, setPage }) {
               <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1 }}>{step.n}</div>
               <div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.2rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{step.h[lang]}</h3>
-                <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{step.p[lang]}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{step.p[lang]}</p>
               </div>
             </div>
           ))}
@@ -2282,7 +2286,7 @@ function EmployersPage({ lang, setPage }) {
               }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -2295,12 +2299,12 @@ function EmployersPage({ lang, setPage }) {
           <div style={{ background:C.white, padding:"3rem 2.5rem" }}>
             <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
             <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.guarH}</h3>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{t.guarP}</p>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{t.guarP}</p>
           </div>
           <div style={{ background:C.white, padding:"3rem 2.5rem" }}>
             <div style={{ width:"32px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
             <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.ink, marginBottom:"0.75rem" }}>{t.feeH}</h3>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8 }}>{t.feeP}</p>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{t.feeP}</p>
           </div>
         </div>
       </section>
@@ -2309,7 +2313,7 @@ function EmployersPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{t.sectorsH}</Eyebrow>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", background:"rgba(255,255,255,0.08)", marginTop:"2rem" }} className="two-col">
+          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"2px", background:"rgba(255,255,255,0.08)", marginTop:"2rem" }}>
             {[
               { h:t.food, p:t.foodP, pg:"food" },
               { h:t.fashion, p:t.fashionP, pg:"fashion" },
@@ -2318,13 +2322,28 @@ function EmployersPage({ lang, setPage }) {
                 onMouseEnter={e => e.currentTarget.style.background="#1e4080"}
                 onMouseLeave={e => e.currentTarget.style.background=C.inkLight}
               >
-                <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.3rem", color:C.orange, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{s.h}</h3>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.orange, letterSpacing:"-0.005em", marginBottom:"0.6rem" }}>{s.h}</h3>
                 <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"0.86rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{s.p}</p>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)" }}>
                   {lang==="en"?"Learn more →":"En savoir plus →"}
                 </span>
               </button>
             ))}
+            {/* Le bloc orange qui ferme la rangee. Ce n'est pas une
+                decoration: il porte une phrase que les grandes agences ne
+                peuvent pas dire. Sans la phrase, le bloc ne sert a rien. */}
+            <div style={{ background:"#c24a10", padding:"2.5rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
+              <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.5rem", lineHeight:1.28, color:"#fff", marginBottom:"0.9rem" }}>
+                {lang==="en"
+                  ? "Your recruiter will not change mid-search."
+                  : "Ton recruteur ne changera pas en cours de mandat."}
+              </p>
+              <p style={{ fontSize:"0.92rem", lineHeight:1.7, color:"#fff" }}>
+                {lang==="en"
+                  ? "The person who takes your call is the one doing the search."
+                  : "Celui qui prend ton appel est celui qui fait la recherche."}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -2348,7 +2367,7 @@ function EmployersPage({ lang, setPage }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <div style={{ maxWidth:"540px" }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,2.6vw,1.8rem)", color:C.ink, letterSpacing:"-0.02em", marginBottom:"0.6rem" }}>{lang==="en" ? "People we are talking to right now." : "Du monde à qui on parle en ce moment."}</h3>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.75 }}>{lang==="en" ? "Anonymous profiles of real candidates we know personally. If one of them looks like the person you need, tell us and we will make the introduction." : "Des profils anonymisés de vrais candidats qu'on connaît personnellement. Si un d'eux ressemble à la personne qu'il te faut, dis-le nous et on fait l'introduction."}</p>
+            <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{lang==="en" ? "Anonymous profiles of real candidates we know personally. If one of them looks like the person you need, tell us and we will make the introduction." : "Des profils anonymisés de vrais candidats qu'on connaît personnellement. Si un d'eux ressemble à la personne qu'il te faut, dis-le nous et on fait l'introduction."}</p>
           </div>
           <button className="btn-ink" onClick={() => setPage("featured")} style={{ flexShrink:0 }}>{lang==="en" ? "See the profiles" : "Voir les profils"}</button>
         </div>
@@ -2415,7 +2434,7 @@ function JobListingsPage({ lang }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
             </a>
           ))}
-          <p style={{ color:C.muted, fontSize:"0.85rem", lineHeight:1.8, marginTop:"1.75rem" }}>{t.sampleNote}</p>
+          <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8, marginTop:"1.75rem" }}>{t.sampleNote}</p>
         </div>
       </section>
     </div>
@@ -2511,7 +2530,7 @@ function NewsletterWidget({ lang, compact }) {
     <div style={{ padding: compact ? "1.5rem 2rem" : "3rem", background: C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
       <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
       <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize: compact ? "1rem" : "1.3rem", color:C.ink, letterSpacing:"-0.01em", marginBottom: t.p ? "0.6rem" : "1.25rem" }}>{t.h}</h3>
-      {t.p && <p style={{ fontFamily:"'Archivo',sans-serif", color:C.muted, fontSize:"0.88rem", lineHeight:1.7, marginBottom:"1.5rem", maxWidth:"420px" }}>{t.p}</p>}
+      {t.p && <p style={{ fontFamily:"'Archivo',sans-serif", color:C.muted, fontSize:"0.95rem", lineHeight:1.8, marginBottom:"1.5rem", maxWidth:"420px" }}>{t.p}</p>}
 
       <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", alignItems:"flex-end" }}>
         <input
@@ -3113,7 +3132,7 @@ function CalculatorPage({ lang, setPage }) {
             </div>
 
             <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"1.5rem" }}>{t.note}</p>
-            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.75rem", color:C.muted, lineHeight:1.6, marginTop:"1rem" }}>{t.disclaimer}</p>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, marginTop:"1rem" }}>{t.disclaimer}</p>
           </div>
         </div>
       </section>
@@ -3434,7 +3453,7 @@ function HowWeWorkPage({ lang, setPage }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", letterSpacing:"0.06em", color:C.orange, flexShrink:0 }}>{tl.time}</span>
             </div>
           ))}
-          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", color:C.muted, fontStyle:"italic", marginTop:"1.5rem", lineHeight:1.7 }}>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", color:C.muted, fontStyle:"italic", marginTop:"1.5rem", lineHeight:1.8 }}>
             {lang==="en"
               ? "These are typical ranges based on current market conditions. Timelines vary based on role complexity, candidate availability, and interview speed on the client side."
               : "Ce sont des fourchettes typiques basées sur les conditions actuelles du marché. Les délais varient selon la complexité du rôle, la disponibilité des candidats et la vitesse des entrevues du côté client."}
@@ -3592,7 +3611,7 @@ function PressPage({ lang, setPage }) {
           {/* Placeholder pour futures mentions */}
           <div style={{ padding:"3rem", background:C.paperDark, marginTop:"2rem", borderLeft:`3px solid rgba(200,200,200,0.3)` }}>
             <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.muted, marginBottom:"0.5rem" }}>{t.emptyH}</h3>
-            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.muted, lineHeight:1.7 }}>{t.emptyP}</p>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8 }}>{t.emptyP}</p>
           </div>
         </div>
       </section>
@@ -3744,7 +3763,7 @@ function ReferralPage({ lang, setPage }) {
               <div key={n} style={{ background:C.white, padding:"2.5rem 2rem" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -3760,7 +3779,7 @@ function ReferralPage({ lang, setPage }) {
               <div key={n}>
                 <div style={{ width:"36px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -3772,7 +3791,7 @@ function ReferralPage({ lang, setPage }) {
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Submit a referral":"Soumettre une référence"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:C.ink, marginBottom:"0.5rem" }}>{t.formH}</h2>
-          <p style={{ color:C.muted, fontSize:"0.9rem", marginBottom:"3rem" }}>{t.formSub}</p>
+          <p style={{ color:C.muted, fontSize:"0.95rem", marginBottom:"3rem" }}>{t.formSub}</p>
 
           {sent ? (
             <div style={{ padding:"3rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
@@ -3844,7 +3863,7 @@ function ReferralPage({ lang, setPage }) {
           {t.terms.map((term, i) => (
             <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"1rem", padding:"1rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <span style={{ color:C.orange, fontSize:"0.7rem", marginTop:"3px", flexShrink:0 }}>▸</span>
-              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.muted, lineHeight:1.7 }}>{term}</p>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8 }}>{term}</p>
             </div>
           ))}
         </div>
@@ -4999,7 +5018,7 @@ function GlossaryPage({ lang, setPage }) {
           ))}
 
           <div style={{ marginTop:"4rem", padding:"2.5rem", background:C.paperDark, borderLeft:`3px solid ${C.orange}` }}>
-            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.25rem" }}>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, marginBottom:"1.25rem" }}>
               {lang==="en"
                 ? "Have a term you'd like us to add? Or want to talk about a role that requires any of this expertise?"
                 : "Un terme que tu aimerais qu'on ajoute? Ou tu veux parler d'un rôle qui exige une de ces expertises?"}
@@ -5059,7 +5078,7 @@ function MarketPage({ lang, setPage, market }) {
                 onMouseLeave={e => e.currentTarget.style.background=C.white}
               >
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, marginBottom:"0.75rem" }}>{s.h}</h3>
-                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.muted, lineHeight:1.75, marginBottom:"1.5rem" }}>{s.p}</p>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, marginBottom:"1.5rem" }}>{s.p}</p>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{lang==="en"?"Learn more →":"En savoir plus →"}</span>
               </button>
             ))}
@@ -5252,7 +5271,7 @@ function StartupPage({ lang, setPage }) {
               <div key={h} style={{ background:C.white, padding:"2.5rem 2rem" }}>
                 <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1.25rem" }} />
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -5368,7 +5387,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
               </div>
             ))}
           </div>
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", letterSpacing:"0.06em", textTransform:"uppercase", color:C.muted }}>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", letterSpacing:"0.06em", textTransform:"uppercase", color:C.muted }}>
             {lang==="en"?"Territory":"Territoire"} &nbsp;/&nbsp; {d.geo[lang]}
           </p>
         </div>
@@ -5403,7 +5422,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
               <div key={x.h.en}>
                 <div>{String(i+1).padStart(2,"0")}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, marginBottom:"0.6rem" }}>{x.h[lang]}</h3>
-                <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.75 }}>{x.p[lang]}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{x.p[lang]}</p>
               </div>
             ))}
           </div>
@@ -5528,7 +5547,7 @@ function SimonPage({ lang, setPage }) {
               <div key={n}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.1rem", color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8 }}>{p}</p>
               </div>
             ))}
           </div>
