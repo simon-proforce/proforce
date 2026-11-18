@@ -9,6 +9,13 @@ const CONTACT_EMAIL = "info@proforce.ca";
 // Tant qu'elles commencent par YOUR_, les formulaires ouvrent plutot le logiciel
 // de courriel du visiteur avec le message deja ecrit. Dans les deux cas le
 // message part pour vrai: on n'affiche jamais une confirmation sans envoi.
+// Proforce a ete fondee en 2001. L'anciennete se calcule au lieu d'etre ecrite
+// en dur: un "25 ans" fige dans le texte devient faux le 1er janvier suivant,
+// et plus personne ne pense a le corriger. Ailleurs sur le site on dit plutot
+// "depuis 2001", qui ne perime jamais et qui se verifie.
+const FONDATION = 2001;
+const ANS = new Date().getFullYear() - FONDATION;
+
 const EMAILJS = {
   serviceId:          "YOUR_SERVICE_ID",
   publicKey:          "YOUR_PUBLIC_KEY",
@@ -995,11 +1002,10 @@ function Ticker({ lang }) {
 function HomePage({ lang, setPage }) {
   const t = {
     en:{
-      issue:"Vol. 25, Specialist Recruitment",
       heroLabel:"Specialist recruitment in food, CPG and fashion",
       h1:"We know\nyour industry.",
       h1em:"Not just the job.",
-      sub:"Proforce Personnel places food, CPG (consumer packaged goods), and fashion professionals across Montreal, Quebec City, and Toronto. No generalists. No job boards. A network built over 25 years.",
+      sub:"Proforce Personnel places food, CPG (consumer packaged goods), and fashion professionals across Montreal, Quebec City, and Toronto. No generalists. No job boards. A network built since 2001.",
       cta1:"Our Sectors", cta2:"Contact Us",
       p1n:"83%",
       p1h:"of our placements come from clients who called us back.",
@@ -1031,11 +1037,10 @@ function HomePage({ lang, setPage }) {
       ctaH:"Ready to talk?", ctaP:"One call is usually enough to know if we're the right fit.", cta3:"Get in Touch",
     },
     fr:{
-      issue:"Vol. 25, Recrutement spécialisé",
       heroLabel:"Recrutement spécialisé en alimentaire, CPG et mode",
       h1:"On connaît\nton industrie.",
       h1em:"Pas juste le poste.",
-      sub:"Proforce Personnel place des professionnels de l'alimentaire, du CPG (produits de consommation emballés) et de la mode à Montréal, Québec et Toronto. Pas de généralistes. Pas de babillards. Un réseau bâti sur 25 ans.",
+      sub:"Proforce Personnel place des professionnels de l'alimentaire, du CPG (produits de consommation emballés) et de la mode à Montréal, Québec et Toronto. Pas de généralistes. Pas de babillards. Un réseau bâti depuis 2001.",
       cta1:"Nos secteurs", cta2:"Nous contacter",
       p1n:"83 %",
       p1h:"de nos placements viennent de clients qui nous ont rappelés.",
@@ -1885,12 +1890,12 @@ function FeaturedCandidatesPage({ lang, setPage }) {
 // ─── ABOUT ────────────────────────────────────────────────────────────────────
 function AboutPage({ lang }) {
   const t = {
-    en:{ eyebrow:"About Proforce Personnel, Montreal, Quebec City & Toronto", h1:"A specialist firm.", h1i:"Built on purpose.", story:"Proforce Personnel was founded in 2001 by David Inzlicht, with a clear idea: build a recruitment firm that actually knows the industries it serves. Not a generalist agency that does everything for everyone. Simon St-Amand joined in 2015, founded the food division, and opened Ontario and the Maritimes. He has been President and shareholder since 2018. 25 years later, that's still the idea: a specialist firm in food, CPG (consumer packaged goods), and fashion, placing professionals in Montreal, Quebec City, Toronto, and Atlantic Canada.",
+    en:{ eyebrow:"About Proforce Personnel, Montreal, Quebec City & Toronto", h1:"A specialist firm.", h1i:"Built on purpose.", story:"Proforce Personnel was founded in 2001 by David Inzlicht, with a clear idea: build a recruitment firm that actually knows the industries it serves. Not a generalist agency that does everything for everyone. Simon St-Amand joined in 2015, founded the food division, and opened Ontario and the Maritimes. He has been President and shareholder since 2018. " + ANS + " years later, that's still the idea: a specialist firm in food, CPG (consumer packaged goods), and fashion, placing professionals in Montreal, Quebec City, Toronto, and Atlantic Canada.",
       v1h:"Specialists, not generalists", v1p:"Every recruiter at Proforce lives inside one industry. They know the roles, the players, the culture. That's not a pitch, it's how we've operated since day one.",
       v2h:"Network over algorithms", v2p:"We don't post job ads and wait. We call people we already know. The best candidates usually aren't looking, we know where they are.",
       v3h:"Guaranteed results", v3p:"Every placement comes with a guarantee. We're confident enough in our process to stand behind who we send you.",
       guarH:"Our Guarantee", guarP:"Every permanent placement comes with a replacement guarantee. If the candidate leaves or doesn't work out within the guarantee period, we find you another one. No charge. That's our commitment." },
-    fr:{ eyebrow:"À propos de Proforce Personnel, Montréal, Québec & Toronto", h1:"Une firme spécialisée.", h1i:"Construite intentionnellement.", story:"Proforce Personnel a été fondée en 2001 par David Inzlicht, avec une idée claire : bâtir une firme de recrutement qui connaît vraiment les industries qu'elle sert. Pas une agence généraliste. Simon St-Amand a rejoint la firme en 2015, y a fondé la division alimentaire et ouvert l'Ontario et les Maritimes. Il en est président et actionnaire depuis 2018. 25 ans plus tard, c'est encore ça l'idée : une firme spécialisée en alimentaire, CPG (produits de consommation emballés) et mode, qui place des professionnels à Montréal, Québec, Toronto et dans les provinces atlantiques.",
+    fr:{ eyebrow:"À propos de Proforce Personnel, Montréal, Québec & Toronto", h1:"Une firme spécialisée.", h1i:"Construite intentionnellement.", story:"Proforce Personnel a été fondée en 2001 par David Inzlicht, avec une idée claire : bâtir une firme de recrutement qui connaît vraiment les industries qu'elle sert. Pas une agence généraliste. Simon St-Amand a rejoint la firme en 2015, y a fondé la division alimentaire et ouvert l'Ontario et les Maritimes. Il en est président et actionnaire depuis 2018. " + ANS + " ans plus tard, c'est encore ça l'idée : une firme spécialisée en alimentaire, CPG (produits de consommation emballés) et mode, qui place des professionnels à Montréal, Québec, Toronto et dans les provinces atlantiques.",
       v1h:"Spécialistes, pas généralistes", v1p:"Chaque recruteur chez Proforce vit à l'intérieur d'une industrie. Il connaît les rôles, les acteurs, la culture. C'est pas un pitch, c'est comme on opère depuis le premier jour.",
       v2h:"Réseau plutôt qu'algorithmes", v2p:"On ne publie pas d'offres d'emploi et on n'attend pas. On appelle des gens qu'on connaît déjà. Les meilleurs candidats ne cherchent généralement pas, on sait où ils sont.",
       v3h:"Des résultats garantis", v3p:"Chaque placement vient avec une garantie. On est suffisamment confiants dans notre processus pour se tenir derrière les gens qu'on t'envoie.",
@@ -2616,7 +2621,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
             {lang==="en"?"No fluff." : "Pas de remplissage."}
           </h2>
           <p className="fu3" style={{ color:C.muted, fontSize:"1rem", lineHeight:1.75, maxWidth:"480px" }}>
-            {lang==="en"?"25 years of observations on food, CPG, and fashion hiring.":"25 ans d'observations sur l'embauche dans l'alimentaire, le CPG et la mode."}
+            {lang==="en"?`${ANS} years of observations on food, CPG, and fashion hiring.`:`${ANS} ans d'observations sur l'embauche dans l'alimentaire, le CPG et la mode.`}
           </p>
         </div>
       </section>
@@ -3994,16 +3999,16 @@ const META = {
     fr: { title:"Donner en retour | Proforce Personnel", desc:"Proforce Personnel soutient fièrement l'UNICEF, la Fondation Starlight, l'Hôpital de Montréal pour Enfants et la Fondation Just for Kids." },
   },
   blog: {
-    en: { title:"Blog | Proforce Personnel", desc:"Straight talk on food industry hiring, career advice, and market observations. 25 years of experience, no fluff." },
-    fr: { title:"Blogue | Proforce Personnel", desc:"Du vrai parler sur l'embauche dans l'alimentaire, les conseils de carrière et les observations de marché. 25 ans d'expérience, pas de remplissage." },
+    en: { title:"Blog | Proforce Personnel", desc:"Straight talk on food industry hiring, career advice, and market observations. Specialist recruitment since 2001, no fluff." },
+    fr: { title:"Blogue | Proforce Personnel", desc:"Du vrai parler sur l'embauche dans l'alimentaire, les conseils de carrière et les observations de marché. Recrutement spécialisé depuis 2001, pas de remplissage." },
   },
   glossary: {
     en: { title:"Food, CPG & Fashion Recruitment Glossary | Proforce Personnel", desc:"Definitions of key terms in food manufacturing, CPG (consumer packaged goods), and fashion recruiting. SQF, HACCP, FSMA, GFSI, co-manufacturing, open-to-buy, contingency search, and more." },
     fr: { title:"Glossaire recrutement alimentaire, CPG et mode | Proforce Personnel", desc:"Définitions des termes clés en fabrication alimentaire, CPG (produits de consommation emballés) et recrutement mode. SQF, HACCP, FSMA, GFSI, co-fabrication, open-to-buy, recrutement contingent et plus." },
   },
   montreal: {
-    en: { title:"Food, CPG & Fashion Recruitment in Montreal | Proforce Personnel", desc:"Proforce Personnel places food, CPG (consumer packaged goods), and fashion professionals in Montreal, Quebec. Specialist recruiters with 25 years of experience in the Montreal market." },
-    fr: { title:"Recrutement alimentaire, CPG et mode à Montréal | Proforce Personnel", desc:"Proforce Personnel place des professionnels de l'alimentaire, du CPG (produits de consommation emballés) et de la mode à Montréal, Québec. Recruteurs spécialisés avec 25 ans d'expérience dans le marché montréalais." },
+    en: { title:"Food, CPG & Fashion Recruitment in Montreal | Proforce Personnel", desc:"Proforce Personnel places food, CPG (consumer packaged goods), and fashion professionals in Montreal, Quebec. Specialist recruiters in the Montreal market since 2001." },
+    fr: { title:"Recrutement alimentaire, CPG et mode à Montréal | Proforce Personnel", desc:"Proforce Personnel place des professionnels de l'alimentaire, du CPG (produits de consommation emballés) et de la mode à Montréal, Québec. Recruteurs spécialisés dans le marché montréalais depuis 2001." },
   },
   quebec: {
     en: { title:"Food & CPG Recruitment in Quebec City | Proforce Personnel", desc:"Proforce Personnel places food, CPG (consumer packaged goods), and fashion professionals in Quebec City, Chaudiere-Appalaches, and the Beauce. A local office, recruiters who know the region's plants." },
@@ -4050,8 +4055,8 @@ const META = {
     fr: { title:"Richard Saucier, conseiller principal, industrie alimentaire | Proforce Personnel", desc:"Richard Saucier a passé 30 ans dans l'industrie alimentaire avant de se joindre à Proforce. Il accompagne les entreprises alimentaires de l'Ontario et du Québec dans leurs besoins d'embauche." },
   },
   simon: {
-    en: { title:"Simon St-Amand | President, Proforce Personnel", desc:"Simon St-Amand is the President of Proforce Personnel. He founded the firm's food division, opened Ontario and Maritime territories, and built the team. 25 years in food and CPG (consumer packaged goods) recruitment." },
-    fr: { title:"Simon St-Amand | Président, Proforce Personnel", desc:"Simon St-Amand est le président de Proforce Personnel. Il a fondé la division alimentaire de la firme, ouvert l'Ontario et les Maritimes comme territoires, et bâti l'équipe. 25 ans en recrutement alimentaire et CPG (produits de consommation emballés)." },
+    en: { title:"Simon St-Amand | President, Proforce Personnel", desc:"Simon St-Amand is the President of Proforce Personnel. He founded the firm's food division, opened Ontario and Maritime territories, and built the team. Proforce has been placing food and CPG (consumer packaged goods) professionals since 2001." },
+    fr: { title:"Simon St-Amand | Président, Proforce Personnel", desc:"Simon St-Amand est le président de Proforce Personnel. Il a fondé la division alimentaire de la firme, ouvert l'Ontario et les Maritimes comme territoires, et bâti l'équipe. Proforce place des professionnels de l'alimentaire et du CPG (produits de consommation emballés) depuis 2001." },
   },
   referral: {
     en: { title:"Referral Program | Proforce Personnel", desc:"Refer a company to Proforce Personnel and earn a $1,000 credit on your next mandate. Food, CPG (consumer packaged goods), and fashion recruitment specialist." },
@@ -4801,7 +4806,7 @@ const MARKETS = {
       sub: "Proforce Personnel has been placing professionals in Montreal's food, CPG (consumer packaged goods), and fashion industries since 2001. Our headquarters is here. Our network is here. We know this market.",
       about: "Montreal is one of Canada's most important food manufacturing centres, home to major processors, dairy producers, confectionery brands, and a growing natural and organic food sector. The city is also the heart of Canadian fashion, with a concentration of wholesale brands, retailers, and designers unmatched outside of Toronto.",
       foodH: "Food & CPG in Montreal",
-      foodP: "Montreal's food manufacturing sector spans everything from large-scale protein processing in the surrounding regions to specialty food producers in the city's industrial corridors. Companies like Saputo, Olymel, Agropur, and dozens of mid-size CPG (consumer packaged goods) brands call Montreal home. Proforce has placed quality directors, plant managers, supply chain leaders, and senior sales professionals across this ecosystem for over 25 years.",
+      foodP: "Montreal's food manufacturing sector spans everything from large-scale protein processing in the surrounding regions to specialty food producers in the city's industrial corridors. Companies like Saputo, Olymel, Agropur, and dozens of mid-size CPG (consumer packaged goods) brands call Montreal home. Proforce has placed quality directors, plant managers, supply chain leaders, and senior sales professionals across this ecosystem since 2001.",
       fashH: "Fashion in Montreal",
       fashP: "Montreal's fashion industry is centered on St-Laurent Boulevard and the Chabanel garment district, with a mix of established brands, emerging designers, and retail head offices. Robin Anisef has spent over 20 years building relationships across Montreal's fashion community, buyers, brand managers, designers, and merchandisers who trust her to handle their career conversations with discretion.",
       recruiterH: "Your Montreal recruiters",
@@ -4816,7 +4821,7 @@ const MARKETS = {
       sub: "Proforce Personnel place des professionnels dans les industries alimentaire, CPG (produits de consommation emballés) et mode de Montréal depuis 2001. Notre siège social est ici. Notre réseau est ici. On connaît ce marché.",
       about: "Montréal est l'un des centres de fabrication alimentaire les plus importants au Canada, accueillant des transformateurs majeurs, des producteurs laitiers, des marques de confiserie et un secteur d'aliments naturels et biologiques en croissance. La ville est aussi le cœur de la mode canadienne, avec une concentration de marques en gros, de détaillants et de designers inégalée en dehors de Toronto.",
       foodH: "Alimentaire & CPG à Montréal",
-      foodP: "Le secteur de la fabrication alimentaire de Montréal s'étend de la transformation de protéines à grande échelle dans les régions environnantes aux producteurs d'aliments spécialisés dans les corridors industriels de la ville. Des compagnies comme Saputo, Olymel, Agropur et des dizaines de marques CPG (produits de consommation emballés) de taille moyenne ont Montréal comme chez-soi. Proforce a placé des directeurs qualité, directeurs d'usine, responsables chaîne d'approvisionnement et professionnels en ventes séniors dans cet écosystème depuis plus de 25 ans.",
+      foodP: "Le secteur de la fabrication alimentaire de Montréal s'étend de la transformation de protéines à grande échelle dans les régions environnantes aux producteurs d'aliments spécialisés dans les corridors industriels de la ville. Des compagnies comme Saputo, Olymel, Agropur et des dizaines de marques CPG (produits de consommation emballés) de taille moyenne ont Montréal comme chez-soi. Proforce a placé des directeurs qualité, directeurs d'usine, responsables chaîne d'approvisionnement et professionnels en ventes séniors dans cet écosystème depuis 2001.",
       fashH: "Mode à Montréal",
       fashP: "L'industrie mode de Montréal est centrée sur le boulevard St-Laurent et le district du vêtement de Chabanel, avec un mélange de marques établies, de designers émergents et de sièges sociaux de détaillants. Robin Anisef a passé plus de 20 ans à bâtir des relations dans la communauté mode de Montréal, acheteurs, gestionnaires de marque, designers et marchandiseurs qui lui font confiance pour gérer leurs conversations de carrière avec discrétion.",
       recruiterH: "Vos recruteurs à Montréal",
