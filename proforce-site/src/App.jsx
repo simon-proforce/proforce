@@ -75,6 +75,9 @@ const G = `
   ${fonts}
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
   html { scroll-behavior:smooth; }
+  /* Gouttiere de page. Les plaques d'ouverture s'y accrochent et leur filet
+     orange ressort par la gauche de la meme distance. */
+  :root { --gut:clamp(1.25rem,4vw,3.5rem); }
   body { font-family:'Archivo',sans-serif; background:${C.paper}; color:${C.ink}; }
 
   h1,h2,h3 { font-family:'Playfair Display',serif; font-weight:500; letter-spacing:-0.005em; }
@@ -170,6 +173,135 @@ const G = `
   }
   .num-list > * > h3 { margin-bottom:0.7rem !important; }
 
+  /* ── Ouvertures de page ───────────────────────────────────────────────
+     Avant, chaque page s'ouvrait exactement de la meme facon: une photo
+     noyee sous un degrade marine, une etiquette, un titre et un
+     paragraphe empiles au centre d'un conteneur. Vingt et une fois. On
+     casse ca en deux familles.
+
+     hero-open: la photo garde sa luminosite et prend toute la largeur.
+     Une plaque blanche vient mordre dedans par le bas a gauche, et le
+     filet orange de la plaque part du bord de l'ecran, pas du bord du
+     texte. hero-flat: pas de photo, le marine reste, mais le filet sort
+     quand meme par la gauche et le paragraphe se decale a droite. */
+  .hero-open {
+    min-height:0 !important;
+    padding:0 0 3.25rem !important;
+    justify-content:flex-start !important;
+    background-position:center 35% !important;
+    background-repeat:no-repeat !important;
+  }
+  .hero-open::before { content:""; display:block; height:clamp(330px,50vh,540px); }
+
+  .hero-open .hero-plate {
+    position:relative;
+    background:#fff;
+    width:min(820px,87vw);
+    max-width:none !important;
+    margin:clamp(-128px,-12vh,-104px) 0 0 var(--gut);
+    padding:2.1rem clamp(1.5rem,4vw,3.5rem) 2.4rem 1.5rem;
+  }
+  .hero-open .hero-plate::before,
+  .hero-flat .hero-plate::before {
+    content:""; position:absolute; top:0; height:5px; background:${C.orange};
+    left:calc(-1 * var(--gut)); width:calc(100% + var(--gut));
+  }
+  /* L'etiquette annoncait ce que le titre dit deja, et le petit filet de
+     2px fait double emploi avec celui qui sort par la gauche. */
+  .hero-open .eyebrow,
+  .hero-flat .eyebrow { display:none !important; }
+  .hero-open .hero-plate > div[style*="height: 2px"],
+  .hero-flat .hero-plate > div[style*="height: 2px"] { display:none !important; }
+  /* Les barres de metadonnees et les gros chiffres fantomes etaient poses
+     sur le degrade. Sur une photo en pleine lumiere, ils ne tiennent plus. */
+  .hero-open > div[style*="position: absolute"] { display:none !important; }
+  /* Sur le marine, les gros chiffres fantomes tombaient maintenant derriere
+     le paragraphe de droite. On garde la petite barre de metadonnees du
+     haut, on enleve le reste. */
+  .hero-flat > div[style*="position: absolute"]:not([style*="top: 80px"]) { display:none !important; }
+
+  .hero-open .hero-plate h1 { color:${C.ink} !important; }
+  .hero-open .hero-plate h2 { color:${C.orange} !important; }
+  .hero-open .hero-plate > p:not(.eyebrow),
+  .hero-flat .hero-plate > p:not(.eyebrow) {
+    color:${C.muted} !important;
+    max-width:min(430px,62%) !important;
+    margin-left:38% !important;
+    font-size:0.95rem !important;
+  }
+  .hero-open .hero-plate > p:not(.eyebrow) { margin-bottom:1.5rem !important; }
+
+  /* Sans photo, le titre doit porter la page tout seul. Il prend donc plus
+     de corps, et le paragraphe passe a sa droite, cale en bas, au lieu de
+     flotter dessous au milieu du marine. */
+  .hero-flat {
+    min-height:0 !important;
+    padding:9.5rem 0 4.5rem !important;
+    justify-content:flex-start !important;
+  }
+  .hero-flat .hero-plate {
+    position:relative;
+    width:min(1150px,92vw);
+    max-width:none !important;
+    margin-left:var(--gut);
+    padding-top:2.3rem;
+    display:grid;
+    grid-template-columns:minmax(0,1.3fr) minmax(0,0.8fr);
+    column-gap:clamp(2rem,5vw,4.5rem);
+    align-content:start;
+  }
+  .hero-flat .hero-plate > * { grid-column:1; }
+  .hero-flat .hero-plate h1 { font-size:clamp(2.4rem,5.8vw,4.5rem) !important; }
+  .hero-flat .hero-plate > p:not(.eyebrow) {
+    grid-column:2; grid-row:1 / span 20; align-self:end;
+    margin:0 0 0.5rem 0 !important; max-width:none !important;
+    color:rgba(255,255,255,0.68) !important;
+  }
+
+  /* ── Liste de postes en drapeau ───────────────────────────────────────
+     Dix cases identiques dans une grille, ca ne dit rien. Un poste en
+     vedette, cinq en taille normale, le reste en retrait: ca dit une
+     hierarchie. */
+  .role-flag { list-style:none; display:flex; flex-wrap:wrap; gap:0.65rem 1.7rem; align-items:baseline; }
+  .role-flag li { font-family:'Archivo',sans-serif; font-size:1rem; color:${C.ink}; }
+  .role-flag li.star {
+    width:100%; margin-bottom:0.35rem;
+    font-family:'Playfair Display',serif; font-weight:500;
+    font-size:clamp(1.5rem,3.2vw,2.3rem); line-height:1.15;
+  }
+  .role-flag li.dim { color:${C.muted}; font-size:0.88rem; }
+
+  /* ── Colonnes decalees ────────────────────────────────────────────────
+     Trois blocs qui commencent tous a la meme ligne, c'est un tableau.
+     Decales, c'est une page. */
+  @media(min-width:769px){
+    .stagger { align-items:start !important; }
+    .stagger > *:nth-child(2) { margin-top:3.5rem !important; }
+    .stagger > *:nth-child(3) { margin-top:7rem !important; }
+    /* Le premier argument porte le bloc: il passe en serif et prend du
+       corps. Les deux autres restent en Archivo et le suivent. */
+    .stagger > *:first-child h3 {
+      font-family:'Playfair Display',serif !important;
+      font-weight:500 !important;
+      font-size:1.75rem !important;
+      line-height:1.18 !important;
+    }
+  }
+
+  /* ── Photo qui sort par la droite ─────────────────────────────────────
+     Elle va jusqu'au bord de l'ecran au lieu de s'arreter sagement a la
+     limite du conteneur. */
+  .escape-row {
+    display:grid; grid-template-columns:minmax(0,0.72fr) 2fr; gap:2.75rem;
+    align-items:end;
+    padding-left:max(var(--gut), calc((100vw - 1180px)/2 + 2rem));
+  }
+  .escape-row > p {
+    border-left:3px solid ${C.orange};
+    padding:0 0 0.9rem 1.1rem;
+    color:${C.muted}; font-size:1rem; line-height:1.8;
+  }
+
   @media(max-width:768px){
     /* Les chiffres debordaient de leur colonne et se chevauchaient:
        MTL+TOR a 2.5rem demande plus de largeur qu'une demi colonne de 390px. */
@@ -202,6 +334,29 @@ const G = `
     .team-photo { max-width:190px !important; }
 
     .num-list { gap:1.9rem !important; }
+
+    /* Ouvertures sur telephone: la plaque reste, mais elle remonte moins
+       haut sur la photo et le paragraphe revient sous le titre. A 390px
+       de large, un decalage de 38% ne laisse plus rien au texte. */
+    .hero-open::before { height:clamp(230px,34vh,320px) !important; }
+    .hero-open .hero-plate { margin-top:-72px !important; width:calc(100% - var(--gut)) !important; }
+    .hero-flat { padding:7rem 0 2.75rem !important; }
+    .hero-flat .hero-plate { width:calc(100% - var(--gut)) !important; }
+    .hero-open .hero-plate > p:not(.eyebrow) {
+      margin-left:0 !important; max-width:none !important; margin-top:1.4rem !important;
+    }
+    /* La grille a deux colonnes du marine ne tient pas a 390px: le titre et
+       le paragraphe reviennent l'un sous l'autre. */
+    .hero-flat .hero-plate { display:block !important; }
+    .hero-flat .hero-plate > p:not(.eyebrow) { margin-top:1.4rem !important; }
+
+    /* La photo qui sort par la droite n'a plus de place pour sa legende
+       a cote: elle passe dessous. */
+    .escape-row { grid-template-columns:1fr !important; gap:1.25rem !important; padding-left:0 !important; }
+    .escape-row > p { margin:0 var(--gut); }
+    .escape-row > :last-child { order:-1; }
+
+    .role-flag li.star { font-size:1.45rem !important; }
 
     /* Bandeau d'equipe de l'accueil: la vignette et le nom cote a cote
        plutot qu'une petite photo perdue dans la largeur. */
@@ -550,6 +705,73 @@ const POSTS = [
 // Sert le WebP quand le navigateur le prend (tous depuis 2020) et garde le JPEG
 // en filet de securite. width et height evitent que la page saute pendant le
 // chargement: le navigateur reserve la place avant que l'image arrive.
+// ─── FICHES PERSONNELLES ─────────────────────────────────────────────────────
+// Declare ici, avant TeamPage, et non en bas du fichier: minifie, le const
+// se retrouvait hors de portee au moment du rendu et /equipe plantait net
+// avec "MEMBERS is not defined". La page revenait blanche en production.
+const MEMBERS = {
+  "robin-anisef": {
+    cta:{en:"Got a fashion role to fill in Montreal or Toronto? Talk to Robin.",fr:"Un poste en mode à combler à Montréal ou à Toronto? Parle à Robin."},
+    g:{en:"she",fr:"elle"},
+    name:"Robin Anisef",
+    lede:{en:"Twenty years in Canadian fashion. The people you're looking for, she already knows by name.",fr:"Vingt ans dans la mode canadienne. Les gens que tu cherches, elle les connaît déjà par leur nom."},
+    geo:{en:"Montreal and Toronto",fr:"Montréal et Toronto"},
+    covers:[{en:"Buyers and senior buyers",fr:"Acheteurs et acheteurs seniors"}, {en:"Brand managers",fr:"Gestionnaires de marque"}, {en:"Designers and creative directors",fr:"Designers et directeurs de création"}, {en:"Pattern technicians",fr:"Techniciens de patron"}, {en:"Product development",fr:"Développement de produit"}, {en:"Production coordination",fr:"Coordination de production"}, {en:"Merchandising and planning",fr:"Marchandisage et planification"}],
+    proof:{ n:"17", label:{en:"people placed at the same client",fr:"personnes placées chez le même client"}, ctx:{en:"Over seven years. In an industry where most searches are one offs, that's the only test that counts.",fr:"Sur sept ans. Dans une industrie où la plupart des mandats sont des one shot, c'est le seul test qui compte."} },
+    how:[{h:{en:"She calls, she doesn't write",fr:"Elle appelle, elle n'écrit pas"},p:{en:"A senior buyer gets messages every month. What makes them answer is recognizing the name on the other end.",fr:"Un acheteur senior reçoit des messages tous les mois. Ce qui le fait répondre, c'est de reconnaître le nom au bout du fil."}}, {h:{en:"Two or three names, not ten",fr:"Deux ou trois noms, pas dix"},p:{en:"If she brings you ten, she hasn't done her job. The shortlist is the work, not the by-product.",fr:"Si elle en présente dix, c'est qu'elle n'a pas fait son travail. La courte liste, c'est le travail, pas le résidu."}}, {h:{en:"She knows the calendar",fr:"Elle connaît le calendrier"},p:{en:"In fashion, when you recruit matters as much as what you offer. She talks to people six months before their window opens.",fr:"En mode, le moment où tu recrutes compte autant que ce que tu offres. Elle parle aux gens six mois avant que leur fenêtre s'ouvre."}}],
+  },
+  "stephanie-lanoie": {
+    cta:{en:"Got a plant role to fill in Quebec? Talk to Stéphanie.",fr:"Un poste à combler dans une usine au Québec? Parle à Stéphanie."},
+    g:{en:"she",fr:"elle"},
+    name:"Stéphanie Lanoie",
+    lede:{en:"Twenty two clients, seventy searches. She closes fast because she prepares both sides.",fr:"Vingt-deux clients, soixante-dix mandats. Elle ferme vite parce qu'elle prépare les deux côtés."},
+    geo:{en:"Quebec",fr:"Québec"},
+    covers:[{en:"Plant management",fr:"Direction d'usine"}, {en:"Production and supervision",fr:"Production et supervision"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Maintenance and engineering",fr:"Maintenance et ingénierie"}, {en:"Supply chain",fr:"Chaîne d'approvisionnement"}],
+    proof:{ n:"70", label:{en:"searches from 22 clients",fr:"mandats confiés par 22 clients"}, ctx:{en:"Six of them gave her five or more. One gave her eleven.",fr:"Six d'entre eux lui en ont donné cinq ou plus. Un lui en a donné onze."} },
+    how:[{h:{en:"She calls the candidate the day before",fr:"Elle appelle le candidat la veille"},p:{en:"Who they're meeting, what the client actually wants, what to say about the gaps. Twenty minutes that change the outcome.",fr:"Qui il rencontre, ce que le client cherche vraiment, quoi répondre sur les trous du CV. Vingt minutes qui changent le résultat."}}, {h:{en:"She sees the counter-offer coming",fr:"Elle voit venir la contre-offre"},p:{en:"She asks the question by the second conversation. If the candidate hesitates, it gets settled before the offer, not after.",fr:"Elle pose la question dès la deuxième conversation. Si le candidat hésite, ça se règle avant l'offre et pas après."}}, {h:{en:"She asks for feedback the same day",fr:"Elle demande un retour le jour même"},p:{en:"Not a decision, feedback. That's what lets her adjust before the right candidate is gone.",fr:"Pas une décision, un retour. C'est ce qui lui permet d'ajuster avant de perdre le bon candidat."}}],
+  },
+  "mathieu-roy": {
+    cta:{en:"A plant outside the big centres looking for someone? Talk to Mathieu.",fr:"Une usine en région qui cherche quelqu'un? Parle à Mathieu."},
+    g:{en:"he",fr:"il"},
+    name:"Mathieu Roy",
+    lede:{en:"Thirty one of his thirty six placements were in food plants. He knows all of Quebec, not just the highway.",fr:"Trente-et-un de ses trente-six placements sont en usine alimentaire. Il connaît tout le Québec, pas juste l'autoroute."},
+    geo:{en:"Quebec, cities and regions",fr:"Québec, grands centres et régions"},
+    covers:[{en:"Production management",fr:"Gérance de production"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Operations",fr:"Opérations"}, {en:"Sales and territory reps",fr:"Ventes et représentation"}, {en:"Plant management",fr:"Direction d'usine"}],
+    proof:{ n:"78 %", label:{en:"of his placements came from returning clients",fr:"de ses placements viennent de clients qui revenaient"}, ctx:{en:"Across thirty six placements. A client who hands you a second search is the only review that counts.",fr:"Sur trente-six placements. Un client qui te redonne un mandat, c'est le seul avis qui compte."} },
+    how:[{h:{en:"He asks the life questions first",fr:"Il pose les questions de vie en premier"},p:{en:"Before the resume. The partner, the kids, the school, the house. Outside the big centres, that's what decides, not the salary.",fr:"Avant le CV. Le conjoint, les enfants, l'école, la maison. En région, c'est ça qui décide, pas le salaire."}}, {h:{en:"He stays in touch between steps",fr:"Il reste en contact entre les étapes"},p:{en:"A candidate who disappears is rarely a candidate problem. It's a communication problem, and that can be fixed.",fr:"Un candidat qui disparaît, c'est rarement un problème de candidat. C'est un problème de communication, et ça se règle."}}, {h:{en:"He knows the area",fr:"Il connaît le coin"},p:{en:"He has lived all over Quebec. When a plant is three hours from Montreal, he knows what he's talking about.",fr:"Il a habité un peu partout au Québec. Quand une usine est à trois heures de Montréal, il sait de quoi il parle."}}],
+  },
+  "rana-yamak": {
+    cta:{en:"Got a commercial role in Ontario or the United States? Talk to Rana.",fr:"Un poste commercial à combler en Ontario ou aux États-Unis? Parle à Rana."},
+    g:{en:"she",fr:"elle"},
+    name:"Rana Yamak",
+    lede:{en:"The top of the commercial market in food ingredients. Median salary of her placements: a hundred thousand dollars.",fr:"Le haut du marché commercial en ingrédients alimentaires. Salaire médian de ses placements: cent mille dollars."},
+    geo:{en:"Ontario and the United States",fr:"Ontario et États-Unis"},
+    covers:[{en:"Account management",fr:"Gestion de comptes"}, {en:"Business development",fr:"Développement des affaires"}, {en:"Territory sales",fr:"Représentation de territoire"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Operations",fr:"Opérations"}],
+    proof:{ n:"100 000 $", label:{en:"median salary of her placements",fr:"salaire médian de ses placements"}, ctx:{en:"Four of her first seven searches were six figures. She started at the top of the market.",fr:"Quatre de ses sept premiers mandats étaient à six chiffres. Elle a commencé en haut du marché."} },
+    how:[{h:{en:"She defines the territory before searching",fr:"Elle définit le territoire avant de chercher"},p:{en:"How many accounts, how much revenue, what share is maintenance and what share is development. Without that, you're searching for a job that doesn't exist.",fr:"Combien de comptes, combien de revenu, quelle part de maintien et quelle part de développement. Sans ça, on cherche un poste qui n'existe pas."}}, {h:{en:"She reads the commission plan",fr:"Elle regarde le plan de commissions"},p:{en:"If she can't explain it to a candidate in three minutes, it's too complicated to motivate anyone.",fr:"Si elle ne peut pas l'expliquer à un candidat en trois minutes, il est trop compliqué pour motiver quelqu'un."}}, {h:{en:"She doesn't sell a contact list",fr:"Elle ne vend pas un carnet d'adresses"},p:{en:"A contact list runs dry in eighteen months. She looks for someone who has a process.",fr:"Un carnet s'épuise en dix-huit mois. Elle cherche quelqu'un qui a un processus."}}],
+  },
+  "michaela-landers": {
+    cta:{en:"Got a role to fill in an Ontario plant? Talk to Michaela.",fr:"Un poste à combler dans une usine ontarienne? Parle à Michaela."},
+    g:{en:"she",fr:"elle"},
+    name:"Michaela Landers",
+    lede:{en:"Thirty five companies in under four years. She walks into a new plant and reads it fast.",fr:"Trente-cinq entreprises en moins de quatre ans. Elle entre dans une nouvelle usine et elle la lit vite."},
+    geo:{en:"Ontario",fr:"Ontario"},
+    covers:[{en:"Production and operations",fr:"Production et opérations"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Supply chain",fr:"Chaîne d'approvisionnement"}, {en:"Supervision",fr:"Supervision"}, {en:"Plant management",fr:"Direction d'usine"}],
+    proof:{ n:"35", label:{en:"client companies in under four years",fr:"entreprises clientes en moins de quatre ans"}, ctx:{en:"Roughly nine new organizations a year. Most recruiters discover two or three in the same span.",fr:"À peu près neuf nouvelles organisations par année. La plupart des recruteurs en découvrent deux ou trois."} },
+    how:[{h:{en:"She visits before she searches",fr:"Elle visite avant de chercher"},p:{en:"Thirty minutes on the floor says more about retention than any interview grid.",fr:"Trente minutes sur le plancher en disent plus long sur la rétention que n'importe quelle grille d'entrevue."}}, {h:{en:"She asks thirty questions",fr:"Elle pose trente questions"},p:{en:"Why the role is open, who was there before, what would make you say no to someone who has everything else.",fr:"Pourquoi le poste est ouvert, qui était là avant, ce qui te ferait dire non à quelqu'un qui a tout le reste."}}, {h:{en:"She rewrites the description",fr:"Elle réécrit la description"},p:{en:"In nearly every search she opens, the description dated from the last hire and no longer described the role.",fr:"Dans presque tous ses mandats, la description datait de la dernière embauche et ne décrivait plus le poste."}}],
+  },
+  "richard-saucier": {
+    cta:{en:"A hiring need in Ontario or Quebec? Talk to Richard.",fr:"Un besoin d'embauche en Ontario ou au Québec? Parle à Richard."},
+    g:{en:"he",fr:"il"},
+    name:"Richard Saucier",
+    lede:{en:"Thirty years in the food industry before joining Proforce. He already knows the people others have to go find.",fr:"Trente ans dans l'alimentaire avant de se joindre à Proforce. Il connaît déjà le monde que les autres doivent aller chercher."},
+    geo:{en:"Ontario and Quebec",fr:"Ontario et Québec"},
+    covers:[{en:"Plant management and operations",fr:"Direction d'usine et opérations"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Supply chain",fr:"Chaîne d'approvisionnement"}, {en:"Sales and business development",fr:"Ventes et développement des affaires"}, {en:"General management",fr:"Direction générale"}],
+    proof:{ n:"30", label:{en:"years in the food industry",fr:"ans dans l'industrie alimentaire"}, ctx:{en:"A business developer starting from scratch needs three years to build a contact list. Richard has had one for a long time.",fr:"Un développeur d'affaires qui part de zéro met trois ans à se bâtir un carnet. Richard en a un depuis longtemps."} },
+    how:[{h:{en:"He talks about the plant before the resume",fr:"Il parle de l'usine avant du CV"},p:{en:"Floor culture decides who stays. A supervisor who is excellent elsewhere can fall flat at your plant.",fr:"La culture du plancher décide qui va rester. Un superviseur excellent ailleurs peut se casser les dents chez toi."}}, {h:{en:"He says things as they are",fr:"Il dit les choses comme elles sont"},p:{en:"If the role has its challenges, say so. The right candidate will respect it. The wrong one walks away, and that's a good thing.",fr:"Si le poste a ses défis, il faut le dire. Le bon candidat va respecter ça. Le mauvais va se retirer, et tant mieux."}}, {h:{en:"He opens, the team delivers",fr:"Il ouvre, l'équipe livre"},p:{en:"He isn't alone. The searches he opens are delivered by recruiters who specialize in that market.",fr:"Il n'est pas seul. Les mandats qu'il ouvre sont livrés par des recruteurs spécialisés dans ce marché."}}],
+  },
+};
+
 function Photo({ src, alt = "", w, h, eager, style, className }) {
   const webp = src.replace(/\.jpg$/, ".webp");
   return (
@@ -848,28 +1070,28 @@ function HomePage({ lang, setPage }) {
 
   return (
     <div>
-      {/* ── HERO ── blanc, un libelle pose sur un filet orange, un seul titre ── */}
-      <section style={{ background:"#fff", padding:"7.5rem 2rem 3.5rem" }}>
-        <div style={{ maxWidth:"1150px", margin:"0 auto" }}>
-          <div className="fu" style={{
-            fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600,
-            letterSpacing:"0.08em", textTransform:"uppercase", color:"#c24a10",
-            paddingBottom:"0.7rem",
-          }}>{t.heroLabel}</div>
-          <div className="fu" style={{ height:"2px", background:C.orange, marginBottom:"1.8rem" }} />
-
+      {/* ── HERO ── la photo prend toute la largeur, la plaque blanche vient
+          mordre dedans par le bas a gauche et son filet orange ressort par le
+          bord de l'ecran. Meme systeme que les autres pages, mais ici le
+          paragraphe et les boutons se partagent la largeur de la plaque. ── */}
+      <section className="hero-open" style={{
+        background:C.ink,
+        backgroundImage:"url(/photos/biscuits-bleu.jpg)",
+        backgroundSize:"cover", backgroundPosition:"center 40%",
+      }}>
+        <div className="hero-plate">
           <h1 className="fu2" style={{
             fontFamily:"'Playfair Display',serif", fontWeight:500,
             fontSize:"clamp(2.2rem,5.4vw,4.1rem)", lineHeight:1.06,
             letterSpacing:"-0.005em", textTransform:"uppercase", color:C.ink,
-            marginBottom:"2.2rem", maxWidth:"1000px",
+            marginBottom:"1.9rem",
           }}>
             {lang==="en" ? "We know your industry" : "On connaît ton industrie"}
             <span style={{ color:C.orange }}>{lang==="en" ? ", not just the job" : ", pas juste le poste"}</span>
           </h1>
 
-          <div className="fu3 two-col" style={{ display:"grid", gridTemplateColumns:"minmax(0,460px) 1fr", gap:"3.5rem", alignItems:"start" }}>
-            <p style={{ fontSize:"1rem", lineHeight:1.8, color:C.inkLight }}>{t.sub}</p>
+          <div className="fu3 two-col hero-home-row" style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,0.95fr)", gap:"2.75rem", alignItems:"start" }}>
+            <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.inkLight }}>{t.sub}</p>
             <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", paddingTop:"0.2rem" }}>
               <button className="btn-orange" onClick={() => setPage("contact")}>{t.heroCta1}</button>
               <button className="btn-ghost" onClick={() => setPage("team")}>{t.heroCta2}</button>
@@ -920,8 +1142,8 @@ function HomePage({ lang, setPage }) {
           entre la section bleue des chiffres et la section blanche des secteurs. */}
       <section className="band-full" style={{ background:C.ink, overflow:"hidden" }}>
         <div style={{ width:"100%", height:"clamp(170px,22vw,300px)" }}>
-          <Photo src="/photos/biscuits-bleu.jpg" w={1600} h={900}
-            alt={lang==="en" ? "Overhead view of filled biscuits in rows on a navy conveyor belt" : "Vue de haut de biscuits fourrés alignés sur une courroie marine"}
+          <Photo src="/photos/supervision-ligne.jpg" w={1600} h={900}
+            alt={lang==="en" ? "Supervisor watching a packaging line in a food plant" : "Superviseur qui surveille une ligne d'emballage dans une usine alimentaire"}
             style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
         </div>
       </section>
@@ -995,7 +1217,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"3rem" }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
@@ -1155,13 +1377,13 @@ function SectorPage({ lang, setPage, sector }) {
 
   return (
     <div>
-      <section style={{
+      <section className="hero-open" style={{
         position:"relative", background:C.ink, minHeight:"32vh",
         display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem",
-        backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.93), rgba(13,37,69,0.74)), url(${sector === "food" ? "/photos/usine-vue-ensemble.jpg" : "/secteurs/mode-hero.jpg"})`,
+        backgroundImage:`url(${sector === "food" ? "/photos/usine-emballage-equipe.jpg" : "/secteurs/mode-hero.jpg"})`,
         backgroundSize:"cover", backgroundPosition:"center",
       }}>
-        <div style={{ maxWidth:"900px", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.orange, lineHeight:1.05, marginBottom:"3rem" }}>{t.h1i}</h2>
@@ -1190,37 +1412,52 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <Eyebrow>{lang==="en"?"Roles We Fill":"Postes qu'on comble"}</Eyebrow>
-          <Divider style={{ marginBottom:"3rem" }} />
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#c24a10", marginBottom:"1.6rem" }}>
+            {lang==="en"?"Roles We Fill":"Postes qu'on comble"}
+          </div>
+          {/* Le premier poste porte la liste, les cinq suivants la soutiennent,
+              le reste suit en retrait. Une grille de dix cases identiques ne
+              disait pas lequel compte. */}
+          <ul className="role-flag">
             {t.roles.map((r,i) => (
-              <div key={r} style={{ padding:"1rem 1.5rem", borderRight: (i+1)%4!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
-                <span style={{ color:C.orange, fontSize:"0.7rem" }}>▸</span>{r}
-              </div>
+              <li key={r} className={i===0 ? "star" : i<6 ? "" : "dim"}>{r}</li>
             ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Une photo qui sort du conteneur et va toucher le bord droit de
+          l'ecran, avec sa legende calee en bas a gauche. Ca casse la colonne
+          centree sans ajouter de contenu. */}
+      <section style={{ background:C.white, padding:"0 0 1rem" }}>
+        <div className="escape-row">
+          <p>{sector === "food"
+            ? (lang==="en"
+                ? "From the slicer to the copper vat, we know the floor before we talk about a resume."
+                : "De la trancheuse à la cuve de cuivre, on connaît le plancher avant de parler de CV.")
+            : (lang==="en"
+                ? "From the pattern room to the sales floor, Robin has worked both ends of this business."
+                : "De la salle de patrons au plancher de vente, Robin a travaillé les deux bouts de ce métier.")}</p>
+          <div style={{ height:"clamp(230px,32vw,440px)", overflow:"hidden" }}>
+            <Photo
+              src={sector === "food" ? "/photos/ligne-fromage.jpg" : "/photos/atelier-couture-usine.jpg"}
+              w={1600} h={900}
+              alt={sector === "food"
+                ? (lang==="en"
+                    ? "Automated slicer fanning cheese slices onto a belt"
+                    : "Trancheuse automatisée qui étale des tranches de fromage sur une courroie")
+                : (lang==="en"
+                    ? "Sewing floor in an apparel factory"
+                    : "Atelier de couture dans une usine de vêtements")}
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+            />
           </div>
         </div>
       </section>
 
-      {/* Bande photo pleine largeur entre les postes et les trois arguments */}
-      {sector === "food" && (
-        <section className="band-full" style={{ background:C.ink, overflow:"hidden" }}>
-          <div style={{ width:"100%", height:"clamp(200px,28vw,360px)", position:"relative" }}>
-            <Photo
-              src="/photos/ligne-fromage.jpg" w={1600} h={900}
-              alt={lang==="en"
-                ? "Automated slicer fanning cheese slices onto a belt"
-                : "Trancheuse automatisée qui étale des tranches de fromage sur une courroie"}
-              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-            />
-            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(13,37,69,0.72) 0%, rgba(13,37,69,0.05) 60%)" }} />
-          </div>
-        </section>
-      )}
-
       <section style={{ background:C.paper, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1556,8 +1793,8 @@ function FeaturedCandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"33vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/talents.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"33vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/talents.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.8rem,4vw,4.5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
@@ -1662,8 +1899,8 @@ function AboutPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/a-propos.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/a-propos.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"3rem" }}>{t.h1i}</h2>
@@ -1675,7 +1912,7 @@ function AboutPage({ lang }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"What We Stand For":"Ce qu'on défend"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.v1h,t.v1p,"01"],[t.v2h,t.v2p,"02"],[t.v3h,t.v3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1699,8 +1936,8 @@ function AboutPage({ lang }) {
 function TeamPage({ lang, setPage, setBlogPost }) {
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Our Team":"Notre équipe"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:600, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.012em", color:C.paper, lineHeight:1.15, marginBottom:"1.5rem" }}>
             {lang==="en"?"Seven specialists." : "Sept spécialistes."}
@@ -1824,8 +2061,8 @@ function CandidatesPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/appel-candidat.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"0.5rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"3rem" }}>{t.h1i}</h2>
@@ -1844,7 +2081,7 @@ function CandidatesPage({ lang, setPage }) {
 
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
             {[[t.h1h,t.h1p,"01"],[t.h2h,t.h2p,"02"],[t.h3h,t.h3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1945,7 +2182,7 @@ function EmployersPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/usine-discussion.webp)`, backgroundSize:"cover", backgroundPosition:"center" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`url(/photos/usine-discussion.webp)`, backgroundSize:"cover", backgroundPosition:"center" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -1953,7 +2190,7 @@ function EmployersPage({ lang, setPage }) {
             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>proforce.ca</span>
           </div>
         </div>
-        <div style={{ maxWidth:"900px" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
@@ -2105,8 +2342,8 @@ function JobListingsPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/emplois.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/emplois.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>{t.h1i}</h2>
@@ -2149,8 +2386,8 @@ function GivingPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/dons.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/dons.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.92 }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>{t.h1i}</h2>
@@ -2369,8 +2606,8 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Proforce Blog":"Blogue Proforce"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"1rem" }}>
             {lang==="en"?"Straight talk." : "Du vrai parler."}
@@ -2545,8 +2782,8 @@ function ContactPage({ lang }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/cafe-montreal.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/cafe-montreal.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative", }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:"clamp(2.4rem,6vw,4.4rem)", letterSpacing:"-0.015em", color:C.paper, lineHeight:0.9 }}>{t.h1}</h1>
         </div>
@@ -2744,8 +2981,8 @@ function CalculatorPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>{t.h1i}</h2>
@@ -3045,7 +3282,7 @@ function HowWeWorkPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -3053,7 +3290,7 @@ function HowWeWorkPage({ lang, setPage }) {
           </div>
         </div>
         <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>09</div>
-        <div style={{ maxWidth:"900px", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
@@ -3266,14 +3503,14 @@ function PressPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
-        <div style={{ maxWidth:"900px" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>{t.h1i}</h2>
@@ -3448,9 +3685,9 @@ function ReferralPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(6rem,18vw,16rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>1K$</div>
-        <div style={{ maxWidth:"900px", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
@@ -3959,7 +4196,7 @@ const track = {
 function NotFoundPage({ lang, setPage }) {
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", fontFamily:"'Playfair Display',serif", fontSize:"clamp(12rem,30vw,28rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", pointerEvents:"none", letterSpacing:"-0.025em" }}>404</div>
         <div style={{ maxWidth:"600px", margin:"0 auto", textAlign:"center", position:"relative" }}>
           <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.orange, marginBottom:"2rem" }}>404</div>
@@ -4039,8 +4276,8 @@ function PrivacyPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
-        <div style={{ maxWidth:"780px" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+        <div className="hero-plate" style={{ maxWidth:"780px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"1rem" }}>{t.h1}</h1>
           <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:"rgba(255,255,255,0.35)", marginTop:"1rem" }}>{t.updated}</p>
@@ -4672,8 +4909,8 @@ function GlossaryPage({ lang, setPage }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
-        <div style={{ maxWidth:"900px" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Industry Glossary":"Glossaire de l'industrie"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>
             {lang==="en" ? "Know the language." : "Connaître le vocabulaire."}
@@ -4763,14 +5000,14 @@ function MarketPage({ lang, setPage, market }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(${marketPhoto.replace(".jpg", ".webp")})`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`url(${marketPhoto.replace(".jpg", ".webp")})`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
           </div>
         </div>
-        <div style={{ maxWidth:"900px" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
@@ -4929,7 +5166,7 @@ function StartupPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`linear-gradient(to right, rgba(13,37,69,0.94), rgba(13,37,69,0.76)), url(/photos/startup.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`url(/photos/startup.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -4939,7 +5176,7 @@ function StartupPage({ lang, setPage }) {
         {/* Background number */}
         <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>01</div>
 
-        <div style={{ maxWidth:"900px", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
@@ -5067,68 +5304,6 @@ function StartupPage({ lang, setPage }) {
 }
 
 // ─── SIMON PAGE ───────────────────────────────────────────────────────────────
-const MEMBERS = {
-  "robin-anisef": {
-    cta:{en:"Got a fashion role to fill in Montreal or Toronto? Talk to Robin.",fr:"Un poste en mode à combler à Montréal ou à Toronto? Parle à Robin."},
-    g:{en:"she",fr:"elle"},
-    name:"Robin Anisef",
-    lede:{en:"Twenty years in Canadian fashion. The people you're looking for, she already knows by name.",fr:"Vingt ans dans la mode canadienne. Les gens que tu cherches, elle les connaît déjà par leur nom."},
-    geo:{en:"Montreal and Toronto",fr:"Montréal et Toronto"},
-    covers:[{en:"Buyers and senior buyers",fr:"Acheteurs et acheteurs seniors"}, {en:"Brand managers",fr:"Gestionnaires de marque"}, {en:"Designers and creative directors",fr:"Designers et directeurs de création"}, {en:"Pattern technicians",fr:"Techniciens de patron"}, {en:"Product development",fr:"Développement de produit"}, {en:"Production coordination",fr:"Coordination de production"}, {en:"Merchandising and planning",fr:"Marchandisage et planification"}],
-    proof:{ n:"17", label:{en:"people placed at the same client",fr:"personnes placées chez le même client"}, ctx:{en:"Over seven years. In an industry where most searches are one offs, that's the only test that counts.",fr:"Sur sept ans. Dans une industrie où la plupart des mandats sont des one shot, c'est le seul test qui compte."} },
-    how:[{h:{en:"She calls, she doesn't write",fr:"Elle appelle, elle n'écrit pas"},p:{en:"A senior buyer gets messages every month. What makes them answer is recognizing the name on the other end.",fr:"Un acheteur senior reçoit des messages tous les mois. Ce qui le fait répondre, c'est de reconnaître le nom au bout du fil."}}, {h:{en:"Two or three names, not ten",fr:"Deux ou trois noms, pas dix"},p:{en:"If she brings you ten, she hasn't done her job. The shortlist is the work, not the by-product.",fr:"Si elle en présente dix, c'est qu'elle n'a pas fait son travail. La courte liste, c'est le travail, pas le résidu."}}, {h:{en:"She knows the calendar",fr:"Elle connaît le calendrier"},p:{en:"In fashion, when you recruit matters as much as what you offer. She talks to people six months before their window opens.",fr:"En mode, le moment où tu recrutes compte autant que ce que tu offres. Elle parle aux gens six mois avant que leur fenêtre s'ouvre."}}],
-  },
-  "stephanie-lanoie": {
-    cta:{en:"Got a plant role to fill in Quebec? Talk to Stéphanie.",fr:"Un poste à combler dans une usine au Québec? Parle à Stéphanie."},
-    g:{en:"she",fr:"elle"},
-    name:"Stéphanie Lanoie",
-    lede:{en:"Twenty two clients, seventy searches. She closes fast because she prepares both sides.",fr:"Vingt-deux clients, soixante-dix mandats. Elle ferme vite parce qu'elle prépare les deux côtés."},
-    geo:{en:"Quebec",fr:"Québec"},
-    covers:[{en:"Plant management",fr:"Direction d'usine"}, {en:"Production and supervision",fr:"Production et supervision"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Maintenance and engineering",fr:"Maintenance et ingénierie"}, {en:"Supply chain",fr:"Chaîne d'approvisionnement"}],
-    proof:{ n:"70", label:{en:"searches from 22 clients",fr:"mandats confiés par 22 clients"}, ctx:{en:"Six of them gave her five or more. One gave her eleven.",fr:"Six d'entre eux lui en ont donné cinq ou plus. Un lui en a donné onze."} },
-    how:[{h:{en:"She calls the candidate the day before",fr:"Elle appelle le candidat la veille"},p:{en:"Who they're meeting, what the client actually wants, what to say about the gaps. Twenty minutes that change the outcome.",fr:"Qui il rencontre, ce que le client cherche vraiment, quoi répondre sur les trous du CV. Vingt minutes qui changent le résultat."}}, {h:{en:"She sees the counter-offer coming",fr:"Elle voit venir la contre-offre"},p:{en:"She asks the question by the second conversation. If the candidate hesitates, it gets settled before the offer, not after.",fr:"Elle pose la question dès la deuxième conversation. Si le candidat hésite, ça se règle avant l'offre et pas après."}}, {h:{en:"She asks for feedback the same day",fr:"Elle demande un retour le jour même"},p:{en:"Not a decision, feedback. That's what lets her adjust before the right candidate is gone.",fr:"Pas une décision, un retour. C'est ce qui lui permet d'ajuster avant de perdre le bon candidat."}}],
-  },
-  "mathieu-roy": {
-    cta:{en:"A plant outside the big centres looking for someone? Talk to Mathieu.",fr:"Une usine en région qui cherche quelqu'un? Parle à Mathieu."},
-    g:{en:"he",fr:"il"},
-    name:"Mathieu Roy",
-    lede:{en:"Thirty one of his thirty six placements were in food plants. He knows all of Quebec, not just the highway.",fr:"Trente-et-un de ses trente-six placements sont en usine alimentaire. Il connaît tout le Québec, pas juste l'autoroute."},
-    geo:{en:"Quebec, cities and regions",fr:"Québec, grands centres et régions"},
-    covers:[{en:"Production management",fr:"Gérance de production"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Operations",fr:"Opérations"}, {en:"Sales and territory reps",fr:"Ventes et représentation"}, {en:"Plant management",fr:"Direction d'usine"}],
-    proof:{ n:"78 %", label:{en:"of his placements came from returning clients",fr:"de ses placements viennent de clients qui revenaient"}, ctx:{en:"Across thirty six placements. A client who hands you a second search is the only review that counts.",fr:"Sur trente-six placements. Un client qui te redonne un mandat, c'est le seul avis qui compte."} },
-    how:[{h:{en:"He asks the life questions first",fr:"Il pose les questions de vie en premier"},p:{en:"Before the resume. The partner, the kids, the school, the house. Outside the big centres, that's what decides, not the salary.",fr:"Avant le CV. Le conjoint, les enfants, l'école, la maison. En région, c'est ça qui décide, pas le salaire."}}, {h:{en:"He stays in touch between steps",fr:"Il reste en contact entre les étapes"},p:{en:"A candidate who disappears is rarely a candidate problem. It's a communication problem, and that can be fixed.",fr:"Un candidat qui disparaît, c'est rarement un problème de candidat. C'est un problème de communication, et ça se règle."}}, {h:{en:"He knows the area",fr:"Il connaît le coin"},p:{en:"He has lived all over Quebec. When a plant is three hours from Montreal, he knows what he's talking about.",fr:"Il a habité un peu partout au Québec. Quand une usine est à trois heures de Montréal, il sait de quoi il parle."}}],
-  },
-  "rana-yamak": {
-    cta:{en:"Got a commercial role in Ontario or the United States? Talk to Rana.",fr:"Un poste commercial à combler en Ontario ou aux États-Unis? Parle à Rana."},
-    g:{en:"she",fr:"elle"},
-    name:"Rana Yamak",
-    lede:{en:"The top of the commercial market in food ingredients. Median salary of her placements: a hundred thousand dollars.",fr:"Le haut du marché commercial en ingrédients alimentaires. Salaire médian de ses placements: cent mille dollars."},
-    geo:{en:"Ontario and the United States",fr:"Ontario et États-Unis"},
-    covers:[{en:"Account management",fr:"Gestion de comptes"}, {en:"Business development",fr:"Développement des affaires"}, {en:"Territory sales",fr:"Représentation de territoire"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Operations",fr:"Opérations"}],
-    proof:{ n:"100 000 $", label:{en:"median salary of her placements",fr:"salaire médian de ses placements"}, ctx:{en:"Four of her first seven searches were six figures. She started at the top of the market.",fr:"Quatre de ses sept premiers mandats étaient à six chiffres. Elle a commencé en haut du marché."} },
-    how:[{h:{en:"She defines the territory before searching",fr:"Elle définit le territoire avant de chercher"},p:{en:"How many accounts, how much revenue, what share is maintenance and what share is development. Without that, you're searching for a job that doesn't exist.",fr:"Combien de comptes, combien de revenu, quelle part de maintien et quelle part de développement. Sans ça, on cherche un poste qui n'existe pas."}}, {h:{en:"She reads the commission plan",fr:"Elle regarde le plan de commissions"},p:{en:"If she can't explain it to a candidate in three minutes, it's too complicated to motivate anyone.",fr:"Si elle ne peut pas l'expliquer à un candidat en trois minutes, il est trop compliqué pour motiver quelqu'un."}}, {h:{en:"She doesn't sell a contact list",fr:"Elle ne vend pas un carnet d'adresses"},p:{en:"A contact list runs dry in eighteen months. She looks for someone who has a process.",fr:"Un carnet s'épuise en dix-huit mois. Elle cherche quelqu'un qui a un processus."}}],
-  },
-  "michaela-landers": {
-    cta:{en:"Got a role to fill in an Ontario plant? Talk to Michaela.",fr:"Un poste à combler dans une usine ontarienne? Parle à Michaela."},
-    g:{en:"she",fr:"elle"},
-    name:"Michaela Landers",
-    lede:{en:"Thirty five companies in under four years. She walks into a new plant and reads it fast.",fr:"Trente-cinq entreprises en moins de quatre ans. Elle entre dans une nouvelle usine et elle la lit vite."},
-    geo:{en:"Ontario",fr:"Ontario"},
-    covers:[{en:"Production and operations",fr:"Production et opérations"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Supply chain",fr:"Chaîne d'approvisionnement"}, {en:"Supervision",fr:"Supervision"}, {en:"Plant management",fr:"Direction d'usine"}],
-    proof:{ n:"35", label:{en:"client companies in under four years",fr:"entreprises clientes en moins de quatre ans"}, ctx:{en:"Roughly nine new organizations a year. Most recruiters discover two or three in the same span.",fr:"À peu près neuf nouvelles organisations par année. La plupart des recruteurs en découvrent deux ou trois."} },
-    how:[{h:{en:"She visits before she searches",fr:"Elle visite avant de chercher"},p:{en:"Thirty minutes on the floor says more about retention than any interview grid.",fr:"Trente minutes sur le plancher en disent plus long sur la rétention que n'importe quelle grille d'entrevue."}}, {h:{en:"She asks thirty questions",fr:"Elle pose trente questions"},p:{en:"Why the role is open, who was there before, what would make you say no to someone who has everything else.",fr:"Pourquoi le poste est ouvert, qui était là avant, ce qui te ferait dire non à quelqu'un qui a tout le reste."}}, {h:{en:"She rewrites the description",fr:"Elle réécrit la description"},p:{en:"In nearly every search she opens, the description dated from the last hire and no longer described the role.",fr:"Dans presque tous ses mandats, la description datait de la dernière embauche et ne décrivait plus le poste."}}],
-  },
-  "richard-saucier": {
-    cta:{en:"A hiring need in Ontario or Quebec? Talk to Richard.",fr:"Un besoin d'embauche en Ontario ou au Québec? Parle à Richard."},
-    g:{en:"he",fr:"il"},
-    name:"Richard Saucier",
-    lede:{en:"Thirty years in the food industry before joining Proforce. He already knows the people others have to go find.",fr:"Trente ans dans l'alimentaire avant de se joindre à Proforce. Il connaît déjà le monde que les autres doivent aller chercher."},
-    geo:{en:"Ontario and Quebec",fr:"Ontario et Québec"},
-    covers:[{en:"Plant management and operations",fr:"Direction d'usine et opérations"}, {en:"Quality and food safety",fr:"Qualité et salubrité"}, {en:"Supply chain",fr:"Chaîne d'approvisionnement"}, {en:"Sales and business development",fr:"Ventes et développement des affaires"}, {en:"General management",fr:"Direction générale"}],
-    proof:{ n:"30", label:{en:"years in the food industry",fr:"ans dans l'industrie alimentaire"}, ctx:{en:"A business developer starting from scratch needs three years to build a contact list. Richard has had one for a long time.",fr:"Un développeur d'affaires qui part de zéro met trois ans à se bâtir un carnet. Richard en a un depuis longtemps."} },
-    how:[{h:{en:"He talks about the plant before the resume",fr:"Il parle de l'usine avant du CV"},p:{en:"Floor culture decides who stays. A supervisor who is excellent elsewhere can fall flat at your plant.",fr:"La culture du plancher décide qui va rester. Un superviseur excellent ailleurs peut se casser les dents chez toi."}}, {h:{en:"He says things as they are",fr:"Il dit les choses comme elles sont"},p:{en:"If the role has its challenges, say so. The right candidate will respect it. The wrong one walks away, and that's a good thing.",fr:"Si le poste a ses défis, il faut le dire. Le bon candidat va respecter ça. Le mauvais va se retirer, et tant mieux."}}, {h:{en:"He opens, the team delivers",fr:"Il ouvre, l'équipe livre"},p:{en:"He isn't alone. The searches he opens are delivered by recruiters who specialize in that market.",fr:"Il n'est pas seul. Les mandats qu'il ouvre sont livrés par des recruteurs spécialisés dans ce marché."}}],
-  },
-};
 
 /* ── Page personnelle ── une seule structure pour les six membres.
    Le contenu vient de MEMBERS, la photo, le titre, le secteur, la bio et
@@ -5193,7 +5368,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
       <section style={{ background:"#fff", padding:"1rem 2rem 4rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?`How ${d.g.en} works`:`Comment ${d.g.fr} travaille`}</Eyebrow>
-          <div className="three-col num-list" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"2rem" }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"2rem" }}>
             {d.how.map((x,i) => (
               <div key={x.h.en}>
                 <div>{String(i+1).padStart(2,"0")}</div>
@@ -5287,7 +5462,7 @@ function SimonPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -5295,7 +5470,7 @@ function SimonPage({ lang, setPage }) {
           </div>
         </div>
         <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>SS</div>
-        <div style={{ maxWidth:"900px", position:"relative" }}>
+        <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.5rem" }}>{t.h1}</h1>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:"rgba(255,255,255,0.45)", lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
