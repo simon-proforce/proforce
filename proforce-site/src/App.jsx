@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 // ─── LIENS EXTERNES ───────────────────────────────────────────────────────────
 const CALENDLY = "https://calendly.com/simonstamand/proforce";
 const CONTACT_EMAIL = "info@proforce.ca";
+// Le babillard vit en dehors du site. C'est lui la source a jour des postes
+// ouverts, pas la liste ecrite en dur dans la page Emplois.
+const JOBS_BOARD = "https://www.proforcejobs.com/";
 
 // Proforce a ete fondee en 2001. L'anciennete se calcule au lieu d'etre ecrite
 // en dur: un "25 ans" fige dans le texte devient faux le 1er janvier suivant,
@@ -188,6 +191,9 @@ const G = `
     margin-bottom:0.65rem !important;
   }
   .num-list > * > h3 { margin-bottom:0.7rem !important; }
+
+  /* Les lignes de la page Emplois menent toutes au babillard externe. */
+  .job-row:hover .job-title { color:${C.orange}; }
 
   /* ── Ouvertures de page ───────────────────────────────────────────────
      Avant, chaque page s'ouvrait exactement de la meme facon: une photo
@@ -1168,16 +1174,16 @@ function HomePage({ lang, setPage }) {
           <Eyebrow>{t.secLabel}</Eyebrow>
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.75rem" }}>
             <button onClick={() => setPage("food")} style={{ textAlign:"left", display:"block", width:"100%" }}>
-              <Photo src="/photos/usine-emballage-equipe.jpg" w={1600} h={900}
-                alt={lang==="en" ? "Packing lines in a meat plant, workers along both sides" : "Lignes d'emballage dans une usine de viande, du monde des deux côtés"}
+              <Photo src="/photos/repas-prets.jpg" w={1600} h={900}
+                alt={lang==="en" ? "Prepared meal trays moving along a filling line" : "Barquettes de repas prêts sur une ligne de remplissage"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.foodH}</h3>
               <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.foodP}</p>
             </button>
 
             <button onClick={() => setPage("fashion")} style={{ textAlign:"left", display:"block", width:"100%" }}>
-              <Photo src="/photos/atelier-couture-usine.jpg" w={1600} h={900}
-                alt={lang==="en" ? "Rows of industrial sewing machines on an apparel production floor" : "Rangées de machines à coudre industrielles dans une usine de vêtements"}
+              <Photo src="/photos/entrepot-vetements.jpg" w={1600} h={900}
+                alt={lang==="en" ? "Aisles of folded garments in an apparel distribution warehouse" : "Allées de vêtements pliés dans un entrepôt de distribution"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.fashH}</h3>
               <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:C.muted }}>{t.fashP}</p>
@@ -2221,8 +2227,8 @@ function EmployersPage({ lang, setPage }) {
       </section>
 
       <PhotoBand items={[
-        ["/photos/supervision-ligne.jpg", 2, 1600, 900,
-         lang==="en" ? "Two supervisors reviewing a clipboard beside a bottling line" : "Deux superviseurs qui regardent un presse-papiers à côté d'une ligne d'embouteillage"],
+        ["/photos/pommes-calibrage.jpg", 2, 1600, 900,
+         lang==="en" ? "Apples moving through an optical grading line" : "Pommes qui défilent sur une ligne de calibrage optiquebouteillage"],
         ["/photos/pesee-etiquetage.jpg", 1, 1600, 900,
          lang==="en" ? "Worker at a weighing and labelling station" : "Employé à un poste de pesée et d'étiquetage"],
         ["/photos/robot-emballage.jpg", 1, 1600, 900,
@@ -2347,10 +2353,12 @@ function EmployersPage({ lang, setPage }) {
 function JobListingsPage({ lang }) {
   const t = {
     en:{ eyebrow:"Job Listings", h1:"Current", h1i:"Opportunities.", sub:"Active mandates across food, CPG (consumer packaged goods), and fashion. All positions are permanent placements unless noted.",
-      note:"Our full job board is on proforcejobs.com, all active listings, updated regularly.", cta:"Visit proforcejobs.com",
+      note:"Every open position we have is on proforcejobs.com, updated as mandates come in and close. That is the list to check.", cta:"See all openings",
+      sampleLabel:"A sample of what we fill", sampleNote:"These are examples of the kind of roles that come across our desks. For what is open right now, go to proforcejobs.com.",
       roles:[{title:"Quality Coordinator",co:"Food Manufacturer",loc:"Rawdon, QC"},{title:"Account Manager | Food Ingredients",co:"Ingredients Distributor",loc:"Montreal, QC"},{title:"Customer Service Coordinator",co:"CPG Company",loc:"Toronto, ON"},{title:"Sales Representative",co:"Food Distributor",loc:"West Quebec"}] },
     fr:{ eyebrow:"Offres d'emploi", h1:"Opportunités", h1i:"en cours.", sub:"Mandats actifs en alimentaire, CPG (produits de consommation emballés) et mode. Tous les postes sont des placements permanents sauf indication.",
-      note:"Notre babillard complet est sur proforcejobs.com, toutes les offres actives, mises à jour régulièrement.", cta:"Visiter proforcejobs.com",
+      note:"Tous nos postes ouverts sont sur proforcejobs.com, mis à jour au fur et à mesure que les mandats rentrent et se comblent. C'est là qu'il faut regarder.", cta:"Voir tous les postes ouverts",
+      sampleLabel:"Un échantillon de ce qu'on comble", sampleNote:"Ce sont des exemples du genre de postes qui passent chez nous. Pour ce qui est ouvert en ce moment, va sur proforcejobs.com.",
       roles:[{title:"Coordinateur qualité",co:"Manufacturier alimentaire",loc:"Rawdon, QC"},{title:"Chargé de compte | Ingrédients alimentaires",co:"Distributeur d'ingrédients",loc:"Montréal, QC"},{title:"Coordinateur service client",co:"Compagnie CPG",loc:"Toronto, ON"},{title:"Représentant aux ventes",co:"Distributeur alimentaire",loc:"Ouest du Québec"}] },
   }[lang];
 
@@ -2365,26 +2373,40 @@ function JobListingsPage({ lang }) {
         </div>
       </section>
 
-      <section style={{ background:C.white, padding:"5rem 2rem" }}>
+      {/* Le renvoi vers le babillard passe AVANT la liste. La liste est ecrite
+          en dur dans le code: elle vieillit toute seule, alors que
+          proforcejobs.com est a jour. C'est lui qui doit etre vu en premier. */}
+      <section style={{ background:C.white, padding:"4rem 2rem 0" }}>
+        <div style={{ maxWidth:"900px", margin:"0 auto", background:C.paper, padding:"2.5rem", borderLeft:`3px solid ${C.orange}` }}>
+          <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.8, marginBottom:"1.4rem" }}>{t.note}</p>
+          <a href={JOBS_BOARD} target="_blank" rel="noopener noreferrer" className="btn-orange"
+            onClick={() => track.contactClick && track.contactClick()}>{t.cta}</a>
+        </div>
+      </section>
+
+      <section style={{ background:C.white, padding:"3.5rem 2rem 5rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#c24a10", marginBottom:"1.2rem" }}>
+            {t.sampleLabel}
+          </div>
           <Divider style={{ marginBottom:"0" }} />
-          {t.roles.map((r,i) => (
-            <div key={r.title} style={{
-              display:"flex", justifyContent:"space-between", alignItems:"center",
-              padding:"1.75rem 0", borderBottom:`1px solid ${C.rule}`, flexWrap:"wrap", gap:"1rem",
-            }}>
+          {/* Chaque ligne mene au babillard: personne n'atterrit sur un poste
+              affiche ici sans pouvoir aller voir s'il est encore ouvert. */}
+          {t.roles.map((r) => (
+            <a key={r.title} href={JOBS_BOARD} target="_blank" rel="noopener noreferrer"
+              className="job-row" style={{
+                display:"flex", justifyContent:"space-between", alignItems:"center",
+                padding:"1.75rem 0", borderBottom:`1px solid ${C.rule}`, flexWrap:"wrap", gap:"1rem",
+                textDecoration:"none",
+              }}>
               <div>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em" }}>{r.title}</div>
+                <div className="job-title" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", transition:"color 0.2s" }}>{r.title}</div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.06em", color:C.muted, marginTop:"4px" }}>{r.co} · {r.loc}</div>
               </div>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
-            </div>
+            </a>
           ))}
-
-          <div style={{ marginTop:"4rem", padding:"2.5rem", background:C.paper, borderLeft:`3px solid ${C.orange}` }}>
-            <p style={{ color:C.muted, fontSize:"0.9rem", lineHeight:1.8, marginBottom:"1.25rem" }}>{t.note}</p>
-            <a href="https://www.proforcejobs.com" target="_blank" rel="noopener noreferrer" className="btn-ink">{t.cta}</a>
-          </div>
+          <p style={{ color:C.muted, fontSize:"0.85rem", lineHeight:1.8, marginTop:"1.75rem" }}>{t.sampleNote}</p>
         </div>
       </section>
     </div>
@@ -2616,7 +2638,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
 
   return (
     <div>
-      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/blogue-index.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
+      <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", backgroundImage:`url(/photos/affinage-fromage.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Proforce Blog":"Blogue Proforce"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"1rem" }}>
