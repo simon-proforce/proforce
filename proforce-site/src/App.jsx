@@ -334,6 +334,7 @@ const G = `
     /* En colonne, le flex-basis:0 des images ramenait leur hauteur a zero et
        la bande disparaissait completement du telephone. */
     .photo-band-3 { flex-direction:column !important; }
+    .photo-band-3 { padding:2rem 0 !important; }
     .photo-band-3 > * { flex:0 0 auto !important; height:200px !important; }
 
     /* ── Respiration ────────────────────────────────────────────────────
@@ -809,13 +810,21 @@ function Photo({ src, alt = "", w, h, eager, style, className }) {
 /* Bande photo pleine largeur. Chaque image vit dans son propre bloc parce que
    <picture> est en display:contents dans la feuille globale: l'image seule ne
    tiendrait pas sa case. items = [[src, poids, largeur, hauteur, alt], ...] */
+// Une bande de photos bord a bord. Le 6e element d'un item est le point de
+// mise au point: dans une case etroite, un recadrage centre coupe souvent a
+// cote du sujet, surtout sur les photos carrees ou la personne n'est pas au
+// milieu. On le precise alors a la main, par exemple "72% 55%".
+//
+// La bande garde du blanc au dessus et en dessous. Sans ca, quand la section
+// precedente est elle aussi une photo, les deux images se touchent et on lit
+// une bouillie d'images collees au lieu de deux blocs distincts.
 function PhotoBand({ items, h = "clamp(190px,24vw,300px)" }) {
   return (
-    <section className="photo-band-3" style={{ display:"flex", gap:"4px", background:"#fff" }}>
-      {items.map(([src, grow, w, ht, alt]) => (
+    <section className="photo-band-3" style={{ display:"flex", gap:"4px", background:"#fff", padding:"3.25rem 0" }}>
+      {items.map(([src, grow, w, ht, alt, pos]) => (
         <div key={src} style={{ flex:`${grow} 1 0`, minWidth:0, height:h, overflow:"hidden" }}>
           <Photo src={src} w={w} h={ht} alt={alt}
-            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+            style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition: pos || "center", display:"block" }} />
         </div>
       ))}
     </section>
@@ -2094,7 +2103,7 @@ function CandidatesPage({ lang, setPage }) {
         ["/photos/emballage-sourire.jpg", 2, 1600, 900,
          lang==="en" ? "Worker packing trays at the end of a meat packaging line" : "Employé qui emboîte des barquettes au bout d'une ligne d'emballage"],
         ["/photos/chocolat-mains.jpg", 1, 900, 900,
-         lang==="en" ? "Worker checking coated chocolate at a panning drum" : "Employée qui vérifie des dragées de chocolat à la sortie de la turbine"],
+         lang==="en" ? "Worker checking coated chocolate at a panning drum" : "Employée qui vérifie des dragées de chocolat à la sortie de la turbine", "72% 58%"],
         ["/photos/boulangerie-fournee.jpg", 1, 900, 900,
          lang==="en" ? "Braided loaves coming out of a bakery oven" : "Pains tressés qui sortent d'un four de boulangerie"],
       ]} />
