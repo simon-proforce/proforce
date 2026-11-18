@@ -171,10 +171,17 @@ const G = `
   /* <picture> ne doit pas casser les grilles: il disparait de la mise en page. */
   picture { display:contents; }
 
-  /* ── Listes numerotees ────────────────────────────────────────────────
-     Un filet orange a gauche de chaque item et le chiffre en serif. Le
-     meme traitement tient en trois colonnes et une fois empile sur
-     telephone, donc il n'y a qu'une seule regle a maintenir. */
+  /* ── Blocs a filet ────────────────────────────────────────────────────
+     Un filet orange a gauche de chaque item, un titre, un paragraphe.
+     Rien d'autre.
+
+     Il y avait avant un chiffre 01 02 03 au dessus de chaque titre, et il
+     etait en serif pendant que le titre etait en Archivo. Ca inversait la
+     regle du site, ou le serif porte les titres et Archivo porte les
+     etiquettes et le texte, et ca mettait trois traitements typographiques
+     dans un bloc de six lignes. Le chiffre est parti: le filet marque deja
+     le debut de chaque item et une numerotation decorative n'ajoutait rien.
+     Le titre reprend le serif comme tous les autres titres du site. */
   .num-list { gap:2rem !important; border:none !important; }
   .num-list > * {
     border:none !important;
@@ -182,15 +189,15 @@ const G = `
     padding:0.15rem 0 0.15rem 1.3rem !important;
     background:transparent !important;
   }
-  .num-list > * > div:first-child {
+  .num-list > * > div:first-child { display:none !important; }
+  .num-list > * > h3 {
     font-family:'Playfair Display',serif !important;
-    font-size:1rem !important;
-    font-weight:600 !important;
-    letter-spacing:0 !important;
-    color:#c24a10 !important;
-    margin-bottom:0.65rem !important;
+    font-weight:500 !important;
+    font-size:1.5rem !important;
+    letter-spacing:-0.005em !important;
+    line-height:1.2 !important;
+    margin-bottom:0.8rem !important;
   }
-  .num-list > * > h3 { margin-bottom:0.7rem !important; }
 
   /* Les lignes de la page Emplois menent toutes au babillard externe. */
   .job-row:hover .job-title { color:${C.orange}; }
@@ -296,19 +303,12 @@ const G = `
   /* ── Colonnes decalees ────────────────────────────────────────────────
      Trois blocs qui commencent tous a la meme ligne, c'est un tableau.
      Decales, c'est une page. */
-  @media(min-width:769px){
-    .stagger { align-items:start !important; }
-    .stagger > *:nth-child(2) { margin-top:3.5rem !important; }
-    .stagger > *:nth-child(3) { margin-top:7rem !important; }
-    /* Le premier argument porte le bloc: il passe en serif et prend du
-       corps. Les deux autres restent en Archivo et le suivent. */
-    .stagger > *:first-child h3 {
-      font-family:'Playfair Display',serif !important;
-      font-weight:500 !important;
-      font-size:1.75rem !important;
-      line-height:1.18 !important;
-    }
-  }
+  /* Il y avait ici un decalage en escalier, chaque colonne demarrant plus
+     bas que la precedente. Un escalier qui ne fait que descendre laisse un
+     grand vide en bas a gauche et se lit comme si un bloc avait glisse,
+     pas comme une intention. Les trois arguments pesent pareil: ils
+     s'alignent. */
+  .stagger { align-items:start !important; }
 
   /* ── Photo qui sort par la droite ─────────────────────────────────────
      Elle va jusqu'au bord de l'ecran au lieu de s'arreter sagement a la
@@ -1246,7 +1246,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Why Proforce":"Pourquoi Proforce"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"3rem" }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
@@ -1486,7 +1486,7 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.paper, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -1941,7 +1941,7 @@ function AboutPage({ lang }) {
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"What We Stand For":"Ce qu'on défend"}</Eyebrow>
           <Divider style={{ marginBottom:"4rem" }} />
-          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"0", border:`1px solid ${C.rule}` }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.v1h,t.v1p,"01"],[t.v2h,t.v2p,"02"],[t.v3h,t.v3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -2110,7 +2110,7 @@ function CandidatesPage({ lang, setPage }) {
 
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
             {[[t.h1h,t.h1p,"01"],[t.h2h,t.h2p,"02"],[t.h3h,t.h3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
@@ -5398,7 +5398,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
       <section style={{ background:"#fff", padding:"1rem 2rem 4rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?`How ${d.g.en} works`:`Comment ${d.g.fr} travaille`}</Eyebrow>
-          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr 0.95fr", gap:"2rem" }}>
+          <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"2rem" }}>
             {d.how.map((x,i) => (
               <div key={x.h.en}>
                 <div>{String(i+1).padStart(2,"0")}</div>
