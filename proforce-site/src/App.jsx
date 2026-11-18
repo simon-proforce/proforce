@@ -23,9 +23,9 @@ const ANS = new Date().getFullYear() - FONDATION;
 // a afficher, {{sujet}}, {{corps}} et {{reply_to}}, donc ajouter un champ a un
 // formulaire ne demande plus d'aller modifier un gabarit en ligne.
 const EMAILJS = {
-  serviceId:  "YOUR_SERVICE_ID",
-  publicKey:  "YOUR_PUBLIC_KEY",
-  template:   "YOUR_TEMPLATE_ID",
+  serviceId:  "service_pdc4obm",
+  publicKey:  "jqiQghHT17pC8KDbi",
+  template:   "template_ei6os5u",
 };
 
 const isSet = v => !!v && !String(v).startsWith("YOUR_");
