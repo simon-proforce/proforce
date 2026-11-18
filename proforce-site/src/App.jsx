@@ -1201,11 +1201,11 @@ function HomePage({ lang, setPage }) {
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.fashH}</h3>
               <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted }}>{t.fashP}</p>
             </button>
-            <div style={{ background:"#c24a10", padding:"1.75rem 1.9rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
+            <div style={{ background:C.orange, padding:"1.75rem 1.9rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
               <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.5rem", lineHeight:1.28, color:"#fff", marginBottom:"0.8rem" }}>
                 {lang==="en" ? "We will tell you no when the search makes no sense." : "On va te dire non quand le mandat n'a pas de bon sens."}
               </p>
-              <p style={{ fontSize:"0.88rem", lineHeight:1.7, color:"#fff" }}>
+              <p style={{ fontSize:"1.05rem", lineHeight:1.65, color:"#fff" }}>
                 {lang==="en" ? "It costs us searches. It saves you three months." : "Ça nous coûte des mandats. Ça t'évite trois mois perdus."}
               </p>
             </div>
@@ -2332,13 +2332,13 @@ function EmployersPage({ lang, setPage }) {
             {/* Le bloc orange qui ferme la rangee. Ce n'est pas une
                 decoration: il porte une phrase que les grandes agences ne
                 peuvent pas dire. Sans la phrase, le bloc ne sert a rien. */}
-            <div style={{ background:"#c24a10", padding:"2.5rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
+            <div style={{ background:C.orange, padding:"2.5rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
               <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.5rem", lineHeight:1.28, color:"#fff", marginBottom:"0.9rem" }}>
                 {lang==="en"
                   ? "Your recruiter will not change mid-search."
                   : "Ton recruteur ne changera pas en cours de mandat."}
               </p>
-              <p style={{ fontSize:"0.92rem", lineHeight:1.7, color:"#fff" }}>
+              <p style={{ fontSize:"1.05rem", lineHeight:1.65, color:"#fff" }}>
                 {lang==="en"
                   ? "The person who takes your call is the one doing the search."
                   : "Celui qui prend ton appel est celui qui fait la recherche."}
