@@ -467,6 +467,17 @@ const FASHION_ROLES = {
   en:["Buyer","Merchandise Planner","Brand Manager","Visual Merchandiser","Account Executive","Production Coordinator","Designer","Sales Director","Retail Manager","E-commerce Manager"],
   fr:["Acheteur","Planificateur marchandise","Gestionnaire de marque","Marchandiseur visuel","Chargé de compte","Coordinateur production","Designer","Directeur des ventes","Directeur de détail","Gestionnaire e-commerce"],
 };
+// Les familles de postes, pas la liste complete. Sur la page d'accueil, six
+// etiquettes montrent la portee plus vite qu'un paragraphe. La liste longue
+// reste sur les pages de secteur.
+const FOOD_TAGS = {
+  en:["Plant management","Quality assurance","Production","Maintenance","Sales and key accounts","R&D"],
+  fr:["Direction d'usine","Assurance qualité","Production","Maintenance","Ventes et comptes clés","R&D"],
+};
+const FASHION_TAGS = {
+  en:["Production management","Product development","Technical design","Patternmaking","Sourcing","Planning"],
+  fr:["Direction de production","Développement de produits","Design technique","Patronnage","Approvisionnement","Planification"],
+};
 const CHARITIES = [
   {name:"UNICEF",desc:{en:"Supporting children's rights and well-being worldwide.",fr:"Soutien aux droits et au bien-être des enfants dans le monde."}},
   {name:"Starlight Foundation",desc:{en:"Bringing joy to seriously ill children and their families.",fr:"Apporter de la joie aux enfants gravement malades et leurs familles."}},
@@ -877,6 +888,22 @@ function PageLink({ to, sub, setPage, children, style, className }) {
   );
 }
 
+// Etiquettes de familles de postes. Un filet, pas une boite remplie: ca reste
+// discret a cote des titres en serif.
+function RoleTags({ items }) {
+  return (
+    <div style={{ display:"flex", flexWrap:"wrap", gap:"0.4rem" }}>
+      {items.map(r => (
+        <span key={r} style={{
+          fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.04em",
+          textTransform:"uppercase", color:C.muted, border:`1px solid ${C.rule}`,
+          padding:"3px 8px", whiteSpace:"nowrap",
+        }}>{r}</span>
+      ))}
+    </div>
+  );
+}
+
 function Divider({ style }) {
   return <span className="rule" style={style} />;
 }
@@ -1191,7 +1218,8 @@ function HomePage({ lang, setPage }) {
                 alt={lang==="en" ? "Prepared meal trays moving along a filling line" : "Barquettes de repas prêts sur une ligne de remplissage"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.foodH}</h3>
-              <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted }}>{t.foodP}</p>
+              <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted, marginBottom:"1rem" }}>{t.foodP}</p>
+              <RoleTags items={FOOD_TAGS[lang]} />
             </button>
 
             <button onClick={() => setPage("fashion")} style={{ textAlign:"left", display:"block", width:"100%" }}>
@@ -1199,7 +1227,8 @@ function HomePage({ lang, setPage }) {
                 alt={lang==="en" ? "Aisles of folded garments in an apparel distribution warehouse" : "Allées de vêtements pliés dans un entrepôt de distribution"}
                 style={{ width:"100%", height:"170px", objectFit:"cover", display:"block", marginBottom:"1rem" }} />
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.ink, marginBottom:"0.4rem" }}>{t.fashH}</h3>
-              <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted }}>{t.fashP}</p>
+              <p style={{ fontSize:"0.95rem", lineHeight:1.8, color:C.muted, marginBottom:"1rem" }}>{t.fashP}</p>
+              <RoleTags items={FASHION_TAGS[lang]} />
             </button>
             <div style={{ background:C.orange, padding:"1.75rem 1.9rem", display:"flex", flexDirection:"column", justifyContent:"center" }}>
               <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.5rem", lineHeight:1.28, color:"#fff", marginBottom:"0.8rem" }}>
@@ -1316,9 +1345,12 @@ function HomePage({ lang, setPage }) {
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"rgba(255,255,255,0.3)", letterSpacing:"0.06em" }}>{c.market[lang]}</div>
-                {c.avail.en==="Actively looking" && (
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.orange, letterSpacing:"0.06em", marginTop:"3px" }}>{lang==="en"?"Active":"Actif"}</div>
-                )}
+                <div style={{
+                  fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.06em", marginTop:"3px",
+                  color: c.avail.en==="Actively looking" ? C.orange : "rgba(255,255,255,0.5)",
+                }}>
+                  {c.notice ? c.notice[lang] : c.avail[lang]}
+                </div>
               </div>
             </button>
           ))}
@@ -1636,6 +1668,11 @@ function FAQSection({ lang, type, setPage }) {
 //   { nom:"Nom de l'entreprise", logo:"/clients/nom-entreprise.svg" },
 const CLIENTS = [];
 
+// Chaque fiche peut porter un preavis concret, qui remplace alors le champ
+// "avail" plus vague en pied de fiche:
+//   notice: { en:"4 weeks notice", fr:"Preavis de 4 semaines" },
+// Il n'est jamais devine. Tant que Simon n'a pas donne le preavis reel du
+// candidat, la fiche affiche "avail" et rien d'invente.
 const FEATURED = [
   {
     id: "fc-01",
@@ -1897,8 +1934,20 @@ function FeaturedCandidatesPage({ lang, setPage }) {
                   ))}
                 </div>
 
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, marginTop:"auto" }}>
-                  {lang==="en"?"View profile →":"Voir le profil →"}
+                {/* La disponibilite descend en pied de fiche, a cote du lien.
+                    C'est l'information qui declenche l'appel: un directeur
+                    d'usine veut savoir si la personne peut entrer en poste
+                    avant les Fetes, pas juste qu'elle est "ouverte". */}
+                <div style={{
+                  display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:"1rem",
+                  marginTop:"auto", paddingTop:"1.25rem", borderTop:`1px solid ${C.rule}`,
+                }}>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.75rem", color:C.ink, fontWeight:500 }}>
+                    {c.notice ? c.notice[lang] : c.avail[lang]}
+                  </span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange, flexShrink:0 }}>
+                    {lang==="en"?"Request this profile →":"Demander ce profil →"}
+                  </span>
                 </div>
               </button>
             ))}
@@ -2145,6 +2194,15 @@ function EmployersPage({ lang, setPage }) {
       h1: "You need the right person.",
       h1i: "Not just a résumé pile.",
       sub: "Proforce works with food manufacturers, CPG (consumer packaged goods) brands, and fashion companies in Montreal, Toronto, and Atlantic Canada that are serious about their next hire. We don't spray and pray. We find the person, the one who wasn't looking, and bring them to you.",
+      checkLabel: "What we verify",
+      checkH: "Before we put someone in front of you, we check",
+      checks: [
+        "The audits they actually ran, not just the ones they sat through",
+        "The numbers: line performance, waste, on time delivery",
+        "How they handled a union floor and three shifts",
+        "The real reason they left",
+      ],
+      checkP: "Four questions that take an hour and save you three months.",
       processLabel: "How It Works",
       processH: "Simple. Accountable. Fast.",
       processLink: "See the full 9-step process →",
@@ -2180,6 +2238,15 @@ function EmployersPage({ lang, setPage }) {
       h1: "T'as besoin de la bonne personne.",
       h1i: "Pas juste une pile de CV.",
       sub: "Proforce travaille avec des fabricants alimentaires, des marques CPG (produits de consommation emballés) et des compagnies mode à Montréal, Toronto et dans les provinces atlantiques qui prennent leur prochaine embauche au sérieux. On n'affiche pas et on croise pas les doigts. On trouve la personne, celle qui ne cherchait pas, et on te l'amène.",
+      checkLabel: "Ce qu'on vérifie",
+      checkH: "Avant de te présenter quelqu'un, on vérifie",
+      checks: [
+        "Les audits qu'il a vraiment menés, pas juste ceux qu'il a subis",
+        "Les chiffres: rendement des lignes, pertes, livraison à temps",
+        "Comment il a géré un plancher syndiqué et trois quarts de travail",
+        "La vraie raison du départ",
+      ],
+      checkP: "Quatre questions qui prennent une heure et qui t'évitent trois mois.",
       processLabel: "Comment ça fonctionne",
       processH: "Simple. Imputable. Rapide.",
       processLink: "Voir le processus complet en 9 étapes →",
@@ -2247,6 +2314,29 @@ function EmployersPage({ lang, setPage }) {
         ["/photos/robot-emballage.jpg", 1, 1600, 900,
          lang==="en" ? "Pick and place robot over a sausage packaging line" : "Robot d'emballage au-dessus d'une ligne de saucisses"],
       ]} />
+
+      {/* Ce qu'on verifie. Quatre points precis font le travail que trois
+          paragraphes sur notre rigueur ne feront jamais. */}
+      <section style={{ background:C.paperDark, padding:"5rem 2rem" }}>
+        <div className="escape-row" style={{ maxWidth:"1180px", margin:"0 auto" }}>
+          <p>{t.checkP}</p>
+          <div>
+            <Eyebrow>{t.checkLabel}</Eyebrow>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.6rem,3.2vw,2.4rem)", letterSpacing:"-0.015em", color:C.ink, lineHeight:1.15, margin:"1.1rem 0 1.9rem" }}>{t.checkH}</h2>
+            <ul style={{ listStyle:"none" }}>
+              {t.checks.map((c, i) => (
+                <li key={i} style={{
+                  display:"grid", gridTemplateColumns:"auto 1fr", gap:"0.9rem", alignItems:"baseline",
+                  padding:"0.85rem 0", borderTop:`1px solid ${C.rule}`,
+                }}>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", fontWeight:700, color:C.orange, letterSpacing:"0.04em" }}>0{i+1}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.ink, lineHeight:1.55 }}>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
 
       {/* Process */}
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
@@ -2942,27 +3032,36 @@ function ContactPage({ lang }) {
 
 // ─── ROI CALCULATOR PAGE ──────────────────────────────────────────────────────
 function CalculatorPage({ lang, setPage }) {
-  const [salary, setSalary] = useState(110000);
-  const [weeks, setWeeks] = useState(12);
-  const [prodLoss, setProdLoss] = useState(70);
-  const [turnover, setTurnover] = useState(40);
-  const [badHirePct, setBadHirePct] = useState(30);
-  const [feePct, setFeePct] = useState(20);
-  const [fillTime, setFillTime] = useState(6);
+  const [salary, setSalary]           = useState(110000);
+  const [weeksAlone, setWeeksAlone]   = useState(12);
+  const [timeWeek, setTimeWeek]       = useState(1200);
+  const [fixWeek, setFixWeek]         = useState(3500);
+  const [missCost, setMissCost]       = useState(150);
+  const [oddsAlone, setOddsAlone]     = useState(40);
+  const [weeksPro, setWeeksPro]       = useState(6);
+  const [oddsPro, setOddsPro]         = useState(20);
+  const [feePct, setFeePct]           = useState(20);
 
   const fmt = (n) => n.toLocaleString(lang === "fr" ? "fr-CA" : "en-CA", { style:"currency", currency:"CAD", maximumFractionDigits:0 });
 
-  // Aucune hypothese n'est cachee dans le calcul: les cinq qui faisaient varier
-  // le resultat sont maintenant des curseurs que le visiteur controle lui meme.
-  const weeklyRate = salary / 52;
-  const vacancyCost = weeks * weeklyRate * (prodLoss / 100);
-  const badHireCost = salary * (badHirePct / 100);
-  const expectedBadHire = badHireCost * (turnover / 100);
-  const totalCost = vacancyCost + expectedBadHire;
-  const fee = salary * (feePct / 100);
-  const weeksSaved = Math.max(0, weeks - fillTime);
-  const vacancySaved = weeksSaved * weeklyRate * (prodLoss / 100);
-  const ecart = vacancySaved - fee;
+  // Le modele est net, pas brut. Le salaire qu'on ne verse pas pendant la
+  // vacance est soustrait, sinon le chiffre ne tient pas deux minutes devant
+  // quelqu'un qui sait compter. La periode d'integration n'est pas comptee:
+  // elle arrive peu importe qui recrute.
+  const weeklySalary = salary / 52;
+  const weeklyGross  = timeWeek + fixWeek;
+  const weeklyNet    = weeklyGross - weeklySalary;
+  const vacancyNet   = weeklyNet * weeksAlone;
+
+  const missValue    = salary * (missCost / 100);
+  const expectedMiss = missValue * (oddsAlone / 100);
+  const exposure     = vacancyNet + expectedMiss;
+
+  const fee          = salary * (feePct / 100);
+  const weeksSaved   = Math.max(0, weeksAlone - weeksPro);
+  const timeSaved    = weeksSaved * weeklyNet;
+  const riskSaved    = missValue * Math.max(0, (oddsAlone - oddsPro)) / 100;
+  const ecart        = timeSaved + riskSaved - fee;
 
   const t = {
     en:{
@@ -2970,21 +3069,35 @@ function CalculatorPage({ lang, setPage }) {
       h1:"What is that empty seat",
       h1i:"actually costing you?",
       sub:"Every assumption below is a slider you control. Nothing goes into the math that you did not set yourself. Move one and watch the answer change, that is the point.",
-      salary:"Annual salary of the role", weeks:"Weeks to fill on your own",
-      prodLoss:"Productivity lost while the seat is empty",
-      turnover:"Odds of a bad hire", badHirePct:"Cost of a bad hire, as a share of salary",
+      g1:"The vacancy", g2:"The risk of a miss", g3:"With a recruiter",
+      salary:"Annual salary of the role",
+      weeksAlone:"Weeks to fill on your own",
+      timeWeek:"Value of the time you and your team absorb, per week",
+      timeWeekHint:"Eight hours of your week at $150 is $1,200",
+      fixWeek:"Overtime, rework, late shipments, frozen projects, per week",
+      fixWeekHint:"What the plant actually pays to cover the gap",
+      missCost:"Cost of a hire that does not work out, as a share of salary",
+      missCostHint:"Search time, lost output, training, team disruption",
+      oddsAlone:"Odds of a miss when you hire on your own",
+      weeksPro:"Weeks to fill with a recruiter",
+      oddsPro:"Odds of a miss with a recruiter",
       feePct:"Fee percentage",
-      fillTime:"Weeks to fill with a recruiter",
       resultsH:"What it costs you.",
       cmpH:"Now compare.",
-      r1:"Cost of the vacancy", r1s:"Lost productivity during the search, at the rate you set",
-      r2:"Expected cost of a bad hire", r2s:"Cost of a miss, weighted by the odds you set",
-      r3:"Total", r3s:"Before anyone talks about fees",
-      r4:"Fee", r4s:"One time, payable on success",
-      r5:"Vacancy saved", r5s:"The weeks gained, at the productivity rate you set",
-      r6:"Difference", r6s:"Vacancy saved minus the fee",
-      note:"This math puts no value on the guarantee. It runs from 90 days to a year and it is in the contract, not in an estimate. Same for the candidates who never answer a job posting. We cannot put a number on them, and they are usually the ones you are looking for.",
-      disclaimer:"This is not a study. It is your scenario with your assumptions. We did not hide a number anywhere to make the answer come out our way.",
+      weekLabel:"Every week that seat stays empty",
+      r1:"Time diverted", r1s:"Yours and your team's, over the weeks you set",
+      r2:"Covering the gap", r2s:"Overtime, rework, late shipments, at the rate you set",
+      r3:"Less the salary you are not paying", r3s:"The seat is empty, the cheque is not going out",
+      r4:"Net cost of the vacancy", r4s:"After the salary credit",
+      r5:"Expected cost of a miss", r5s:"The cost of a failed hire, weighted by the odds you set",
+      r6:"Total exposure", r6s:"Before anyone talks about fees",
+      c1:"Weeks gained", c1s:"At the net weekly cost above",
+      c2:"Risk removed", c2s:"The drop in the odds of a miss, at the cost you set",
+      c3:"Fee", c3s:"One time, payable on success",
+      c4:"Difference", c4s:"What you gain, minus what we charge",
+      note:"This math puts no value on the guarantee, and none on the candidates who never answer a job posting. Both are real. Neither one can be priced honestly here.",
+      note2:"We also leave out the ramp-up period. A new manager takes months to reach full speed, but that happens no matter who does the hiring, so it has no business in a comparison.",
+      disclaimer:"This is not a study. It is your scenario with your assumptions. We did not hide a number anywhere to make the answer come out our way. If the net cost comes out negative, that means the role costs more than its absence does. That is an answer too, and it is worth knowing before you hire.",
       cta:"Ready to talk?", cta2:"Contact Us",
     },
     fr:{
@@ -2992,49 +3105,103 @@ function CalculatorPage({ lang, setPage }) {
       h1:"Ça te coûte quoi au juste,",
       h1i:"une chaise vide?",
       sub:"Chaque hypothèse en dessous est un curseur que tu contrôles. Rien n'entre dans le calcul que tu n'as pas réglé toi-même. Bouge un curseur et la réponse change, c'est le but.",
-      salary:"Salaire annuel du poste", weeks:"Semaines pour combler par toi-même",
-      prodLoss:"Productivité perdue pendant que la chaise est vide",
-      turnover:"Probabilité d'un mauvais candidat", badHirePct:"Coût d'un mauvais candidat, en % du salaire",
+      g1:"La vacance", g2:"Le risque d'erreur", g3:"Avec un recruteur",
+      salary:"Salaire annuel du poste",
+      weeksAlone:"Semaines pour combler par toi-même",
+      timeWeek:"Valeur du temps que toi et ton équipe absorbez, par semaine",
+      timeWeekHint:"Huit heures de ta semaine à 150 $, c'est 1 200 $",
+      fixWeek:"Surtemps, reprises, retards de livraison, projets gelés, par semaine",
+      fixWeekHint:"Ce que l'usine paie vraiment pour couvrir le trou",
+      missCost:"Coût d'une embauche qui ne marche pas, en % du salaire",
+      missCostHint:"Temps de recherche, production perdue, formation, équipe brassée",
+      oddsAlone:"Probabilité de te tromper en recrutant seul",
+      weeksPro:"Semaines pour combler avec un recruteur",
+      oddsPro:"Probabilité de te tromper avec un recruteur",
       feePct:"Pourcentage d'honoraires",
-      fillTime:"Semaines pour combler avec un recruteur",
       resultsH:"Ce que ça te coûte.",
       cmpH:"Maintenant, compare.",
-      r1:"Coût du poste vacant", r1s:"Productivité perdue pendant la recherche, au taux que tu as fixé",
-      r2:"Coût attendu d'un mauvais candidat", r2s:"Le coût d'un échec, pondéré par la probabilité que tu as fixée",
-      r3:"Total", r3s:"Avant même qu'on parle d'honoraires",
-      r4:"Honoraires", r4s:"Une seule fois, payable au succès",
-      r5:"Vacance économisée", r5s:"Les semaines gagnées, à la productivité que tu as fixée",
-      r6:"Écart", r6s:"La vacance économisée moins les honoraires",
-      note:"Ce calcul ne met aucune valeur sur la garantie. Elle va de 90 jours à un an et elle est dans le contrat, pas dans une estimation. Même chose pour les candidats qui ne répondent jamais à une annonce: on ne peut pas les chiffrer, et c'est souvent eux que tu cherches.",
-      disclaimer:"C'est pas une étude. C'est ton scénario, avec tes hypothèses. On n'a caché aucun chiffre pour que la réponse sorte de notre bord.",
+      weekLabel:"Chaque semaine où la chaise reste vide",
+      r1:"Temps détourné", r1s:"Le tien et celui de ton équipe, sur les semaines que tu as fixées",
+      r2:"Couvrir le trou", r2s:"Surtemps, reprises, retards, au taux que tu as fixé",
+      r3:"Moins le salaire que tu ne verses pas", r3s:"La chaise est vide, le chèque ne sort pas",
+      r4:"Coût net de la vacance", r4s:"Une fois le salaire soustrait",
+      r5:"Coût attendu d'une erreur", r5s:"Le coût d'une embauche ratée, pondéré par la probabilité que tu as fixée",
+      r6:"Exposition totale", r6s:"Avant même qu'on parle d'honoraires",
+      c1:"Semaines gagnées", c1s:"Au coût net hebdomadaire ci-dessus",
+      c2:"Risque enlevé", c2s:"La baisse de probabilité, au coût que tu as fixé",
+      c3:"Honoraires", c3s:"Une seule fois, payable au succès",
+      c4:"Écart", c4s:"Ce que tu gagnes, moins ce qu'on charge",
+      note:"Ce calcul ne met aucune valeur sur la garantie, ni sur les candidats qui ne répondent jamais à une annonce. Les deux sont réels. Ni l'un ni l'autre ne se chiffre honnêtement ici.",
+      note2:"On ne compte pas non plus la période d'intégration. Un nouveau gestionnaire prend des mois à être à pleine vitesse, mais ça arrive peu importe qui recrute, alors ça n'a pas d'affaire dans une comparaison.",
+      disclaimer:"C'est pas une étude. C'est ton scénario, avec tes hypothèses. On n'a caché aucun chiffre pour que la réponse sorte de notre bord. Si le coût net sort négatif, ça veut dire que le poste coûte plus cher que son absence. C'est une réponse aussi, et ça vaut la peine de le savoir avant d'embaucher.",
       cta:"Prêt à jaser?", cta2:"Nous contacter",
     },
   }[lang];
 
-  const sliders = [
-    { label:t.salary, value:salary, set:setSalary, min:60000, max:250000, step:5000, fmt:(v)=>`${fmt(v)}` },
-    { label:t.weeks, value:weeks, set:setWeeks, min:4, max:26, step:1, fmt:(v)=>`${v} ${lang==="en"?"weeks":"semaines"}` },
-    { label:t.prodLoss, value:prodLoss, set:setProdLoss, min:0, max:100, step:5, fmt:(v)=>`${v}%` },
-    { label:t.turnover, value:turnover, set:setTurnover, min:0, max:70, step:5, fmt:(v)=>`${v}%` },
-    { label:t.badHirePct, value:badHirePct, set:setBadHirePct, min:0, max:100, step:5, fmt:(v)=>`${v}%` },
-    { label:t.feePct, value:feePct, set:setFeePct, min:15, max:25, step:1, fmt:(v)=>`${v}%` },
-    { label:t.fillTime, value:fillTime, set:setFillTime, min:2, max:16, step:1, fmt:(v)=>`${v} ${lang==="en"?"weeks":"semaines"}` },
+  const money = (v) => fmt(v);
+  const pct   = (v) => `${v}%`;
+  const wks   = (v) => `${v} ${lang === "en" ? "weeks" : "semaines"}`;
+
+  // Trois groupes plutot qu'une colonne de nine curseurs. Le visiteur voit
+  // ou il est rendu au lieu de se faire assommer.
+  const groups = [
+    { title:t.g1, items:[
+      { label:t.salary,     value:salary,     set:setSalary,     min:60000, max:250000, step:5000, fmt:money },
+      { label:t.weeksAlone, value:weeksAlone, set:setWeeksAlone, min:4,     max:26,     step:1,    fmt:wks },
+      { label:t.timeWeek,   value:timeWeek,   set:setTimeWeek,   min:0,     max:5000,   step:100,  fmt:money, hint:t.timeWeekHint },
+      { label:t.fixWeek,    value:fixWeek,    set:setFixWeek,    min:0,     max:15000,  step:250,  fmt:money, hint:t.fixWeekHint },
+    ]},
+    { title:t.g2, items:[
+      { label:t.missCost,  value:missCost,  set:setMissCost,  min:50, max:300, step:10, fmt:pct, hint:t.missCostHint },
+      { label:t.oddsAlone, value:oddsAlone, set:setOddsAlone, min:0,  max:70,  step:5,  fmt:pct },
+    ]},
+    { title:t.g3, items:[
+      { label:t.weeksPro, value:weeksPro, set:setWeeksPro, min:2,  max:16, step:1, fmt:wks },
+      { label:t.oddsPro,  value:oddsPro,  set:setOddsPro,  min:0,  max:70, step:5, fmt:pct },
+      { label:t.feePct,   value:feePct,   set:setFeePct,   min:15, max:25, step:1, fmt:pct },
+    ]},
   ];
 
-  // Deux blocs separes: ce que le poste vacant coute, puis seulement apres la
-  // comparaison avec un mandat. Le premier bloc ne mentionne pas Proforce.
   const rows = [
-    { label:t.r1, sub:t.r1s, value:vacancyCost, type:"cost" },
-    { label:t.r2, sub:t.r2s, value:expectedBadHire, type:"cost" },
-    { label:t.r3, sub:t.r3s, value:totalCost, type:"total" },
+    { label:t.r1, sub:t.r1s, value:timeWeek * weeksAlone,     type:"cost" },
+    { label:t.r2, sub:t.r2s, value:fixWeek * weeksAlone,      type:"cost" },
+    { label:t.r3, sub:t.r3s, value:-weeklySalary * weeksAlone, type:"credit" },
+    { label:t.r4, sub:t.r4s, value:vacancyNet,                type:"total" },
+    { label:t.r5, sub:t.r5s, value:expectedMiss,              type:"cost" },
+    { label:t.r6, sub:t.r6s, value:exposure,                  type:"total" },
   ];
   const cmpRows = [
-    { label:t.r4, sub:t.r4s, value:fee, type:"fee" },
-    { label:t.r5, sub:t.r5s, value:vacancySaved, type:"saving" },
-    { label:t.r6, sub:t.r6s, value:ecart, type: ecart >= 0 ? "saving" : "cost" },
+    { label:t.c1, sub:t.c1s, value:timeSaved, type: timeSaved >= 0 ? "saving" : "cost" },
+    { label:t.c2, sub:t.c2s, value:riskSaved, type:"saving" },
+    { label:t.c3, sub:t.c3s, value:fee,       type:"fee" },
   ];
 
   const sliderStyle = { width:"100%", accentColor:C.orange, cursor:"pointer" };
+
+  const Row = ({ row, big }) => (
+    <div style={{
+      display:"flex", justifyContent:"space-between", alignItems:"center",
+      padding:"0.9rem 0", borderBottom:`1px solid ${C.rule}`,
+      background: row.type === "total" ? C.paperDark : "transparent",
+      paddingLeft:  row.type === "total" ? "0.5rem" : 0,
+      paddingRight: row.type === "total" ? "0.5rem" : 0,
+    }}>
+      <div>
+        <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink, fontWeight: row.type === "total" ? 700 : 400 }}>{row.label}</div>
+        <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
+      </div>
+      <div style={{
+        fontFamily:"'Archivo',sans-serif", fontSize: big ? "0.95rem" : "0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
+        color: row.type === "cost" ? "#c0392b"
+             : row.type === "credit" ? "#27ae60"
+             : row.type === "fee" ? C.muted
+             : row.type === "saving" ? (row.value >= 0 ? "#27ae60" : "#c0392b")
+             : (row.value >= 0 ? "#c0392b" : "#27ae60"),
+      }}>
+        {row.type === "saving" && row.value > 0 ? "+" : ""}{fmt(row.value)}
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -3050,88 +3217,77 @@ function CalculatorPage({ lang, setPage }) {
       <section style={{ background:C.white, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4rem", alignItems:"start" }} className="two-col">
 
-          {/* Sliders */}
+          {/* Curseurs, groupes par bloc */}
           <div>
-            <Eyebrow>{lang==="en"?"Your scenario":"Ton scénario"}</Eyebrow>
-            <Divider style={{ marginBottom:"2rem" }} />
-            {sliders.map((sl, i) => (
-              <div key={i} style={{ marginBottom:"2rem" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.6rem" }}>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink, fontWeight:500 }}>{sl.label}</span>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:C.orange, fontWeight:600 }}>{sl.fmt(sl.value)}</span>
-                </div>
-                <input type="range" min={sl.min} max={sl.max} step={sl.step}
-                  value={sl.value} onChange={e => sl.set(Number(e.target.value))}
-                  style={sliderStyle}
-                />
-                <div style={{ display:"flex", justifyContent:"space-between", marginTop:"3px" }}>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.min)}</span>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.max)}</span>
-                </div>
+            {groups.map((g, gi) => (
+              <div key={gi} style={{ marginBottom: gi === groups.length - 1 ? 0 : "2.75rem" }}>
+                <Eyebrow>{g.title}</Eyebrow>
+                <Divider style={{ marginBottom:"1.75rem" }} />
+                {g.items.map((sl, i) => (
+                  <div key={i} style={{ marginBottom:"1.9rem" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", gap:"1rem", marginBottom:"0.35rem" }}>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink, fontWeight:500 }}>{sl.label}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:C.orange, fontWeight:600, flexShrink:0 }}>{sl.fmt(sl.value)}</span>
+                    </div>
+                    {sl.hint && (
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", color:C.muted, marginBottom:"0.5rem" }}>{sl.hint}</div>
+                    )}
+                    <input type="range" min={sl.min} max={sl.max} step={sl.step}
+                      value={sl.value} onChange={e => sl.set(Number(e.target.value))}
+                      style={sliderStyle}
+                    />
+                    <div style={{ display:"flex", justifyContent:"space-between", marginTop:"3px" }}>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.min)}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", color:C.muted }}>{sl.fmt(sl.max)}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
 
-          {/* Results */}
+          {/* Resultats */}
           <div>
-            <Eyebrow>{t.resultsH}</Eyebrow>
-            <Divider style={{ marginBottom:"0" }} />
-
-            {rows.map((row, i) => (
-              <div key={i} style={{
-                display:"flex", justifyContent:"space-between", alignItems:"center",
-                padding:"0.9rem 0", borderBottom:`1px solid ${C.rule}`,
-                background: row.type==="total" ? C.paperDark : "transparent",
-                paddingLeft: row.type==="total" ? "0.5rem" : 0,
-                paddingRight: row.type==="total" ? "0.5rem" : 0,
-              }}>
-                <div>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color: row.type==="total" ? C.ink : C.ink, fontWeight: row.type==="total" ? 700 : 400 }}>{row.label}</div>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
-                </div>
-                <div style={{
-                  fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
-                  color: row.type==="cost"||row.type==="total" ? "#c0392b" : row.type==="fee" ? C.muted : "#27ae60",
-                }}>
-                  {row.type==="saving" ? "+" : ""}{fmt(row.value)}
-                </div>
+            {/* Le chiffre hebdomadaire en premier. Un total de six chiffres ne
+                veut rien dire a personne. Un montant par semaine, oui. */}
+            <div style={{ padding:"1.9rem", background:C.ink, borderLeft:`4px solid ${C.orange}`, marginBottom:"2.5rem" }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.5rem" }}>{t.weekLabel}</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.6rem", fontWeight:700, letterSpacing:"-0.015em", color:"#fff", lineHeight:1 }}>
+                {fmt(weeklyNet)}
               </div>
-            ))}
-
-            {/* Le total du poste vacant: le seul chiffre mis en vedette, et il ne
-                parle pas de nous. */}
-            <div style={{ marginTop:"1.5rem", padding:"1.75rem", background:C.ink, borderLeft:`4px solid ${C.orange}` }}>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.5rem" }}>{t.r3}</div>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, letterSpacing:"-0.015em", color:"#fff", lineHeight:1 }}>
-                {fmt(totalCost)}
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.55)", marginTop:"0.7rem" }}>
+                {lang === "en"
+                  ? `${weeksAlone} weeks of it is ${fmt(vacancyNet)}, before the risk of a miss.`
+                  : `${weeksAlone} semaines de ça, c'est ${fmt(vacancyNet)}, avant même le risque d'erreur.`}
               </div>
             </div>
 
-            {/* La comparaison vient apres, et elle est presentee comme un ecart,
-                pas comme une economie garantie. */}
+            <Eyebrow>{t.resultsH}</Eyebrow>
+            <Divider style={{ marginBottom:"0" }} />
+            {rows.map((row, i) => <Row key={i} row={row} />)}
+
             <div style={{ marginTop:"3rem" }}>
               <Eyebrow>{t.cmpH}</Eyebrow>
               <Divider style={{ marginBottom:"0" }} />
-              {cmpRows.map((row, i) => (
-                <div key={i} style={{
-                  display:"flex", justifyContent:"space-between", alignItems:"center",
-                  padding:"0.9rem 0", borderBottom:`1px solid ${C.rule}`,
-                }}>
-                  <div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:C.ink }}>{row.label}</div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"1px" }}>{row.sub}</div>
-                  </div>
-                  <div style={{
-                    fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
-                    color: row.type==="cost" ? "#c0392b" : row.type==="fee" ? C.muted : "#27ae60",
-                  }}>
-                    {row.type==="saving" && row.value > 0 ? "+" : ""}{fmt(row.value)}
-                  </div>
+              {cmpRows.map((row, i) => <Row key={i} row={row} />)}
+
+              {/* L'ecart est la reponse de la page. Il merite le meme traitement
+                  que le chiffre hebdomadaire, pas une ligne de tableau. */}
+              <div style={{
+                marginTop:"1.5rem", padding:"1.6rem 1.9rem",
+                background: ecart >= 0 ? C.paperDark : "#fdf0ee",
+                borderLeft:`4px solid ${ecart >= 0 ? C.orange : "#c0392b"}`,
+              }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color: ecart >= 0 ? C.orange : "#c0392b", marginBottom:"0.4rem" }}>{t.c4}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2rem", fontWeight:700, letterSpacing:"-0.015em", color:C.ink, lineHeight:1 }}>
+                  {ecart > 0 ? "+" : ""}{fmt(ecart)}
                 </div>
-              ))}
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:C.muted, marginTop:"0.6rem" }}>{t.c4s}</div>
+              </div>
             </div>
 
             <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"1.5rem" }}>{t.note}</p>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", color:C.inkLight, lineHeight:1.75, fontWeight:300, fontStyle:"italic", marginTop:"0.9rem" }}>{t.note2}</p>
             <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:C.muted, lineHeight:1.8, marginTop:"1rem" }}>{t.disclaimer}</p>
           </div>
         </div>
@@ -3144,7 +3300,7 @@ function CalculatorPage({ lang, setPage }) {
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.cta2}</button>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
-              {lang==="en"?"Book a Call":"Réserver un appel"}
+              {lang === "en" ? "Book a Call" : "Réserver un appel"}
             </a>
           </div>
         </div>
@@ -3164,63 +3320,63 @@ function HowWeWorkPage({ lang, setPage }) {
       phaseLabel: "The Full Process",
       phases: [
         {
-          n: "01", phase: "Discovery",
+          n: "01", phase: "We listen",
           h: "We learn your business, not just the job description.",
           p: "The first conversation isn't about resumes. It's about your company, your team, your culture, and the real reason this role exists. We want to understand what's made people succeed in this position before, what's made them fail, and what kind of person actually fits your environment.\n\nThis call typically takes 30 to 60 minutes. We'll ask you things most recruiters don't ask, about management style, team dynamics, growth trajectory, and what you're not willing to compromise on. The more you tell us, the better we place.\n\nAt the end of this call, we tell you honestly whether we think we can help, what our timeline looks like, and what we'll need from you to move quickly.",
           duration: "30 to 60 minutes",
           deliverable: "Honest assessment of the mandate + timeline",
         },
         {
-          n: "02", phase: "Mandate Definition",
+          n: "02", phase: "We frame",
           h: "We agree on what we're looking for, and what we're not.",
           p: "Before we start searching, we align on the profile. Not just the job title and years of experience, the actual person. What does success look like at 6 months? At 12? What certifications are truly required versus nice to have? What's the real salary range, not the posted range, the range you'd actually offer a strong candidate?\n\nWe also agree on exclusivity or contingency terms, the guarantee period, and the fee structure. Everything is clear before we start. No surprises at invoice time.\n\nIf the compensation range isn't competitive for the profile you're looking for, we tell you now, not after three weeks of searching.",
           duration: "1 to 2 business days",
           deliverable: "Signed mandate agreement + candidate profile brief",
         },
         {
-          n: "03", phase: "Network Search",
+          n: "03", phase: "We call",
           h: "We go into our network. Not a job board.",
           p: "We don't post your role publicly. We identify the candidates who fit your profile and we call them directly. These are people we already know, people we've placed before, people who've referred candidates to us, people we've spoken with over the years and stayed in touch with.\n\nFor some mandates, we also reach out to candidates in our extended network through targeted outreach. Every approach is personalized. We're not sending mass messages.\n\nThis phase typically takes 1 to 3 weeks depending on the complexity of the role and the market conditions. We update you regularly on what we're seeing, including if the profile you described doesn't match what's available at your compensation level.",
           duration: "1 to 3 weeks",
           deliverable: "Ongoing market feedback + candidate pipeline",
         },
         {
-          n: "04", phase: "Screening & Evaluation",
+          n: "04", phase: "We dig",
           h: "We evaluate before you spend time interviewing.",
           p: "We conduct in-depth interviews with every candidate before presenting them to you. We evaluate their experience, their motivations, their cultural fit, and their realistic interest in your specific opportunity, not just in 'a new opportunity.'\n\nWe check for red flags: gaps they didn't mention, reasons for leaving that don't add up, compensation expectations that are out of range. We save you from spending an hour interviewing someone who was never going to accept your offer.\n\nWe also prepare candidates on your company, your culture, and the role, so that your interview time is spent evaluating fit, not explaining basics.",
           duration: "Ongoing during search",
           deliverable: "Pre-screened, pre-qualified candidates only",
         },
         {
-          n: "05", phase: "Shortlist Presentation",
+          n: "05", phase: "We present",
           h: "Two or three people. Not twenty.",
           p: "We present a shortlist of two to three candidates. Each submission includes a written profile summary, our assessment of strengths and fit, and an honest note on any risks or considerations you should factor into your evaluation.\n\nWe don't pad the shortlist. If we only have two candidates worth presenting, we present two. If we haven't found the right people yet, we tell you that instead of sending you candidates who don't fit just to look active.\n\nMost clients schedule their first interviews within a few days of receiving the shortlist.",
           duration: "Delivered when ready, not on an arbitrary deadline",
           deliverable: "Written candidate profiles + Proforce assessment",
         },
         {
-          n: "06", phase: "Interview Coordination",
+          n: "06", phase: "We coordinate",
           h: "We manage the logistics. You focus on the conversation.",
           p: "We coordinate all interviews between your team and the candidates. We confirm availability, send details, handle reschedules, and follow up afterward with both sides.\n\nAfter each interview, we debrief with the candidate and share their feedback with you. We also gather your impressions and communicate them to the candidate, professionally and with appropriate discretion. This two-way communication keeps the process moving and prevents candidates from disengaging while you deliberate.",
           duration: "1 to 3 weeks depending on your process",
           deliverable: "Interview scheduling + post-interview debrief",
         },
         {
-          n: "07", phase: "Offer & Negotiation",
+          n: "07", phase: "We negotiate",
           h: "We help you make an offer that lands.",
           p: "Before you make an offer, we talk. We tell you what the candidate's actual expectations are, not what they said in the first interview, but what they've told us through the process. We tell you if there's a competing offer on the table, if they have concerns about the role, and what would make them say yes without hesitation.\n\nWe help you structure the offer to maximize the chance of acceptance. That might mean adjusting the base, adding a sign-on, changing the start date, or simply framing it the right way.\n\nWe communicate the offer on your behalf or support you in making it directly, depending on your preference. We manage counteroffers and negotiate professionally on your behalf when needed.",
           duration: "1 to 5 business days",
           deliverable: "Offer strategy + negotiation support",
         },
         {
-          n: "08", phase: "References & Background",
+          n: "08", phase: "We cross-check",
           h: "We verify before you onboard.",
           p: "We conduct professional reference checks on your final candidate before the offer is finalized or as a condition of acceptance. We speak with direct supervisors and colleagues, not just the references the candidate hand-picked.\n\nWe ask structured questions about performance, working style, strengths, and areas of development. We share a written reference summary with you.\n\nBackground checks (criminal, credential verification) can be arranged through our network of third-party providers if required.",
           duration: "3 to 5 business days",
           deliverable: "Written reference summary",
         },
         {
-          n: "09", phase: "Placement & Guarantee",
+          n: "09", phase: "We stay",
           h: "We don't disappear when the offer is signed.",
           p: "We stay in touch after the placement. We check in with both you and the candidate during their first 90 days, not to be intrusive, but to catch any friction early before it becomes a problem.\n\nEvery permanent placement is covered by a replacement guarantee. If the candidate leaves or is terminated for performance reasons within the guarantee period, we restart the search at no additional charge.\n\nThe guarantee period is defined in your mandate agreement. We stand behind every placement we make.",
           duration: "Ongoing post-placement",
@@ -3252,63 +3408,63 @@ function HowWeWorkPage({ lang, setPage }) {
       phaseLabel: "Le processus complet",
       phases: [
         {
-          n: "01", phase: "Découverte",
+          n: "01", phase: "On écoute",
           h: "On apprend ton business, pas juste la description de poste.",
           p: "La première conversation ne porte pas sur les CV. Elle porte sur ta compagnie, ton équipe, ta culture, et la vraie raison pour laquelle ce rôle existe. On veut comprendre ce qui a fait réussir les gens dans ce poste avant, ce qui les a fait échouer, et quel type de personne convient vraiment à ton environnement.\n\nCet appel prend généralement 30 à 60 minutes. On va te poser des questions que la plupart des recruteurs ne posent pas, sur le style de gestion, la dynamique d'équipe, la trajectoire de croissance et ce sur quoi tu n'es pas prêt à faire de compromis. Plus tu nous en dis, mieux on place.\n\nÀ la fin de cet appel, on te dit honnêtement si on pense pouvoir aider, à quoi ressemble notre calendrier et ce dont on aura besoin de toi pour bouger rapidement.",
           duration: "30 à 60 minutes",
           deliverable: "Évaluation honnête du mandat + calendrier",
         },
         {
-          n: "02", phase: "Définition du mandat",
+          n: "02", phase: "On cadre",
           h: "On s'entend sur ce qu'on cherche, et ce qu'on cherche pas.",
           p: "Avant de commencer la recherche, on s'aligne sur le profil. Pas juste le titre et les années d'expérience, la vraie personne. À quoi ressemble le succès à 6 mois? À 12? Quelles certifications sont vraiment requises versus souhaitables? Quelle est la vraie fourchette salariale, pas celle affichée, celle que tu offrirais vraiment à un candidat fort?\n\nOn s'entend aussi sur les termes d'exclusivité ou de contingence, la période de garantie et la structure des honoraires. Tout est clair avant qu'on commence. Pas de surprises à la facturation.\n\nSi la fourchette salariale n'est pas compétitive pour le profil que tu cherches, on te le dit maintenant, pas après trois semaines de recherche.",
           duration: "1 à 2 jours ouvrables",
           deliverable: "Entente de mandat signée + brief de profil candidat",
         },
         {
-          n: "03", phase: "Recherche réseau",
+          n: "03", phase: "On appelle",
           h: "On va dans notre réseau. Pas sur un babillard d'emploi.",
           p: "On n'affiche pas ton rôle publiquement. On identifie les candidats qui correspondent à ton profil et on les appelle directement. Ce sont des gens qu'on connaît déjà, des gens qu'on a placés avant, des gens qui nous ont référé des candidats, des gens avec qui on a parlé au fil des années et avec qui on est restés en contact.\n\nCette phase prend généralement 1 à 3 semaines selon la complexité du rôle et les conditions du marché. On te tient au courant régulièrement de ce qu'on voit, incluant si le profil que tu as décrit ne correspond pas à ce qui est disponible à ton niveau de rémunération.",
           duration: "1 à 3 semaines",
           deliverable: "Rétroaction de marché continue + pipeline de candidats",
         },
         {
-          n: "04", phase: "Évaluation",
+          n: "04", phase: "On creuse",
           h: "On évalue avant que tu passes du temps en entrevue.",
           p: "On mène des entrevues approfondies avec chaque candidat avant de te les présenter. On évalue leur expérience, leurs motivations, leur adéquation culturelle et leur intérêt réel pour ton opportunité spécifique, pas juste pour 'une nouvelle opportunité.'\n\nOn vérifie les signaux d'alarme : les lacunes qu'ils n'ont pas mentionnées, les raisons de départ qui ne tiennent pas la route, les attentes salariales hors fourchette. On t'évite de passer une heure à interviewer quelqu'un qui n'aurait jamais accepté ton offre.\n\nOn prépare aussi les candidats sur ta compagnie, ta culture et le rôle, pour que ton temps d'entrevue soit consacré à évaluer l'adéquation, pas à expliquer les bases.",
           duration: "En continu pendant la recherche",
           deliverable: "Candidats pré-filtrés et pré-qualifiés seulement",
         },
         {
-          n: "05", phase: "Présentation de la courte liste",
+          n: "05", phase: "On présente",
           h: "Deux ou trois personnes. Pas vingt.",
           p: "On présente une courte liste de deux à trois candidats. Chaque soumission inclut un résumé écrit du profil, notre évaluation des forces et de l'adéquation, et une note honnête sur les risques ou considérations à factoriser dans ton évaluation.\n\nOn ne gonfle pas la courte liste. Si on a seulement deux candidats valables à présenter, on en présente deux. Si on n'a pas encore trouvé les bonnes personnes, on te le dit plutôt que d'envoyer des candidats qui ne conviennent pas juste pour paraître actifs.\n\nLa plupart des clients planifient leurs premières entrevues dans les quelques jours suivant la réception de la courte liste.",
           duration: "Livré quand c'est prêt, pas sur une échéance arbitraire",
           deliverable: "Profils écrits des candidats + évaluation Proforce",
         },
         {
-          n: "06", phase: "Coordination des entrevues",
+          n: "06", phase: "On coordonne",
           h: "On gère la logistique. Toi tu te concentres sur la conversation.",
           p: "On coordonne toutes les entrevues entre ton équipe et les candidats. On confirme les disponibilités, envoie les détails, gère les reports et fait le suivi après.\n\nAprès chaque entrevue, on débriefe avec le candidat et partageons leurs commentaires avec toi. On recueille aussi tes impressions et les communiquons au candidat, professionnellement et avec la discrétion appropriée. Cette communication bidirectionnelle fait avancer le processus et empêche les candidats de se désengager pendant que tu délibères.",
           duration: "1 à 3 semaines selon ton processus",
           deliverable: "Planification des entrevues + débrief post-entrevue",
         },
         {
-          n: "07", phase: "Offre et négociation",
+          n: "07", phase: "On négocie",
           h: "On t'aide à faire une offre qui atterrit.",
           p: "Avant que tu fasses une offre, on parle. On te dit quelles sont vraiment les attentes du candidat, pas ce qu'il a dit à la première entrevue, mais ce qu'il nous a dit tout au long du processus. On te dit s'il y a une offre concurrente sur la table, s'il a des préoccupations sur le rôle, et ce qui lui ferait dire oui sans hésitation.\n\nOn t'aide à structurer l'offre pour maximiser les chances d'acceptation. Ça peut vouloir dire ajuster la base, ajouter un boni à la signature, changer la date de début, ou simplement la formuler de la bonne façon.\n\nOn communique l'offre en ton nom ou on te supporte dans la faire directement, selon ta préférence.",
           duration: "1 à 5 jours ouvrables",
           deliverable: "Stratégie d'offre + soutien à la négociation",
         },
         {
-          n: "08", phase: "Références et vérification",
+          n: "08", phase: "On recoupe",
           h: "On vérifie avant l'intégration.",
           p: "On mène des vérifications de références professionnelles sur ton candidat final avant que l'offre soit finalisée. On parle avec des superviseurs directs et des collègues, pas juste les références que le candidat a choisies.\n\nOn pose des questions structurées sur la performance, le style de travail, les forces et les axes de développement. On te partage un résumé écrit des références.",
           duration: "3 à 5 jours ouvrables",
           deliverable: "Résumé écrit des références",
         },
         {
-          n: "09", phase: "Placement et garantie",
+          n: "09", phase: "On reste",
           h: "On ne disparaît pas quand l'offre est signée.",
           p: "On reste en contact après le placement. On fait un suivi avec toi et le candidat pendant leurs 90 premiers jours, pas pour être intrusif, mais pour détecter les frictions tôt avant qu'elles deviennent un problème.\n\nChaque placement permanent est couvert par une garantie de remplacement. Si le candidat part ou est congédié pour des raisons de performance dans la période de garantie, on relance la recherche sans frais supplémentaires.\n\nOn se tient derrière chaque placement qu'on fait.",
           duration: "En continu post-placement",
