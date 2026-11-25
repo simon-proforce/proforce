@@ -501,7 +501,24 @@ const G = `
     .escape-row > p { margin:0 var(--gut); }
     .escape-row > :last-child { order:-1; }
 
-    .role-flag li.star { font-size:1.45rem !important; }
+    /* La liste en drapeau a besoin de largeur pour se lire comme un choix. Sur
+       une colonne de telephone, chaque poste prend presque toute la ligne: le
+       dispositif disparait et il ne reste que les accidents de retour a la
+       ligne, plus une bascule de taille au sixieme poste qui a l'air d'une
+       erreur. Elle redevient une liste simple, separee par des filets, et le
+       poste vedette garde le serif, qui devient alors sans ambiguite le poste
+       mis en avant plutot qu'un faux titre de section. */
+    .role-flag { display:block !important; }
+    .role-flag li {
+      font-size:1rem !important; color:${C.ink} !important;
+      padding:0.55rem 0 !important; border-top:1px solid ${C.rule} !important;
+    }
+    .role-flag li:first-child { border-top:none !important; }
+    .role-flag li.star {
+      width:auto !important; margin-bottom:0 !important;
+      font-size:1.45rem !important; padding:0 0 0.7rem !important;
+    }
+    .role-flag li.dim { color:${C.ink} !important; font-size:1rem !important; }
 
     /* Bandeau d'equipe de l'accueil: la vignette et le nom cote a cote
        plutot qu'une petite photo perdue dans la largeur. */
