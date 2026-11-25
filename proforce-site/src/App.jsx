@@ -83,6 +83,22 @@ const C = {
                               // comme un inconfort flou. Celui-ci donne 6,27.
   white:     "#ffffff",
 };
+// Le blanc translucide sur fond marine. Il y avait vingt-deux opacites
+// differentes dans le fichier, choisies au juge une par une. Cinq paliers
+// suffisent, et tout nouveau code passe par ceux-la.
+//   rule  filets et separateurs, jamais du texte
+//   edge  bordures et aplats discrets, jamais du texte
+//   faint micro-etiquettes decoratives. 3,1 de contraste sur le marine, donc
+//         sous le seuil de 4,5 pour du petit texte: decision a prendre.
+//   mute  le texte courant sur fond fonce. 6,3 de contraste.
+//   plain l'emphase sur fond fonce.
+const W = {
+  rule:  "rgba(255,255,255,0.08)",
+  edge:  "rgba(255,255,255,0.2)",
+  faint: "rgba(255,255,255,0.35)",
+  mute:  "rgba(255,255,255,0.6)",
+  plain: "rgba(255,255,255,0.85)",
+};
 
 // ─── FONTS ────────────────────────────────────────────────────────────────────
 // Deux familles. Playfair Display, un serif a fort contraste, porte les titres
@@ -100,7 +116,13 @@ const G = `
   html { scroll-behavior:smooth; }
   /* Gouttiere de page. Les plaques d'ouverture s'y accrochent et leur filet
      orange ressort par la gauche de la meme distance. */
-  :root { --gut:clamp(1.25rem,4vw,3.5rem); }
+  :root {
+    --gut:clamp(1.25rem,4vw,3.5rem);
+    /* Deux courbes, pas quinze. --ease pour ce qui repond au doigt,
+       --ease-out pour ce qui entre dans la page. */
+    --ease:cubic-bezier(0.4,0,0.2,1);
+    --ease-out:cubic-bezier(0.22,1,0.36,1);
+  }
   body { font-family:'Archivo',sans-serif; background:${C.paper}; color:${C.ink}; }
 
   h1,h2,h3 { font-family:'Playfair Display',serif; font-weight:500; letter-spacing:-0.005em; }
@@ -126,15 +148,15 @@ const G = `
     display:inline-block; background:${C.ink}; color:#fff;
     padding:12px 28px; font-family:'Archivo',sans-serif; font-weight:600;
     font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
-    transition:background 0.2s, transform 0.15s;
+    transition:background 0.2s, transform 0.2s;
   }
   .btn-ink:hover { background:${C.inkLight}; transform:translateY(-2px); }
 
   .btn-orange {
-    display:inline-block; background:#c24a10; color:#fff;
+    display:inline-block; background:#b8440c; color:#fff;
     padding:12px 28px; font-family:'Archivo',sans-serif; font-weight:600;
     font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
-    transition:background 0.2s, transform 0.15s;
+    transition:background 0.2s, transform 0.2s;
   }
   .btn-orange:hover { background:#a33d0c; transform:translateY(-2px); }
 
@@ -157,9 +179,25 @@ const G = `
     from { transform:translateX(0); }
     to   { transform:translateX(-50%); }
   }
-  .fu  { animation:fadeUp 0.6s ease both; }
-  .fu2 { animation:fadeUp 0.6s 0.1s ease both; }
-  .fu3 { animation:fadeUp 0.6s 0.2s ease both; }
+  .fu  { animation:fadeUp 0.6s var(--ease-out) both; }
+  .fu2 { animation:fadeUp 0.6s 0.1s var(--ease-out) both; }
+  .fu3 { animation:fadeUp 0.6s 0.2s var(--ease-out) both; }
+
+  /* Le bandeau s'arrete quand on le survole. Une animation qui ne s'arrete
+     jamais fatigue et n'apporte rien a celui qui essaie de la lire. */
+  .ticker-track { animation:ticker 32s linear infinite; }
+  .ticker-track:hover, .ticker-track:focus-within { animation-play-state:paused; }
+
+  /* Rien ne bougeait pour quelqu'un qui demande moins de mouvement. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.01ms !important;
+      scroll-behavior:auto !important;
+    }
+    .ticker-track { animation:none !important; }
+  }
 
   /* Le menu complet a besoin d'environ 1180px. En bas de ca on passe au burger,
      sinon le logo colle aux liens et le bouton d'appel sort de l'ecran. */
@@ -288,7 +326,7 @@ const G = `
   .hero-flat .hero-plate > p:not(.eyebrow) {
     grid-column:2; grid-row:1 / span 20; align-self:end;
     margin:0 0 0.5rem 0 !important; max-width:none !important;
-    color:rgba(255,255,255,0.68) !important;
+    color:rgba(255,255,255,0.6) !important;
   }
 
   /* ── Liste de postes en drapeau ───────────────────────────────────────
@@ -940,7 +978,7 @@ function Nav({ page, setPage, lang, setLang }) {
         position:"fixed", top:0, left:0, right:0, zIndex:200,
         background:"#fff",
         borderBottom:`1px solid ${scrolled ? C.ink : C.rule}`,
-        transition:"background 0.3s",
+        transition:"background 0.2s var(--ease)",
         padding:"0 2rem", height:"56px",
         display:"flex", alignItems:"center", justifyContent:"space-between",
       }}>
@@ -960,15 +998,15 @@ function Nav({ page, setPage, lang, setLang }) {
             <PageLink key={k} to={k} setPage={setPage} style={{
               fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
-              color: page===k ? "#c24a10" : C.ink,
+              color: page===k ? "#b8440c" : C.ink,
               borderBottom: page===k ? `1px solid ${C.orange}` : "1px solid transparent",
-              paddingBottom:"1px", transition:"color 0.2s",
+              paddingBottom:"1px", transition:"color 0.2s var(--ease)",
             }}>{l}</PageLink>
           ))}
           <button onClick={() => setLang(lang==="en"?"fr":"en")} style={{
             fontFamily:"'Archivo',sans-serif", fontSize:"0.68rem",
             letterSpacing:"0.08em", textTransform:"uppercase",
-            color:"#c24a10", borderBottom:`1px solid #c24a10`,
+            color:"#b8440c", borderBottom:`1px solid #b8440c`,
             paddingBottom:"1px",
           }}>{lang==="en"?"FR":"EN"}</button>
 
@@ -976,10 +1014,10 @@ function Nav({ page, setPage, lang, setLang }) {
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
             onClick={() => track.contactClick()}
             style={{
-              background:"#c24a10", color:"#fff", padding:"7px 16px",
+              background:"#b8440c", color:"#fff", padding:"7px 16px",
               fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.72rem",
               letterSpacing:"0.08em", textTransform:"uppercase",
-              transition:"background 0.2s", whiteSpace:"nowrap",
+              transition:"background 0.2s var(--ease)", whiteSpace:"nowrap",
             }}
             onMouseEnter={e => e.currentTarget.style.background=C.orangeHov}
             onMouseLeave={e => e.currentTarget.style.background=C.orange}
@@ -1001,7 +1039,7 @@ function Nav({ page, setPage, lang, setLang }) {
           position:"fixed", top:"56px", left:0, right:0, bottom:0,
           background:C.ink, zIndex:199, padding:"2rem",
           display:"flex", flexDirection:"column", gap:"0",
-          borderTop:`1px solid rgba(255,255,255,0.1)`,
+          borderTop:`1px solid rgba(255,255,255,0.08)`,
           overflowY:"auto",
         }}>
           {links.map(([k,l]) => (
@@ -1044,7 +1082,7 @@ function Ticker({ lang }) {
   const text = items.map(i => `/ ${i}`).join("  ");
   return (
     <div style={{ background:C.ink, overflow:"hidden", whiteSpace:"nowrap", padding:"10px 0" }}>
-      <div style={{ display:"inline-block", animation:"ticker 32s linear infinite" }}>
+      <div className="ticker-track" style={{ display:"inline-block" }}>
         <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange }}>
           {text}&nbsp;&nbsp;&nbsp;{text}
         </span>
@@ -1184,16 +1222,16 @@ function HomePage({ lang, setPage }) {
             }}>{t.proofH}</p>
           </div>
           <div className="pt-desk" style={{ paddingTop:"2rem" }}>
-            <p style={{ fontSize:"0.95rem", lineHeight:1.85, color:"rgba(255,255,255,0.78)", marginBottom:"2rem" }}>{t.proofP}</p>
+            <p style={{ fontSize:"0.95rem", lineHeight:1.85, color:W.plain, marginBottom:"2rem" }}>{t.proofP}</p>
             <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"1.5rem" }}>
               {[[t.f1n,t.f1p],[t.f2n,t.f2p],[t.f3n,t.f3p]].map(([n,l]) => (
                 <div key={l}>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontWeight:600, fontSize:"1.8rem", color:"#f0803f", marginBottom:"0.2rem" }}>{n}</div>
-                  <div style={{ fontSize:"0.78rem", lineHeight:1.55, color:"rgba(255,255,255,0.72)" }}>{l}</div>
+                  <div style={{ fontSize:"0.78rem", lineHeight:1.55, color:W.plain }}>{l}</div>
                 </div>
               ))}
             </div>
-            <p style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.4)", marginTop:"1.5rem" }}>{t.psrc}</p>
+            <p style={{ fontSize:"0.68rem", color:W.faint, marginTop:"1.5rem" }}>{t.psrc}</p>
           </div>
         </div>
       </section>
@@ -1322,18 +1360,18 @@ function HomePage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
-            <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{lang==="en"?"Featured Candidates":"Candidats vedettes"}</Eyebrow>
+            <Eyebrow style={{ color:W.faint }}>{lang==="en"?"Featured Candidates":"Candidats vedettes"}</Eyebrow>
             <button onClick={() => setPage("featured")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"All profiles →":"Tous les profils →"}
             </button>
           </div>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)", marginBottom:"0" }} />
+          <div style={{ height:"1px", background:W.rule, marginBottom:"0" }} />
           {FEATURED.slice(0,3).map((c,i) => (
             <button key={c.id} onClick={() => setPage("featured")} style={{
               width:"100%", display:"grid", gridTemplateColumns:"auto 1fr auto",
               gap:"2rem", alignItems:"center", padding:"1.5rem 0",
-              borderBottom:`1px solid rgba(255,255,255,0.07)`, textAlign:"left",
-              transition:"opacity 0.2s",
+              borderBottom:`1px solid rgba(255,255,255,0.08)`, textAlign:"left",
+              transition:"opacity 0.2s var(--ease)",
             }}
               onMouseEnter={e => e.currentTarget.style.opacity="0.7"}
               onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -1341,13 +1379,13 @@ function HomePage({ lang, setPage }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em", width:"28px" }}>0{i+1}</span>
               <div>
                 <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"rgba(255,255,255,0.35)", marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:W.faint, marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:"rgba(255,255,255,0.3)", letterSpacing:"0.06em" }}>{c.market[lang]}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:W.faint, letterSpacing:"0.06em" }}>{c.market[lang]}</div>
                 <div style={{
                   fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.06em", marginTop:"3px",
-                  color: c.avail.en==="Actively looking" ? C.orange : "rgba(255,255,255,0.5)",
+                  color: c.avail.en==="Actively looking" ? C.orange : W.mute,
                 }}>
                   {c.notice ? c.notice[lang] : c.avail[lang]}
                 </div>
@@ -1372,7 +1410,7 @@ function HomePage({ lang, setPage }) {
               <button onClick={() => setPage("blog")} style={{
                 width:"100%", display:"grid", gridTemplateColumns:"auto 1fr auto",
                 gap:"2rem", alignItems:"center", padding:"1.75rem 0", textAlign:"left",
-                transition:"opacity 0.2s",
+                transition:"opacity 0.2s var(--ease)",
               }}
                 onMouseEnter={e => e.currentTarget.style.opacity="0.7"}
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -1392,13 +1430,13 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.7rem,3.4vw,2.6rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>{t.ctaH}</h2>
-            <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", lineHeight:1.7, maxWidth:"420px" }}>{t.ctaP}</p>
+            <p style={{ color:W.plain, fontSize:"1rem", lineHeight:1.7, maxWidth:"420px" }}>{t.ctaP}</p>
           </div>
           <button onClick={() => setPage("contact")} style={{
             background:"#fff", color:C.orange, padding:"14px 32px",
             fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem",
             letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0,
-            transition:"opacity 0.2s",
+            transition:"opacity 0.2s var(--ease)",
           }}
             onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
             onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -1452,7 +1490,7 @@ function SectorPage({ lang, setPage, sector }) {
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.paper, lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:C.orange, lineHeight:1.05, marginBottom:"3rem" }}>{t.h1i}</h2>
-          <p className="fu3" style={{ color:"rgba(255,255,255,0.72)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px", marginBottom:"2rem" }}>{t.sub}</p>
+          <p className="fu3" style={{ color:W.plain, fontSize:"1rem", lineHeight:1.75, maxWidth:"520px", marginBottom:"2rem" }}>{t.sub}</p>
           <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
       </section>
@@ -1477,7 +1515,7 @@ function SectorPage({ lang, setPage, sector }) {
 
       <section style={{ background:C.white, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#c24a10", marginBottom:"1.6rem" }}>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#b8440c", marginBottom:"1.6rem" }}>
             {lang==="en"?"Roles We Fill":"Postes qu'on comble"}
           </div>
           {/* Le premier poste porte la liste, les cinq suivants la soutiennent,
@@ -1637,7 +1675,7 @@ function FAQSection({ lang, type, setPage }) {
               padding:"1.5rem 0", textAlign:"left", gap:"1.5rem",
             }}>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:C.ink, letterSpacing:"-0.01em", lineHeight:1.3 }}>{faq.q}</span>
-              <span style={{ color:C.orange, fontSize:"1.2rem", flexShrink:0, fontWeight:300, lineHeight:1, transition:"transform 0.2s", transform: open===i?"rotate(45deg)":"rotate(0deg)" }}>+</span>
+              <span style={{ color:C.orange, fontSize:"1.2rem", flexShrink:0, fontWeight:300, lineHeight:1, transition:"transform 0.2s var(--ease)", transform: open===i?"rotate(45deg)":"rotate(0deg)" }}>+</span>
             </button>
             {open===i && (
               <div style={{ paddingBottom:"1.5rem" }}>
@@ -1810,19 +1848,19 @@ function FeaturedCandidatesPage({ lang, setPage }) {
       <div>
         <section style={{ background:C.ink, padding:"9rem 2rem 3.5rem" }}>
           <div style={{ maxWidth:"780px", margin:"0 auto" }}>
-            <button onClick={() => setActive(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)", marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
+            <button onClick={() => setActive(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.faint, marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
               {t.back}
             </button>
             <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"1.5rem" }}>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{c.sector[lang]}</span>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:"rgba(255,255,255,0.3)" }}>·</span>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)" }}>{c.tag[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:W.faint }}>·</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.faint }}>{c.tag[lang]}</span>
             </div>
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{c.title[lang]}</h1>
             <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"2rem" }}>
               {[[t.exp, c.exp[lang]], [t.market, c.market[lang]], [t.avail, c.avail[lang]], [t.recruiter, c.recruiter]].map(([label, val]) => (
                 <div key={label}>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)", marginBottom:"3px" }}>{label}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:W.faint, marginBottom:"3px" }}>{label}</div>
                   <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color: label===t.avail && c.avail.en==="Actively looking" ? C.orange : "#fff", fontWeight:500 }}>{val}</div>
                 </div>
               ))}
@@ -1868,7 +1906,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.8rem,4vw,4.5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
-          <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
+          <p className="fu3" style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
 
@@ -1881,7 +1919,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
                 fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
                 color: activeFilter===val ? C.orange : C.muted,
                 borderBottom: activeFilter===val ? `1px solid ${C.orange}` : "1px solid transparent",
-                paddingBottom:"2px", transition:"color 0.2s",
+                paddingBottom:"2px", transition:"color 0.2s var(--ease)",
               }}>{label}</button>
             ))}
           </div>
@@ -1895,7 +1933,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
             {filtered.map(c => (
               <button key={c.id} onClick={() => { setActive(c.id); track.candidateView(c.title[lang]); window.scrollTo({top:0,behavior:"smooth"}); }} style={{
                 background:C.white, padding:"2.5rem", textAlign:"left",
-                transition:"background 0.2s", width:"100%",
+                transition:"background 0.2s var(--ease)", width:"100%",
               }}
                 onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
                 onMouseLeave={e => e.currentTarget.style.background=C.white}
@@ -2054,7 +2092,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                   <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{
                     display:"inline-flex", alignItems:"center", gap:"6px",
                     fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.08em", textTransform:"uppercase",
-                    color:C.ink, borderBottom:`1px solid ${C.rule}`, paddingBottom:"2px", transition:"color 0.2s, border-color 0.2s",
+                    color:C.ink, borderBottom:`1px solid ${C.rule}`, paddingBottom:"2px", transition:"color 0.2s, border-color 0.2s var(--ease)",
                   }}
                     onMouseEnter={e => { e.currentTarget.style.color=C.orange; e.currentTarget.style.borderColor=C.orange; }}
                     onMouseLeave={e => { e.currentTarget.style.color=C.ink; e.currentTarget.style.borderColor=C.rule; }}
@@ -2090,7 +2128,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                             textAlign:"left", padding:"0.6rem 0",
                             borderBottom:`1px solid ${C.rule}`,
                             display:"flex", alignItems:"center", gap:"1rem",
-                            transition:"opacity 0.2s",
+                            transition:"opacity 0.2s var(--ease)",
                           }}
                             onMouseEnter={e => e.currentTarget.style.opacity="0.6"}
                             onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -2284,22 +2322,22 @@ function EmployersPage({ lang, setPage }) {
       {/* Hero */}
       <section className="hero-open" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`url(/photos/usine-discussion.webp)`, backgroundSize:"cover", backgroundPosition:"center" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
+          <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>proforce.ca</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>proforce.ca</span>
           </div>
         </div>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
-          <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
-            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.3)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s", cursor:"pointer", background:"transparent" }}
+            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.35)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)", cursor:"pointer", background:"transparent" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.3)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor=W.faint}
               onClick={() => setPage("food")}
             >{t.cta2}</button>
           </div>
@@ -2402,19 +2440,19 @@ function EmployersPage({ lang, setPage }) {
       {/* Sectors */}
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{t.sectorsH}</Eyebrow>
-          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"2px", background:"rgba(255,255,255,0.08)", marginTop:"2rem" }}>
+          <Eyebrow style={{ color:W.faint }}>{t.sectorsH}</Eyebrow>
+          <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"2px", background:W.rule, marginTop:"2rem" }}>
             {[
               { h:t.food, p:t.foodP, pg:"food" },
               { h:t.fashion, p:t.fashionP, pg:"fashion" },
             ].map(s => (
-              <button key={s.pg} onClick={() => setPage(s.pg)} style={{ background:C.inkLight, padding:"2.5rem", textAlign:"left", transition:"background 0.2s", width:"100%" }}
+              <button key={s.pg} onClick={() => setPage(s.pg)} style={{ background:C.inkLight, padding:"2.5rem", textAlign:"left", transition:"background 0.2s var(--ease)", width:"100%" }}
                 onMouseEnter={e => e.currentTarget.style.background="#1e4080"}
                 onMouseLeave={e => e.currentTarget.style.background=C.inkLight}
               >
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.orange, letterSpacing:"-0.005em", marginBottom:"0.6rem" }}>{s.h}</h3>
-                <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"0.86rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{s.p}</p>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)" }}>
+                <p style={{ color:W.mute, fontSize:"0.86rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{s.p}</p>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.faint }}>
                   {lang==="en"?"Learn more →":"En savoir plus →"}
                 </span>
               </button>
@@ -2443,9 +2481,9 @@ function EmployersPage({ lang, setPage }) {
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
-            <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
+            <p style={{ color:W.plain, fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s var(--ease)" }}
             onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
             onMouseLeave={e => e.currentTarget.style.opacity="1"}
           >{t.cta}</button>
@@ -2504,7 +2542,7 @@ function JobListingsPage({ lang }) {
 
       <section style={{ background:C.white, padding:"3.5rem 2rem 5rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
-          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#c24a10", marginBottom:"1.2rem" }}>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", color:"#b8440c", marginBottom:"1.2rem" }}>
             {t.sampleLabel}
           </div>
           <Divider style={{ marginBottom:"0" }} />
@@ -2518,7 +2556,7 @@ function JobListingsPage({ lang }) {
                 textDecoration:"none",
               }}>
               <div>
-                <div className="job-title" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", transition:"color 0.2s" }}>{r.title}</div>
+                <div className="job-title" style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:C.ink, letterSpacing:"-0.01em", transition:"color 0.2s var(--ease)" }}>{r.title}</div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.06em", color:C.muted, marginTop:"4px" }}>{r.co} · {r.loc}</div>
               </div>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
@@ -2633,7 +2671,7 @@ function NewsletterWidget({ lang, compact }) {
             flex:"1 1 220px", padding:"10px 0", background:"transparent",
             border:"none", borderBottom:`1px solid ${C.rule}`,
             fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:C.ink,
-            outline:"none", transition:"border-color 0.2s", minWidth:"180px",
+            outline:"none", transition:"border-color 0.2s var(--ease)", minWidth:"180px",
           }}
           onFocus={e => e.target.style.borderColor=C.orange}
           onBlur={e => e.target.style.borderColor=C.rule}
@@ -2781,7 +2819,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                   fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
                   color: filter===val ? C.orange : C.muted,
                   borderBottom: filter===val ? `1px solid ${C.orange}` : "1px solid transparent",
-                  paddingBottom:"2px", transition:"color 0.2s",
+                  paddingBottom:"2px", transition:"color 0.2s var(--ease)",
                 }}>{label}</button>
               ))}
             </div>
@@ -2796,7 +2834,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                   border:`1px solid ${C.rule}`, borderRadius:"0",
                   fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem",
                   letterSpacing:"0.06em", color:C.ink, outline:"none",
-                  width:"200px", transition:"border-color 0.2s",
+                  width:"200px", transition:"border-color 0.2s var(--ease)",
                 }}
                 onFocus={e => e.target.style.borderColor=C.orange}
                 onBlur={e => e.target.style.borderColor=C.rule}
@@ -2832,7 +2870,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
             if (i === 0) {
               return (
                 <div key={post.id}>
-                  <button onClick={open} style={{ width:"100%", textAlign:"left", padding:"0 0 2.75rem", transition:"opacity 0.2s" }}
+                  <button onClick={open} style={{ width:"100%", textAlign:"left", padding:"0 0 2.75rem", transition:"opacity 0.2s var(--ease)" }}
                     onMouseEnter={e => e.currentTarget.style.opacity="0.78"}
                     onMouseLeave={e => e.currentTarget.style.opacity="1"}
                   >
@@ -2856,7 +2894,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                 <button onClick={open} className="post-row" style={{
                   width:"100%", display:"grid", gridTemplateColumns:"60px 150px 1fr 120px",
                   gap:"2rem", alignItems:"start", padding:"2.25rem 0", textAlign:"left",
-                  transition:"opacity 0.2s",
+                  transition:"opacity 0.2s var(--ease)",
                 }}
                   onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -2925,7 +2963,7 @@ function ContactPage({ lang }) {
          required:"Ça prend ton nom, un courriel valide et un message." },
   }[lang];
 
-  const inp = { width:"100%", padding:"11px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", outline:"none", transition:"border-color 0.2s" };
+  const inp = { width:"100%", padding:"11px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", outline:"none", transition:"border-color 0.2s var(--ease)" };
 
   return (
     <div>
@@ -2958,7 +2996,7 @@ function ContactPage({ lang }) {
               <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Prefer to book directly?":"Tu préfères réserver directement?"}
               </div>
-              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:"rgba(255,255,255,0.65)", lineHeight:1.6, marginBottom:"1.25rem" }}>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.85rem", color:W.mute, lineHeight:1.6, marginBottom:"1.25rem" }}>
                 {lang==="en"
                   ? "Pick a time that works for you. 15 minutes is usually enough to know if we're the right fit."
                   : "Choisis un moment qui te convient. 15 minutes suffit généralement pour savoir si on est le bon fit."}
@@ -2980,7 +3018,7 @@ function ContactPage({ lang }) {
                 { href:"https://www.linkedin.com/company/proforce-personnel", title:"LinkedIn", icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> },
               ].map(s => (
                 <a key={s.title} href={s.href} target="_blank" rel="noopener noreferrer" title={s.title}
-                  style={{ width:"36px", height:"36px", border:`1px solid ${C.rule}`, display:"flex", alignItems:"center", justifyContent:"center", color:C.muted, transition:"all 0.2s" }}
+                  style={{ width:"36px", height:"36px", border:`1px solid ${C.rule}`, display:"flex", alignItems:"center", justifyContent:"center", color:C.muted, transition:"all 0.2s var(--ease)" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor=C.rule; e.currentTarget.style.color=C.muted; }}
                 >{s.icon}</a>
@@ -3210,7 +3248,7 @@ function CalculatorPage({ lang, setPage }) {
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>{t.h1i}</h2>
-          <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
+          <p className="fu3" style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
 
@@ -3255,7 +3293,7 @@ function CalculatorPage({ lang, setPage }) {
               <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.6rem", fontWeight:700, letterSpacing:"-0.015em", color:"#fff", lineHeight:1 }}>
                 {fmt(weeklyNet)}
               </div>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.55)", marginTop:"0.7rem" }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.78rem", color:W.mute, marginTop:"0.7rem" }}>
                 {lang === "en"
                   ? `${weeksAlone} weeks of it is ${fmt(vacancyNet)}, before the risk of a miss.`
                   : `${weeksAlone} semaines de ça, c'est ${fmt(vacancyNet)}, avant même le risque d'erreur.`}
@@ -3299,7 +3337,7 @@ function CalculatorPage({ lang, setPage }) {
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,4vw,3rem)", color:"#fff", letterSpacing:"-0.015em" }}>{t.cta}</h2>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>{t.cta2}</button>
-            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.6)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase" }}>
               {lang === "en" ? "Book a Call" : "Réserver un appel"}
             </a>
           </div>
@@ -3497,9 +3535,9 @@ function HowWeWorkPage({ lang, setPage }) {
       {/* Hero */}
       <section className="hero-flat" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
+          <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
           </div>
         </div>
         <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>09</div>
@@ -3507,7 +3545,7 @@ function HowWeWorkPage({ lang, setPage }) {
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
-          <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px" }}>{t.sub}</p>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.8, maxWidth:"580px" }}>{t.sub}</p>
         </div>
       </section>
 
@@ -3532,12 +3570,12 @@ function HowWeWorkPage({ lang, setPage }) {
                 width:"100%", display:"grid", gridTemplateColumns:"56px 1fr auto",
                 gap:"1.5rem", alignItems:"center", padding:"2rem 0", textAlign:"left",
               }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.8rem", fontWeight:700, color: openPhase===i ? C.orange : C.rule, letterSpacing:"-0.015em", lineHeight:1, transition:"color 0.2s" }}>{phase.n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.8rem", fontWeight:700, color: openPhase===i ? C.orange : C.rule, letterSpacing:"-0.015em", lineHeight:1, transition:"color 0.2s var(--ease)" }}>{phase.n}</div>
                 <div>
                   <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{phase.phase}</div>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1rem,2vw,1.2rem)", color:C.ink, letterSpacing:"-0.01em" }}>{phase.h}</div>
                 </div>
-                <span style={{ color:C.orange, fontSize:"1.3rem", fontWeight:300, transition:"transform 0.2s", transform: openPhase===i?"rotate(45deg)":"rotate(0deg)", flexShrink:0 }}>+</span>
+                <span style={{ color:C.orange, fontSize:"1.3rem", fontWeight:300, transition:"transform 0.2s var(--ease)", transform: openPhase===i?"rotate(45deg)":"rotate(0deg)", flexShrink:0 }}>+</span>
               </button>
 
               {openPhase === i && (
@@ -3589,7 +3627,7 @@ function HowWeWorkPage({ lang, setPage }) {
             </p>
             <p style={{
               fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.03em",
-              textTransform:"uppercase", color:"rgba(255,255,255,0.45)",
+              textTransform:"uppercase", color:W.mute,
             }}>
               {lang==="en" ? "That is the whole method" : "C'est là que la méthode commence"}
             </p>
@@ -3622,12 +3660,12 @@ function HowWeWorkPage({ lang, setPage }) {
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Our Commitments":"Nos engagements"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.1rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.commitH}</h2>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:"2px", background:"rgba(255,255,255,0.05)" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:"2px", background:W.rule }}>
             {[[t.commit1h,t.commit1p,"01"],[t.commit2h,t.commit2p,"02"],[t.commit3h,t.commit3p,"03"]].map(([h,p,n]) => (
               <div key={n} style={{ background:C.inkLight, padding:"2.5rem 2rem" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:"#fff", letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
-                <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
+                <p style={{ color:W.mute, fontSize:"0.86rem", lineHeight:1.75 }}>{p}</p>
               </div>
             ))}
           </div>
@@ -3639,16 +3677,16 @@ function HowWeWorkPage({ lang, setPage }) {
         <div style={{ maxWidth:"860px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2.5rem" }}>
           <div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
-            <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", lineHeight:1.7 }}>{t.ctaP}</p>
+            <p style={{ color:W.plain, fontSize:"1rem", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
-            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"opacity 0.2s" }}
+            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"opacity 0.2s var(--ease)" }}
               onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
               onMouseLeave={e => e.currentTarget.style.opacity="1"}
             >{t.cta}</button>
-            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.5)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s" }}
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.6)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.5)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor=W.mute}
             >{t.cta2}</a>
           </div>
         </div>
@@ -3718,16 +3756,16 @@ function PressPage({ lang, setPage }) {
     <div>
       <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
+          <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
           </div>
         </div>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>{t.h1i}</h2>
-          <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>{t.sub}</p>
         </div>
       </section>
 
@@ -3755,7 +3793,7 @@ function PressPage({ lang, setPage }) {
               {item.url && (
                 <a href={item.url} target="_blank" rel="noopener noreferrer" style={{
                   fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
-                  color:C.orange, borderBottom:`1px solid ${C.orange}30`, paddingBottom:"2px", transition:"border-color 0.2s",
+                  color:C.orange, borderBottom:`1px solid ${C.orange}30`, paddingBottom:"2px", transition:"border-color 0.2s var(--ease)",
                 }}
                   onMouseEnter={e => e.currentTarget.style.borderColor=C.orange}
                   onMouseLeave={e => e.currentTarget.style.borderColor=C.orange+"30"}
@@ -3777,7 +3815,7 @@ function PressPage({ lang, setPage }) {
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <div style={{ width:"36px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,3vw,2.5rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"1rem" }}>{t.pitchH}</h2>
-          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"rgba(255,255,255,0.6)", lineHeight:1.8, marginBottom:"2rem", maxWidth:"520px", fontWeight:300 }}>{t.pitchP}</p>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:W.mute, lineHeight:1.8, marginBottom:"2rem", maxWidth:"520px", fontWeight:300 }}>{t.pitchP}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
       </section>
@@ -3889,7 +3927,7 @@ function ReferralPage({ lang, setPage }) {
     },
   }[lang];
 
-  const inp = { width:"100%", padding:"10px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", outline:"none", transition:"border-color 0.2s" };
+  const inp = { width:"100%", padding:"10px 0", background:"transparent", border:"none", borderBottom:`1px solid ${C.rule}`, color:C.ink, fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", outline:"none", transition:"border-color 0.2s var(--ease)" };
 
   return (
     <div>
@@ -3900,7 +3938,7 @@ function ReferralPage({ lang, setPage }) {
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,5vw,3.6rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
-          <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"560px" }}>{t.sub}</p>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.8, maxWidth:"560px" }}>{t.sub}</p>
         </div>
       </section>
 
@@ -4078,7 +4116,7 @@ function Footer({ lang, setPage }) {
   return (
     <footer style={{ background:C.ink, padding:"4rem 2rem 2rem" }}>
       <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-        <div style={{ marginBottom:"3rem", borderLeft:`3px solid ${C.orange}`, padding:"1.5rem 2rem", background:"rgba(255,255,255,0.04)" }}>
+        <div style={{ marginBottom:"3rem", borderLeft:`3px solid ${C.orange}`, padding:"1.5rem 2rem", background:W.rule }}>
           <div style={{ width:"28px", height:"3px", background:C.orange, marginBottom:"1rem" }} />
           <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.95rem", color:"#fff", marginBottom:"1rem" }}>
             {lang==="en"?"Get new articles in your inbox.":"Reçois les nouveaux articles par courriel."}
@@ -4100,7 +4138,7 @@ function Footer({ lang, setPage }) {
               <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:C.orange, marginBottom:"1rem" }}>Pages</div>
               <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
                 {links.map(([k,l]) => (
-                  <PageLink key={k} to={k} setPage={setPage} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s" }}
+                  <PageLink key={k} to={k} setPage={setPage} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s var(--ease)" }}
                     onMouseEnter={e => e.currentTarget.style.color=C.paper}
                     onMouseLeave={e => e.currentTarget.style.color="rgba(244,241,235,0.45)"}
                   >{l}</PageLink>
@@ -4117,9 +4155,9 @@ function Footer({ lang, setPage }) {
               </div>
               <div style={{ display:"flex", gap:"0.75rem", marginTop:"1.25rem" }}>
                 <a href="https://www.facebook.com/share/17YcPvUvNn/" target="_blank" rel="noopener noreferrer"
-                  style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,255,255,0.45)", transition:"all 0.2s" }}
+                  style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:W.mute, transition:"all 0.2s var(--ease)" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.15)"; e.currentTarget.style.color="rgba(255,255,255,0.45)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; }}
                   title="Facebook"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -4127,9 +4165,9 @@ function Footer({ lang, setPage }) {
                   </svg>
                 </a>
                 <a href="https://www.instagram.com/proforcepersonnel" target="_blank" rel="noopener noreferrer"
-                  style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,255,255,0.45)", transition:"all 0.2s" }}
+                  style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:W.mute, transition:"all 0.2s var(--ease)" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.15)"; e.currentTarget.style.color="rgba(255,255,255,0.45)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; }}
                   title="Instagram"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -4137,9 +4175,9 @@ function Footer({ lang, setPage }) {
                   </svg>
                 </a>
                 <a href="https://www.linkedin.com/company/proforce-personnel" target="_blank" rel="noopener noreferrer"
-                  style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,255,255,0.45)", transition:"all 0.2s" }}
+                  style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:W.mute, transition:"all 0.2s var(--ease)" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.15)"; e.currentTarget.style.color="rgba(255,255,255,0.45)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; }}
                   title="LinkedIn"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -4151,13 +4189,13 @@ function Footer({ lang, setPage }) {
           </div>
         </div>
 
-        <div style={{ borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:"1.5rem", display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:"0.75rem", alignItems:"center" }}>
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)" }}>© {new Date().getFullYear()} Proforce Personnel Inc.</p>
-          <button onClick={() => setPage("privacy")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)", transition:"color 0.2s" }}
-            onMouseEnter={e => e.currentTarget.style.color="rgba(255,255,255,0.5)"}
-            onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.2)"}
+        <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:"1.5rem", display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:"0.75rem", alignItems:"center" }}>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:W.edge }}>© {new Date().getFullYear()} Proforce Personnel Inc.</p>
+          <button onClick={() => setPage("privacy")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:W.edge, transition:"color 0.2s var(--ease)" }}
+            onMouseEnter={e => e.currentTarget.style.color=W.mute}
+            onMouseLeave={e => e.currentTarget.style.color=W.edge}
           >{lang==="en"?"Privacy Policy":"Politique de confidentialité"}</button>
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:"rgba(255,255,255,0.2)" }}>proforce.ca</p>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.06em", color:W.edge }}>proforce.ca</p>
         </div>
       </div>
     </footer>
@@ -4411,7 +4449,7 @@ function NotFoundPage({ lang, setPage }) {
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,4vw,3rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"3rem" }}>
             {lang==="en" ? "But we can still help." : "Mais on peut quand même aider."}
           </h2>
-          <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"1rem", lineHeight:1.75, marginBottom:"3rem" }}>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, marginBottom:"3rem" }}>
             {lang==="en"
               ? "The page you're looking for has moved or doesn't exist. Head back home or get in touch directly."
               : "La page que tu cherches a bougé ou n'existe pas. Retourne à l'accueil ou contacte-nous directement."}
@@ -4420,9 +4458,9 @@ function NotFoundPage({ lang, setPage }) {
             <button className="btn-orange" onClick={() => setPage("home")}>
               {lang==="en" ? "Back to Home" : "Retour à l'accueil"}
             </button>
-            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.25)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", background:"transparent", cursor:"pointer", transition:"border-color 0.2s" }}
+            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.2)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", background:"transparent", cursor:"pointer", transition:"border-color 0.2s var(--ease)" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.25)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor=W.edge}
               onClick={() => setPage("contact")}
             >
               {lang==="en" ? "Contact Us" : "Nous contacter"}
@@ -4430,9 +4468,9 @@ function NotFoundPage({ lang, setPage }) {
           </div>
           <div style={{ marginTop:"4rem", display:"flex", gap:"2rem", justifyContent:"center", flexWrap:"wrap" }}>
             {[["food", lang==="en"?"Food & CPG":"Alimentaire & CPG"],["fashion", lang==="en"?"Fashion":"Mode"],["blog", lang==="en"?"Blog":"Blogue"],["team", lang==="en"?"Team":"Équipe"]].map(([k,l]) => (
-              <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)", borderBottom:`1px solid rgba(255,255,255,0.15)`, paddingBottom:"2px", transition:"color 0.2s" }}
+              <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint, borderBottom:`1px solid rgba(255,255,255,0.2)`, paddingBottom:"2px", transition:"color 0.2s var(--ease)" }}
                 onMouseEnter={e => e.currentTarget.style.color=C.orange}
-                onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.4)"}
+                onMouseLeave={e => e.currentTarget.style.color=W.faint}
               >{l}</button>
             ))}
           </div>
@@ -4485,7 +4523,7 @@ function PrivacyPage({ lang, setPage }) {
         <div className="hero-plate" style={{ maxWidth:"780px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"1rem" }}>{t.h1}</h1>
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:"rgba(255,255,255,0.35)", marginTop:"1rem" }}>{t.updated}</p>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:W.faint, marginTop:"1rem" }}>{t.updated}</p>
         </div>
       </section>
 
@@ -5123,7 +5161,7 @@ function GlossaryPage({ lang, setPage }) {
           <h2 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2rem" }}>
             {lang==="en" ? "Food, CPG & Fashion." : "Alimentaire, CPG et mode."}
           </h2>
-          <p className="fu3" style={{ color:"rgba(255,255,255,0.6)", fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>
+          <p className="fu3" style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"520px" }}>
             {lang==="en"
               ? "A practical reference for the certifications, terms, and concepts that come up in food manufacturing, CPG (consumer packaged goods), and fashion recruiting."
               : "Une référence pratique pour les certifications, termes et concepts qui reviennent dans le recrutement en fabrication alimentaire, CPG (produits de consommation emballés) et mode."}
@@ -5207,16 +5245,16 @@ function MarketPage({ lang, setPage, market }) {
     <div>
       <section className="hero-open" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`url(${marketPhoto.replace(".jpg", ".webp")})`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
+          <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
           </div>
         </div>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.5rem,3vw,2.4rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
-          <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
       </section>
@@ -5229,7 +5267,7 @@ function MarketPage({ lang, setPage, market }) {
 
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", background:C.rule, marginBottom:"4rem" }} className="two-col">
             {[{h:t.foodH,p:t.foodP,pg:"food"},{h:t.fashH,p:t.fashP,pg:"fashion"}].map(s => (
-              <button key={s.pg} onClick={() => setPage(s.pg)} style={{ background:C.white, padding:"2.5rem", textAlign:"left", transition:"background 0.2s", width:"100%" }}
+              <button key={s.pg} onClick={() => setPage(s.pg)} style={{ background:C.white, padding:"2.5rem", textAlign:"left", transition:"background 0.2s var(--ease)", width:"100%" }}
                 onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
                 onMouseLeave={e => e.currentTarget.style.background=C.white}
               >
@@ -5252,8 +5290,8 @@ function MarketPage({ lang, setPage, market }) {
                     <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginTop:"2px" }}>{m.title[lang]}</div>
                   </div>
                 </div>
-                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:"rgba(255,255,255,0.55)", lineHeight:1.6 }}>{m.sector[lang]}</p>
-                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"5px", fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginTop:"1rem", borderBottom:`1px solid rgba(255,255,255,0.15)`, paddingBottom:"2px" }}><LinkedInIcon />LinkedIn</a>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:W.mute, lineHeight:1.6 }}>{m.sector[lang]}</p>
+                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"5px", fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:W.faint, marginTop:"1rem", borderBottom:`1px solid rgba(255,255,255,0.2)`, paddingBottom:"2px" }}><LinkedInIcon />LinkedIn</a>
               </div>
             ))}
           </div>
@@ -5373,9 +5411,9 @@ function StartupPage({ lang, setPage }) {
       {/* Hero */}
       <section className="hero-open" style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden", backgroundImage:`url(/photos/startup.webp)`, backgroundSize:"cover", backgroundPosition:"center", position:"relative" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
+          <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
           </div>
         </div>
         {/* Background number */}
@@ -5385,7 +5423,7 @@ function StartupPage({ lang, setPage }) {
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
           <h2 className="fu3" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, marginBottom:"2.5rem" }}>{t.h1i}</h2>
-          <p style={{ color:"rgba(255,255,255,0.65)", fontSize:"1rem", lineHeight:1.8, maxWidth:"580px", marginBottom:"2.5rem" }}>{t.sub}</p>
+          <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.8, maxWidth:"580px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
         </div>
       </section>
@@ -5452,14 +5490,14 @@ function StartupPage({ lang, setPage }) {
       {/* Process */}
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <Eyebrow style={{ color:"rgba(255,255,255,0.4)" }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
+          <Eyebrow style={{ color:W.faint }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"2px", background:"rgba(255,255,255,0.05)" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"2px", background:W.rule }}>
             {t.steps.map(s => (
               <div key={s.n} style={{ background:C.inkLight, padding:"2.5rem 2rem" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"2.5rem", fontWeight:700, color:C.orange, letterSpacing:"-0.015em", lineHeight:1, marginBottom:"1.5rem" }}>{s.n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1rem", color:"#fff", letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{s.h}</h3>
-                <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.85rem", lineHeight:1.75 }}>{s.p}</p>
+                <p style={{ color:W.mute, fontSize:"0.85rem", lineHeight:1.75 }}>{s.p}</p>
               </div>
             ))}
           </div>
@@ -5476,7 +5514,7 @@ function StartupPage({ lang, setPage }) {
               <button onClick={() => setPage("blog")} style={{
                 width:"100%", display:"grid", gridTemplateColumns:"40px 1fr auto",
                 gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", textAlign:"left",
-                transition:"opacity 0.2s",
+                transition:"opacity 0.2s var(--ease)",
               }}
                 onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -5496,9 +5534,9 @@ function StartupPage({ lang, setPage }) {
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"3rem" }}>
           <div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.7rem,3.2vw,2.5rem)", color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
-            <p style={{ color:"rgba(255,255,255,0.8)", fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
+            <p style={{ color:W.plain, fontSize:"1rem", maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s" }}
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:"0.82rem", letterSpacing:"0.08em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s var(--ease)" }}
             onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
             onMouseLeave={e => e.currentTarget.style.opacity="1"}
           >{t.cta}</button>
@@ -5527,7 +5565,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
             <div style={{ height:"2px", width:"56px", background:C.orange, marginBottom:"1.4rem" }} />
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2rem,4.4vw,3.2rem)", textTransform:"uppercase", letterSpacing:"-0.005em", color:"#fff", lineHeight:1.05, marginBottom:"0.5rem" }}>{m.name}</h1>
             <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.72rem", letterSpacing:"0.08em", textTransform:"uppercase", color:C.orange, marginBottom:"1.6rem" }}>{m.title[lang]} &nbsp;/&nbsp; {m.sector[lang]}</div>
-            <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.15rem,2.2vw,1.5rem)", lineHeight:1.4, color:"rgba(255,255,255,0.88)" }}>{d.lede[lang]}</p>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.15rem,2.2vw,1.5rem)", lineHeight:1.4, color:W.plain }}>{d.lede[lang]}</p>
           </div>
         </div>
       </section>
@@ -5612,7 +5650,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
           </h2>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", alignItems:"center" }}>
             <button className="btn-orange" onClick={() => setPage("contact")}>{lang==="en"?"Get in touch":"Nous contacter"}</button>
-            <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"8px", fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.45)", borderBottom:"1px solid rgba(255,255,255,0.18)", paddingBottom:"2px" }}>
+            <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"8px", fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px" }}>
               <LinkedInIcon /> LinkedIn, {m.name}
             </a>
           </div>
@@ -5669,16 +5707,16 @@ function SimonPage({ lang, setPage }) {
       {/* Hero */}
       <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
-          <div style={{ height:"1px", background:"rgba(255,255,255,0.1)" }} />
+          <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.3)" }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
           </div>
         </div>
         <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>SS</div>
         <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
           <h1 className="fu2" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.1rem,5vw,3.9rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.5rem" }}>{t.h1}</h1>
-          <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:"rgba(255,255,255,0.45)", lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:400, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", color:W.mute, lineHeight:0.95, marginBottom:"0.5rem" }}>{t.h1i}</h2>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(1.7rem,3.6vw,2.8rem)", letterSpacing:"-0.005em", textTransform:"uppercase", lineHeight:1.05, color:C.orange, lineHeight:0.95 }}>{t.h1ii}</h2>
         </div>
       </section>
@@ -5731,13 +5769,13 @@ function SimonPage({ lang, setPage }) {
               <a href="https://www.linkedin.com/in/chrislivingstone" target="_blank" rel="noopener noreferrer" style={{
                 marginLeft:"auto", display:"inline-flex", alignItems:"center", gap:"5px",
                 fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase",
-                color:"rgba(255,255,255,0.35)", borderBottom:"1px solid rgba(255,255,255,0.15)", paddingBottom:"2px", transition:"color 0.2s",
+                color:W.faint, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px", transition:"color 0.2s var(--ease)",
               }}
                 onMouseEnter={e => e.currentTarget.style.color=C.orange}
-                onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.35)"}
+                onMouseLeave={e => e.currentTarget.style.color=W.faint}
               ><LinkedInIcon />LinkedIn</a>
             </div>
-            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.85, fontWeight:300 }}>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:W.mute, lineHeight:1.85, fontWeight:300 }}>
               {lang==="en"
                 ? "Christopher hired me. He's the one who took a chance on me when I didn't have a recruitment background, and he taught me everything about this business, how to build relationships, how to have the right conversations, how to actually help people instead of just filling roles. Everything I know about recruiting, I learned from watching him and listening to him. I don't take that lightly."
                 : "C'est Christopher qui m'a embauché. C'est lui qui a pris une chance sur moi quand j'avais pas de background en recrutement, et c'est lui qui m'a tout appris sur ce métier, comment bâtir des relations, comment avoir les bonnes conversations, comment vraiment aider des gens plutôt que juste combler des postes. Tout ce que je sais sur le recrutement, je l'ai appris en le regardant faire et en l'écoutant. Je prends pas ça à la légère."
@@ -5746,17 +5784,17 @@ function SimonPage({ lang, setPage }) {
           </div>
 
           {/* David Inzlicht */}
-          <div style={{ borderLeft:`3px solid rgba(255,255,255,0.15)`, paddingLeft:"2rem" }}>
+          <div style={{ borderLeft:`3px solid rgba(255,255,255,0.2)`, paddingLeft:"2rem" }}>
             <div style={{ display:"flex", alignItems:"center", gap:"1rem", marginBottom:"1.25rem", flexWrap:"wrap" }}>
-              <div style={{ width:"44px", height:"44px", background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:"rgba(255,255,255,0.6)", fontWeight:700, flexShrink:0 }}>DI</div>
+              <div style={{ width:"44px", height:"44px", background:W.rule, border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:W.mute, fontWeight:700, flexShrink:0 }}>DI</div>
               <div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:"#fff" }}>David Inzlicht</div>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:"rgba(255,255,255,0.4)", marginTop:"2px" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:W.faint, marginTop:"2px" }}>
                   {lang==="en"?"Business Mentor, Founder, Proforce Personnel":"Mentor en affaires, Fondateur, Proforce Personnel"}
                 </div>
               </div>
             </div>
-            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:"rgba(255,255,255,0.55)", lineHeight:1.85, fontWeight:300 }}>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:W.mute, lineHeight:1.85, fontWeight:300 }}>
               {lang==="en"
                 ? "David founded Proforce in 2001 and built it into what it was when I joined. When he handed me the keys in 2018, he didn't just give me a company, he gave me a model for how to run a business with integrity. David taught me that the way you treat people, clients and candidates alike, is the business. Not a value. The business. I think about that a lot."
                 : "David a fondé Proforce en 2001 et l'a bâtie pour en faire ce qu'elle était quand je l'ai rejointe. Quand il m'a remis les clés en 2018, il m'a pas juste donné une compagnie, il m'a donné un modèle pour diriger un business avec intégrité. David m'a appris que la façon dont tu traites les gens, clients et candidats pareil, c'est le business. Pas une valeur. Le business. Je pense à ça souvent."
@@ -5834,7 +5872,7 @@ function SimonPage({ lang, setPage }) {
             <div key={post.id}>
               <button onClick={() => setPage("blog")} style={{
                 width:"100%", display:"grid", gridTemplateColumns:"40px 1fr auto",
-                gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", textAlign:"left", transition:"opacity 0.2s",
+                gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", textAlign:"left", transition:"opacity 0.2s var(--ease)",
               }}
                 onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
                 onMouseLeave={e => e.currentTarget.style.opacity="1"}
@@ -5856,21 +5894,21 @@ function SimonPage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <Eyebrow>{t.conH}</Eyebrow>
-          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", color:"rgba(255,255,255,0.65)", lineHeight:1.8, marginBottom:"3rem", maxWidth:"520px" }}>{t.conP}</p>
+          <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", color:W.mute, lineHeight:1.8, marginBottom:"3rem", maxWidth:"520px" }}>{t.conP}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", alignItems:"center", marginBottom:"2.5rem" }}>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="btn-orange" onClick={() => track.contactClick()}>{t.cta}</a>
-            <button className="btn-ghost" onClick={() => setPage("contact")} style={{ borderColor:"rgba(255,255,255,0.25)", color:"#fff" }}
-              onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.08)"; }}
+            <button className="btn-ghost" onClick={() => setPage("contact")} style={{ borderColor:W.edge, color:"#fff" }}
+              onMouseEnter={e => { e.currentTarget.style.background=W.rule; }}
               onMouseLeave={e => { e.currentTarget.style.background="transparent"; }}
             >{t.cta2}</button>
           </div>
           <a href="https://www.linkedin.com/in/simonstamand" target="_blank" rel="noopener noreferrer" style={{
             display:"inline-flex", alignItems:"center", gap:"8px",
             fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
-            color:"rgba(255,255,255,0.4)", borderBottom:"1px solid rgba(255,255,255,0.15)", paddingBottom:"2px", transition:"color 0.2s",
+            color:W.faint, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px", transition:"color 0.2s var(--ease)",
           }}
             onMouseEnter={e => e.currentTarget.style.color=C.orange}
-            onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.4)"}
+            onMouseLeave={e => e.currentTarget.style.color=W.faint}
           >
             <LinkedInIcon /> LinkedIn, Simon St-Amand
           </a>
@@ -5935,7 +5973,7 @@ function SimonPage({ lang, setPage }) {
           letterSpacing:"0.08em", textTransform:"uppercase",
           boxShadow:"0 4px 20px rgba(232,93,26,0.4)",
           display:"flex", alignItems:"center", gap:"8px",
-          transition:"transform 0.2s, box-shadow 0.2s",
+          transition:"transform 0.2s, box-shadow 0.2s var(--ease)",
         }}
         onMouseEnter={e => { e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 8px 28px rgba(232,93,26,0.5)"; }}
         onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(232,93,26,0.4)"; }}
