@@ -84,18 +84,18 @@ const C = {
   white:     "#ffffff",
 };
 // Le blanc translucide sur fond marine. Il y avait vingt-deux opacites
-// differentes dans le fichier, choisies au juge une par une. Cinq paliers
+// differentes dans le fichier, choisies au juge une par une. Quatre paliers
 // suffisent, et tout nouveau code passe par ceux-la.
 //   rule  filets et separateurs, jamais du texte
 //   edge  bordures et aplats discrets, jamais du texte
-//   faint micro-etiquettes decoratives. 3,1 de contraste sur le marine, donc
-//         sous le seuil de 4,5 pour du petit texte: decision a prendre.
-//   mute  le texte courant sur fond fonce. 6,3 de contraste.
+//   mute  tout le texte secondaire sur fond fonce. 6,3 de contraste.
 //   plain l'emphase sur fond fonce.
+// Il y avait un cinquieme palier a 0,35 pour les micro-etiquettes. A 3,1 de
+// contraste il passait sous le seuil de 4,5: un gestionnaire d'usine sur un
+// portable mal eclaire ne les lisait pas. Monte a mute, palier supprime.
 const W = {
   rule:  "rgba(255,255,255,0.08)",
   edge:  "rgba(255,255,255,0.2)",
-  faint: "rgba(255,255,255,0.35)",
   mute:  "rgba(255,255,255,0.6)",
   plain: "rgba(255,255,255,0.85)",
 };
@@ -1231,7 +1231,7 @@ function HomePage({ lang, setPage }) {
                 </div>
               ))}
             </div>
-            <p style={{ fontSize:"0.68rem", color:W.faint, marginTop:"1.5rem" }}>{t.psrc}</p>
+            <p style={{ fontSize:"0.68rem", color:W.mute, marginTop:"1.5rem" }}>{t.psrc}</p>
           </div>
         </div>
       </section>
@@ -1360,7 +1360,7 @@ function HomePage({ lang, setPage }) {
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
-            <Eyebrow style={{ color:W.faint }}>{lang==="en"?"Featured Candidates":"Candidats vedettes"}</Eyebrow>
+            <Eyebrow style={{ color:W.mute }}>{lang==="en"?"Featured Candidates":"Candidats vedettes"}</Eyebrow>
             <button onClick={() => setPage("featured")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"All profiles →":"Tous les profils →"}
             </button>
@@ -1379,10 +1379,10 @@ function HomePage({ lang, setPage }) {
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:C.orange, letterSpacing:"0.1em", width:"28px" }}>0{i+1}</span>
               <div>
                 <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.95rem,2vw,1.15rem)", color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:W.faint, marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:W.mute, marginLeft:"1rem", letterSpacing:"0.06em" }}>{c.tag[lang]}</span>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:W.faint, letterSpacing:"0.06em" }}>{c.market[lang]}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", color:W.mute, letterSpacing:"0.06em" }}>{c.market[lang]}</div>
                 <div style={{
                   fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.06em", marginTop:"3px",
                   color: c.avail.en==="Actively looking" ? C.orange : W.mute,
@@ -1706,6 +1706,12 @@ function FAQSection({ lang, type, setPage }) {
 //   { nom:"Nom de l'entreprise", logo:"/clients/nom-entreprise.svg" },
 const CLIENTS = [];
 
+// ATTENTION, A REMPLACER AVANT LE LANCEMENT: les preavis ci-dessous sont des
+// valeurs de remplissage entre deux et six semaines, posees a la demande de
+// Simon pour voir le rendu. Aucune ne vient du candidat. Les profils seront
+// remplaces par de nouveaux avant la mise en ligne de proforce.ca, et chaque
+// preavis doit alors venir du candidat lui-meme.
+//
 // Chaque fiche peut porter un preavis concret, qui remplace alors le champ
 // "avail" plus vague en pied de fiche:
 //   notice: { en:"4 weeks notice", fr:"Preavis de 4 semaines" },
@@ -1720,6 +1726,7 @@ const FEATURED = [
     market: { en:"Ontario", fr:"Ontario" },
     exp: { en:"15 to 20 years", fr:"15 à 20 ans" },
     avail: { en:"Open to opportunities", fr:"Ouvert aux opportunités" },
+    notice: { en:"4 weeks notice", fr:"Préavis de 4 semaines" },
     highlights: {
       en:["SQF Practitioner, HACCP and FSMA certified","Has run QA programs across multiple sites","Has built and led QA teams","Fluent in English and French"],
       fr:["Praticien SQF, certifié HACCP et FSMA","A dirigé des programmes QA sur plusieurs sites","A bâti et dirigé des équipes QA","Bilingue anglais et français"],
@@ -1737,14 +1744,15 @@ const FEATURED = [
     tag: { en:"Protein / Meat Processing", fr:"Protéines / Transformation des viandes" },
     market: { en:"Quebec", fr:"Québec" },
     exp: { en:"20+ years", fr:"Plus de 20 ans" },
-    avail: { en:"Available now", fr:"Disponible maintenant" },
+    avail: { en:"Open to opportunities", fr:"Ouvert aux opportunités" },
+    notice: { en:"2 weeks notice", fr:"Préavis de 2 semaines" },
     highlights: {
       en:["Has managed large scale processing facilities","Full P&L responsibility","HACCP, SQF Level 3 and FSEP certified","Strong track record in union environments"],
       fr:["A géré des installations de transformation à grande échelle","Pleine responsabilité P&L","Certifié HACCP, SQF Niveau 3 et FSEP","Solide expérience en milieu syndiqué"],
     },
     summary: {
-      en:"Seasoned plant manager who has run large scale protein processing in Quebec. Deep operational expertise, a strong safety culture, and a consistent record of hitting production targets. Available now.",
-      fr:"Directeur d'usine chevronné qui a mené de la transformation de protéines à grande échelle au Québec. Expertise opérationnelle profonde, culture de sécurité forte et un bilan constant d'atteinte des objectifs de production. Disponible maintenant.",
+      en:"Seasoned plant manager who has run large scale protein processing in Quebec. Deep operational expertise, a strong safety culture, and a consistent record of hitting production targets. Available at short notice.",
+      fr:"Directeur d'usine chevronné qui a mené de la transformation de protéines à grande échelle au Québec. Expertise opérationnelle profonde, culture de sécurité forte et un bilan constant d'atteinte des objectifs de production. Disponible à court préavis.",
     },
     recruiter: "Stéphanie Lanoie",
   },
@@ -1756,6 +1764,7 @@ const FEATURED = [
     market: { en:"Quebec", fr:"Québec" },
     exp: { en:"10 to 15 years", fr:"10 à 15 ans" },
     avail: { en:"Open to opportunities", fr:"Ouvert aux opportunités" },
+    notice: { en:"3 weeks notice", fr:"Préavis de 3 semaines" },
     highlights: {
       en:["Has owned open-to-buy budgets","Strong vendor relationships in Europe and Asia","Experience with both mass market and contemporary brands","Bilingual, knows the French speaking market"],
       fr:["A géré des budgets open-to-buy","Solides relations fournisseurs en Europe et en Asie","Expérience avec des marques grand public et contemporaines","Bilingue, connaît le marché francophone"],
@@ -1774,6 +1783,7 @@ const FEATURED = [
     market: { en:"Ontario", fr:"Ontario" },
     exp: { en:"15 to 20 years", fr:"15 à 20 ans" },
     avail: { en:"Open to opportunities", fr:"Ouvert aux opportunités" },
+    notice: { en:"6 weeks notice", fr:"Préavis de 6 semaines" },
     highlights: {
       en:["Has led end to end supply chain for a national CPG operation","SAP and Oracle ERP implementation experience","Track record of cutting logistics costs","Cross border Canada and US supply chain expertise"],
       fr:["A dirigé la chaîne d'approvisionnement de bout en bout pour une opération CPG nationale","Expérience d'implantation SAP et Oracle ERP","Bilan de réduction des coûts logistiques","Expertise en chaîne d'approvisionnement transfrontalière Canada et É.-U."],
@@ -1792,6 +1802,7 @@ const FEATURED = [
     market: { en:"Canada-wide", fr:"Partout au Canada" },
     exp: { en:"20+ years", fr:"Plus de 20 ans" },
     avail: { en:"Open to opportunities", fr:"Ouvert aux opportunités" },
+    notice: { en:"5 weeks notice", fr:"Préavis de 5 semaines" },
     highlights: {
       en:["Has built national food service sales teams from scratch","Has carried national revenue responsibility","Works with GPOs, distributors and regional chains","Bilingual, coast to coast market experience"],
       fr:["A bâti des équipes de ventes nationales en service alimentaire de zéro","A porté une responsabilité de revenus nationale","Travaille avec les GPO, distributeurs et chaînes régionales","Bilingue, expérience du marché d'un océan à l'autre"],
@@ -1809,14 +1820,15 @@ const FEATURED = [
     tag: { en:"Contemporary / Lifestyle", fr:"Contemporain / Lifestyle" },
     market: { en:"Ontario / Quebec", fr:"Ontario / Québec" },
     exp: { en:"5 to 10 years", fr:"5 à 10 ans" },
-    avail: { en:"Available now", fr:"Disponible maintenant" },
+    avail: { en:"Open to opportunities", fr:"Ouvert aux opportunités" },
+    notice: { en:"2 weeks notice", fr:"Préavis de 2 semaines" },
     highlights: {
       en:["Has built and run brand strategies for mid market and contemporary labels","Experience across wholesale, DTC and e-commerce","Strong social and digital marketing background","Bilingual, creative, works from the numbers"],
       fr:["A bâti et mené des stratégies de marque pour des étiquettes de marché intermédiaire et contemporaines","Expérience en vente en gros, DTC et commerce en ligne","Solide bagage en marketing social et numérique","Bilingue, créatif, travaille avec les chiffres"],
     },
     summary: {
-      en:"A brand manager who blends creative instinct with commercial discipline. Has grown brands in both wholesale and DTC, with a good grasp of digital marketing and influencer strategy. Available now and looking for a Senior Manager or Director level role in Canadian fashion.",
-      fr:"Un gestionnaire de marque qui allie l'instinct créatif à la discipline commerciale. A développé des marques en vente en gros et en DTC, avec une bonne maîtrise du marketing numérique et de la stratégie d'influence. Disponible maintenant et cherche un rôle de Gestionnaire principal ou Directeur dans la mode canadienne.",
+      en:"A brand manager who blends creative instinct with commercial discipline. Has grown brands in both wholesale and DTC, with a good grasp of digital marketing and influencer strategy. Available at short notice and looking for a Senior Manager or Director level role in Canadian fashion.",
+      fr:"Un gestionnaire de marque qui allie l'instinct créatif à la discipline commerciale. A développé des marques en vente en gros et en DTC, avec une bonne maîtrise du marketing numérique et de la stratégie d'influence. Disponible à court préavis et cherche un rôle de Gestionnaire principal ou Directeur dans la mode canadienne.",
     },
     recruiter: "Robin Anisef",
   },
@@ -1848,19 +1860,19 @@ function FeaturedCandidatesPage({ lang, setPage }) {
       <div>
         <section style={{ background:C.ink, padding:"9rem 2rem 3.5rem" }}>
           <div style={{ maxWidth:"780px", margin:"0 auto" }}>
-            <button onClick={() => setActive(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.faint, marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
+            <button onClick={() => setActive(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.mute, marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
               {t.back}
             </button>
             <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"1.5rem" }}>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:C.orange }}>{c.sector[lang]}</span>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:W.faint }}>·</span>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.faint }}>{c.tag[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", color:W.mute }}>·</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.mute }}>{c.tag[lang]}</span>
             </div>
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{c.title[lang]}</h1>
             <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"2rem" }}>
               {[[t.exp, c.exp[lang]], [t.market, c.market[lang]], [t.avail, c.avail[lang]], [t.recruiter, c.recruiter]].map(([label, val]) => (
                 <div key={label}>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:W.faint, marginBottom:"3px" }}>{label}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:W.mute, marginBottom:"3px" }}>{label}</div>
                   <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.88rem", color: label===t.avail && c.avail.en==="Actively looking" ? C.orange : "#fff", fontWeight:500 }}>{val}</div>
                 </div>
               ))}
@@ -2324,8 +2336,8 @@ function EmployersPage({ lang, setPage }) {
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>proforce.ca</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>proforce.ca</span>
           </div>
         </div>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
@@ -2335,9 +2347,9 @@ function EmployersPage({ lang, setPage }) {
           <p style={{ color:W.mute, fontSize:"1rem", lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
-            <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.35)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)", cursor:"pointer", background:"transparent" }}
+            <button style={{ display:"inline-block", border:`1.5px solid ${W.edge}`, color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:"0.78rem", letterSpacing:"0.08em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)", cursor:"pointer", background:"transparent" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor=W.faint}
+              onMouseLeave={e => e.currentTarget.style.borderColor=W.mute}
               onClick={() => setPage("food")}
             >{t.cta2}</button>
           </div>
@@ -2440,7 +2452,7 @@ function EmployersPage({ lang, setPage }) {
       {/* Sectors */}
       <section style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <Eyebrow style={{ color:W.faint }}>{t.sectorsH}</Eyebrow>
+          <Eyebrow style={{ color:W.mute }}>{t.sectorsH}</Eyebrow>
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"2px", background:W.rule, marginTop:"2rem" }}>
             {[
               { h:t.food, p:t.foodP, pg:"food" },
@@ -2452,7 +2464,7 @@ function EmployersPage({ lang, setPage }) {
               >
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"1.4rem", color:C.orange, letterSpacing:"-0.005em", marginBottom:"0.6rem" }}>{s.h}</h3>
                 <p style={{ color:W.mute, fontSize:"0.86rem", lineHeight:1.7, marginBottom:"1.25rem" }}>{s.p}</p>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.faint }}>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.62rem", letterSpacing:"0.02em", color:W.mute }}>
                   {lang==="en"?"Learn more →":"En savoir plus →"}
                 </span>
               </button>
@@ -3537,7 +3549,7 @@ function HowWeWorkPage({ lang, setPage }) {
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>{t.eyebrow}</span>
           </div>
         </div>
         <div style={{ position:"absolute", right:"-1rem", bottom:"-1rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(8rem,20vw,18rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>09</div>
@@ -3758,7 +3770,7 @@ function PressPage({ lang, setPage }) {
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>{t.eyebrow}</span>
           </div>
         </div>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
@@ -4468,9 +4480,9 @@ function NotFoundPage({ lang, setPage }) {
           </div>
           <div style={{ marginTop:"4rem", display:"flex", gap:"2rem", justifyContent:"center", flexWrap:"wrap" }}>
             {[["food", lang==="en"?"Food & CPG":"Alimentaire & CPG"],["fashion", lang==="en"?"Fashion":"Mode"],["blog", lang==="en"?"Blog":"Blogue"],["team", lang==="en"?"Team":"Équipe"]].map(([k,l]) => (
-              <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint, borderBottom:`1px solid rgba(255,255,255,0.2)`, paddingBottom:"2px", transition:"color 0.2s var(--ease)" }}
+              <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute, borderBottom:`1px solid rgba(255,255,255,0.2)`, paddingBottom:"2px", transition:"color 0.2s var(--ease)" }}
                 onMouseEnter={e => e.currentTarget.style.color=C.orange}
-                onMouseLeave={e => e.currentTarget.style.color=W.faint}
+                onMouseLeave={e => e.currentTarget.style.color=W.mute}
               >{l}</button>
             ))}
           </div>
@@ -4523,7 +4535,7 @@ function PrivacyPage({ lang, setPage }) {
         <div className="hero-plate" style={{ maxWidth:"780px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:"clamp(2.5rem,6vw,5rem)", letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"1rem" }}>{t.h1}</h1>
-          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:W.faint, marginTop:"1rem" }}>{t.updated}</p>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.1em", color:W.mute, marginTop:"1rem" }}>{t.updated}</p>
         </div>
       </section>
 
@@ -5247,7 +5259,7 @@ function MarketPage({ lang, setPage, market }) {
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>{t.eyebrow}</span>
           </div>
         </div>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
@@ -5291,7 +5303,7 @@ function MarketPage({ lang, setPage, market }) {
                   </div>
                 </div>
                 <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.82rem", color:W.mute, lineHeight:1.6 }}>{m.sector[lang]}</p>
-                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"5px", fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:W.faint, marginTop:"1rem", borderBottom:`1px solid rgba(255,255,255,0.2)`, paddingBottom:"2px" }}><LinkedInIcon />LinkedIn</a>
+                <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", gap:"5px", fontFamily:"'Archivo',sans-serif", fontSize:"0.58rem", letterSpacing:"0.08em", textTransform:"uppercase", color:W.mute, marginTop:"1rem", borderBottom:`1px solid rgba(255,255,255,0.2)`, paddingBottom:"2px" }}><LinkedInIcon />LinkedIn</a>
               </div>
             ))}
           </div>
@@ -5413,7 +5425,7 @@ function StartupPage({ lang, setPage }) {
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>{t.eyebrow}</span>
           </div>
         </div>
         {/* Background number */}
@@ -5490,7 +5502,7 @@ function StartupPage({ lang, setPage }) {
       {/* Process */}
       <section style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
-          <Eyebrow style={{ color:W.faint }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
+          <Eyebrow style={{ color:W.mute }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3vw,2.2rem)", letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"2px", background:W.rule }}>
             {t.steps.map(s => (
@@ -5709,7 +5721,7 @@ function SimonPage({ lang, setPage }) {
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
-            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.faint }}>{t.eyebrow}</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em", color:W.mute }}>{t.eyebrow}</span>
           </div>
         </div>
         <div style={{ position:"absolute", right:"-1rem", bottom:"-2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(10rem,25vw,22rem)", fontWeight:700, color:"rgba(232,93,26,0.05)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>SS</div>
@@ -5769,10 +5781,10 @@ function SimonPage({ lang, setPage }) {
               <a href="https://www.linkedin.com/in/chrislivingstone" target="_blank" rel="noopener noreferrer" style={{
                 marginLeft:"auto", display:"inline-flex", alignItems:"center", gap:"5px",
                 fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase",
-                color:W.faint, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px", transition:"color 0.2s var(--ease)",
+                color:W.mute, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px", transition:"color 0.2s var(--ease)",
               }}
                 onMouseEnter={e => e.currentTarget.style.color=C.orange}
-                onMouseLeave={e => e.currentTarget.style.color=W.faint}
+                onMouseLeave={e => e.currentTarget.style.color=W.mute}
               ><LinkedInIcon />LinkedIn</a>
             </div>
             <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", color:W.mute, lineHeight:1.85, fontWeight:300 }}>
@@ -5789,7 +5801,7 @@ function SimonPage({ lang, setPage }) {
               <div style={{ width:"44px", height:"44px", background:W.rule, border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Archivo',sans-serif", fontSize:"0.9rem", color:W.mute, fontWeight:700, flexShrink:0 }}>DI</div>
               <div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"1.05rem", color:"#fff" }}>David Inzlicht</div>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:W.faint, marginTop:"2px" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:"0.6rem", letterSpacing:"0.02em", color:W.mute, marginTop:"2px" }}>
                   {lang==="en"?"Business Mentor, Founder, Proforce Personnel":"Mentor en affaires, Fondateur, Proforce Personnel"}
                 </div>
               </div>
@@ -5905,10 +5917,10 @@ function SimonPage({ lang, setPage }) {
           <a href="https://www.linkedin.com/in/simonstamand" target="_blank" rel="noopener noreferrer" style={{
             display:"inline-flex", alignItems:"center", gap:"8px",
             fontFamily:"'Archivo',sans-serif", fontSize:"0.65rem", letterSpacing:"0.02em",
-            color:W.faint, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px", transition:"color 0.2s var(--ease)",
+            color:W.mute, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"2px", transition:"color 0.2s var(--ease)",
           }}
             onMouseEnter={e => e.currentTarget.style.color=C.orange}
-            onMouseLeave={e => e.currentTarget.style.color=W.faint}
+            onMouseLeave={e => e.currentTarget.style.color=W.mute}
           >
             <LinkedInIcon /> LinkedIn, Simon St-Amand
           </a>
