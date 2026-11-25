@@ -75,6 +75,19 @@ const C = {
   paperDark: "#f0f4f9",       // blanc bleuté très léger
   orange:    "#e85d1a",
   orangeHov: "#d04e10",
+  // Le #e85d1a de marque ne passe pas en petit texte: 3,49 de contraste sur
+  // blanc et 4,40 sur le marine, pour un seuil de 4,5. Il reste la couleur des
+  // aplats, des filets et des tres gros titres, ou le seuil est de 3. Ces deux
+  // jetons-ci sont reserves au TEXTE, selon le fond.
+  orangeTxt:  "#b8440c",   // petit texte orange sur fond clair: 5,43
+  orangeTxtF: "#e96423",   // petit texte orange sur le marine: 4,62
+  // CHOIX ASSUME, NE PAS "CORRIGER": le texte blanc pose sur l'aplat orange
+  // donne 3,49 de contraste. Les gros titres passent, le seuil etant de 3,
+  // mais la deuxieme ligne des encadres de citation et le paragraphe des
+  // bandes d'appel restent sous le seuil de 4,5. Simon a choisi cette
+  // combinaison en connaissance de cause, le 25 novembre 2026, apres avoir
+  // vu la mesure. La rendre conforme demanderait de foncer l'aplat ou de
+  // grossir cette ligne, et les deux changent l'allure des blocs.
   rule:      "#c8d4e3",       // filet bleu clair
   muted:     "#46637f",       // bleu-gris pour texte secondaire
                               // Le #5a7a9a d'avant donnait 4,48 de contraste sur blanc,
@@ -151,6 +164,13 @@ const G = `
 
   /* Une etiquette visible au-dessus d'une boite de recherche fait doublon avec
      la loupe et le texte d'invite. Celle-la est lue, pas vue. */
+  /* Sur un ecran tactile, la cible visee par un pouce demande 44 px, pas 24.
+     Le rembourrage est transparent: seule la zone cliquable grandit. */
+  @media (pointer: coarse) {
+    .nav-links a, .nav-links button,
+    .pied-liens a, .pied-liens button { min-height:44px; display:inline-flex; align-items:center; }
+  }
+
   .lue-non-vue {
     position:absolute; width:1px; height:1px; padding:0; margin:-1px;
     overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
@@ -159,13 +179,17 @@ const G = `
   /* Lien d'evitement: invisible jusqu'a ce qu'on l'atteigne au clavier. Sans
      lui, il faut traverser tout l'entete a chaque page avant le contenu. */
   .evitement {
-    position:absolute; left:-9999px; top:0; z-index:200;
+    position:absolute; left:-9999px; top:0; z-index:var(--z-evitement);
     background:${C.ink}; color:#fff; padding:12px 20px;
     font-family:'Archivo',sans-serif; font-size:0.875rem;
   }
   .evitement:focus { left:0; }
 
   :root {
+    /* Les couches fixes, nommees. Le lien d'evitement etait a egalite avec
+       l'entete et se faisait recouvrir: a z-index egal, c'est le dernier du
+       document qui gagne. */
+    --z-entete:200; --z-menu:210; --z-flottant:150; --z-evitement:300;
     --gut:clamp(1.25rem,4vw,3.5rem);
     /* Deux courbes, pas quinze. --ease pour ce qui repond au doigt,
        --ease-out pour ce qui entre dans la page. */
@@ -330,6 +354,13 @@ const G = `
      2px fait double emploi avec celui qui sort par la gauche. */
   .hero-open .eyebrow,
   .hero-flat .eyebrow { display:none !important; }
+
+  /* Sur le marine, le #b8440c tombe a 2,83 de contraste. Les sections foncees
+     portent la classe .fonce et leurs etiquettes prennent l'orange eclairci.
+     La plaque d'ouverture est blanche meme dans une section foncee: elle
+     garde l'orange sombre. */
+  .fonce .eyebrow { color:${C.orangeTxtF} !important; }
+  .fonce .hero-plate .eyebrow { color:${C.orangeTxt} !important; }
   .hero-open .hero-plate > div[style*="height: 2px"],
   .hero-flat .hero-plate > div[style*="height: 2px"] { display:none !important; }
   /* Les barres de metadonnees et les gros chiffres fantomes etaient poses
@@ -515,7 +546,7 @@ const G = `
     .hero-meta   { font-size:0.55rem !important; letter-spacing:0.04em !important; }
     .hide-narrow { display:none !important; }
     /* Le bouton flottant recouvrait le bouton Nous contacter. */
-    .float-cta   { bottom:1rem !important; right:1rem !important; left:1rem !important;
+    .float-cta   { bottom:calc(1rem + env(safe-area-inset-bottom)) !important; right:1rem !important; left:1rem !important;
                    justify-content:center !important; padding:14px 16px !important; }
     .hero-section { padding-bottom:7.5rem !important; }
   }
@@ -977,6 +1008,16 @@ function PageLink({ to, sub, setPage, children, style, className }) {
 
 // Etiquettes de familles de postes. Un filet, pas une boite remplie: ca reste
 // discret a cote des titres en serif.
+// Les effets de survol du site sont ecrits en JavaScript, pas en CSS. Sur un
+// ecran tactile, toucher un element declenche mouseenter et l'etat reste
+// colle jusqu'au prochain toucher: une carte reste eclairee apres qu'on l'a
+// touchee. On n'execute ces effets que la ou un vrai pointeur existe.
+const POINTEUR_SURVOL =
+  typeof window !== "undefined" && typeof window.matchMedia === "function"
+    ? window.matchMedia("(hover: hover)").matches
+    : true;
+const survol = fn => e => { if (POINTEUR_SURVOL) fn(e); };
+
 function RoleTags({ items }) {
   return (
     <div style={{ display:"flex", flexWrap:"wrap", gap:"0.4rem" }}>
@@ -1013,11 +1054,13 @@ function Divider({ style }) {
   return <span className="rule" style={style} />;
 }
 
-function Eyebrow({ children, as }) {
+function Eyebrow({ children, as, style }) {
   // Les etiquettes qui ouvrent une section peuvent porter le niveau de titre,
   // ce qui remet la hierarchie en ordre sans rien changer a l'apparence.
+  // Le style passe en prop etait ignore: trois appels en fournissaient un et
+  // il n'arrivait jamais jusqu'a l'element.
   const Tag = as || "p";
-  return <Tag className="eyebrow" style={{ marginBottom:"1.25rem", fontWeight:"inherit" }}>{children}</Tag>;
+  return <Tag className="eyebrow" style={{ marginBottom:"1.25rem", fontWeight:"inherit", ...style }}>{children}</Tag>;
 }
 
 function LinkedInIcon() {
@@ -1045,7 +1088,7 @@ function Nav({ page, setPage, lang, setLang }) {
   return (
     <>
       <nav style={{
-        position:"fixed", top:0, left:0, right:0, zIndex:200,
+        position:"fixed", top:0, left:0, right:0, zIndex:"var(--z-entete)",
         background:"#fff",
         borderBottom:`1px solid ${scrolled ? C.ink : C.rule}`,
         transition:"background 0.2s var(--ease)",
@@ -1089,8 +1132,8 @@ function Nav({ page, setPage, lang, setLang }) {
               letterSpacing:"0.04em", textTransform:"uppercase",
               transition:"background 0.2s var(--ease)", whiteSpace:"nowrap",
             }}
-            onMouseEnter={e => e.currentTarget.style.background=C.orangeHov}
-            onMouseLeave={e => e.currentTarget.style.background=C.orange}
+            onMouseEnter={survol(e => e.currentTarget.style.background=C.orangeHov)}
+            onMouseLeave={survol(e => e.currentTarget.style.background=C.orange)}
           >
             {lang==="en"?"Book a Call":"Réserver un appel"}
           </a>
@@ -1107,7 +1150,7 @@ function Nav({ page, setPage, lang, setLang }) {
       {open && (
         <div style={{
           position:"fixed", top:"56px", left:0, right:0, bottom:0,
-          background:C.ink, zIndex:199, padding:"2rem",
+          background:C.ink, zIndex:"var(--z-menu)", padding:"2rem",
           display:"flex", flexDirection:"column", gap:"0",
           borderTop:`1px solid rgba(255,255,255,0.08)`,
           overflowY:"auto",
@@ -1130,7 +1173,7 @@ function Nav({ page, setPage, lang, setLang }) {
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer"
             onClick={() => { track.contactClick(); setOpen(false); }}
             style={{
-              background:C.orange, color:"#fff", padding:"14px 24px",
+              background:C.orangeTxt, color:"#fff", padding:"14px 24px",
               fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.meta,
               letterSpacing:"0.04em", textTransform:"uppercase", textAlign:"center",
               marginTop:"1.5rem", display:"block",
@@ -1153,7 +1196,7 @@ function Ticker({ lang }) {
   return (
     <div style={{ background:C.ink, overflow:"hidden", whiteSpace:"nowrap", padding:"10px 0" }}>
       <div className="ticker-track" style={{ display:"inline-block" }}>
-        <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange }}>
+        <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt }}>
           {text}&nbsp;&nbsp;&nbsp;{text}
         </span>
       </div>
@@ -1244,7 +1287,7 @@ function HomePage({ lang, setPage }) {
           paragraphe et les boutons se partagent la largeur de la plaque. ── */}
       <section className="hero-open" style={{
         background:C.ink,
-        backgroundImage:"url(/photos/biscuits-bleu.jpg)",
+        backgroundImage:"url(/photos/biscuits-bleu.webp)",
         backgroundSize:"cover", backgroundPosition:"center 40%",
       }}>
         <div className="hero-plate">
@@ -1279,7 +1322,7 @@ function HomePage({ lang, setPage }) {
       ]} />
 
       {/* ── PREUVE ── bande marine, la phrase en serif, les chiffres a cote ── */}
-      <section style={{ background:C.ink, padding:"4.5rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"4.5rem 2rem" }}>
         <div className="two-col" style={{ maxWidth:"1150px", margin:"0 auto", display:"grid", gridTemplateColumns:"minmax(0,540px) 1fr", gap:"3.5rem", alignItems:"start" }}>
           <div>
             <div style={{
@@ -1390,7 +1433,7 @@ function HomePage({ lang, setPage }) {
           <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"3rem" }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginBottom:"1.5rem" }}>{n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginBottom:"1.5rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.h4, letterSpacing:"-0.02em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8 }}>{p}</p>
               </div>
@@ -1404,7 +1447,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow as="h2">{lang==="en"?"The Team":"L'équipe"}</Eyebrow>
-            <button onClick={() => setPage("team")} style={{  padding:"6px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("team")} style={{  padding:"6px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"Meet everyone →":"Voir l'équipe →"}
             </button>
           </div>
@@ -1427,11 +1470,11 @@ function HomePage({ lang, setPage }) {
       </section>
 
       {/* ── FEATURED CANDIDATES STRIP ── */}
-      <section style={{ background:C.ink, padding:"5rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow style={{ fontWeight:500, color:W.mute }}>{lang==="en"?"Featured Candidates":"Candidats vedettes"}</Eyebrow>
-            <button onClick={() => setPage("featured")} style={{  padding:"6px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("featured")} style={{  padding:"6px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxtF, borderBottom:`1px solid ${C.orangeTxtF}` }}>
               {lang==="en"?"All profiles →":"Tous les profils →"}
             </button>
           </div>
@@ -1443,10 +1486,10 @@ function HomePage({ lang, setPage }) {
               borderBottom:`1px solid rgba(255,255,255,0.08)`, textAlign:"left",
               transition:"opacity 0.2s var(--ease)",
             }}
-              onMouseEnter={e => e.currentTarget.style.opacity="0.7"}
-              onMouseLeave={e => e.currentTarget.style.opacity="1"}
+              onMouseEnter={survol(e => e.currentTarget.style.opacity="0.7")}
+              onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
             >
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange, letterSpacing:"0.04em", width:"28px" }}>0{i+1}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxtF, letterSpacing:"0.04em", width:"28px" }}>0{i+1}</span>
               <div>
                 <span style={{ fontFamily:"'Playfair Display',serif", fontSize:T.bodyFluid, color:"#fff", letterSpacing:"-0.01em" }}>{c.title[lang]}</span>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, fontWeight:500, color:W.mute, marginLeft:"1rem", letterSpacing:"0.04em" }}>{c.tag[lang]}</span>
@@ -1470,7 +1513,7 @@ function HomePage({ lang, setPage }) {
         <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap", gap:"1rem" }}>
             <Eyebrow>{lang==="en"?"From the Blog":"Du blogue"}</Eyebrow>
-            <button onClick={() => setPage("blog")} style={{  padding:"6px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("blog")} style={{  padding:"6px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, borderBottom:`1px solid ${C.orangeTxt}` }}>
               {lang==="en"?"All articles →":"Tous les articles →"}
             </button>
           </div>
@@ -1482,10 +1525,10 @@ function HomePage({ lang, setPage }) {
                 gap:"2rem", alignItems:"center", padding:"1.75rem 0", textAlign:"left",
                 transition:"opacity 0.2s var(--ease)",
               }}
-                onMouseEnter={e => e.currentTarget.style.opacity="0.7"}
-                onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                onMouseEnter={survol(e => e.currentTarget.style.opacity="0.7")}
+                onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
               >
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange }}>0{i+1}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt }}>0{i+1}</span>
                 <span style={{ fontFamily:"'Playfair Display',serif", fontSize:T.bodyFluid, color:C.ink, fontWeight:400 }}>{p.title[lang]}</span>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted, letterSpacing:"0.04em", whiteSpace:"nowrap" }}>{p.date}</span>
               </button>
@@ -1503,13 +1546,13 @@ function HomePage({ lang, setPage }) {
             <p style={{ color:W.plain, fontSize:T.lead, lineHeight:1.7, maxWidth:"420px" }}>{t.ctaP}</p>
           </div>
           <button onClick={() => setPage("contact")} style={{
-            background:"#fff", color:C.orange, padding:"14px 32px",
+            background:"#fff", color:C.orangeTxt, padding:"14px 32px",
             fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.meta,
             letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0,
             transition:"opacity 0.2s var(--ease)",
           }}
-            onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
-            onMouseLeave={e => e.currentTarget.style.opacity="1"}
+            onMouseEnter={survol(e => e.currentTarget.style.opacity="0.9")}
+            onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
           >{t.cta3}</button>
         </div>
       </section>
@@ -1633,7 +1676,7 @@ function SectorPage({ lang, setPage, sector }) {
           <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.w1h,t.w1p,"01"],[t.w2h,t.w2p,"02"],[t.w3h,t.w3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, letterSpacing:"-0.01em", color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8 }}>{p}</p>
               </div>
@@ -1647,7 +1690,7 @@ function SectorPage({ lang, setPage, sector }) {
       <section style={{ background:C.orange, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2Lg, color:"#fff", letterSpacing:"-0.015em", maxWidth:"580px", lineHeight:1.05 }}>{t.ctaH}</h2>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0 }}>{t.cta}</button>
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orangeTxt, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0 }}>{t.cta}</button>
         </div>
       </section>
     </div>
@@ -1745,7 +1788,7 @@ function FAQSection({ lang, type, setPage }) {
               padding:"1.5rem 0", textAlign:"left", gap:"1.5rem",
             }}>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, letterSpacing:"-0.01em", lineHeight:1.3 }}>{faq.q}</span>
-              <span style={{ color:C.orange, fontSize:T.h4, flexShrink:0, fontWeight:300, lineHeight:1, transition:"transform 0.2s var(--ease)", transform: open===i?"rotate(45deg)":"rotate(0deg)" }}>+</span>
+              <span style={{ color:C.orangeTxt, fontSize:T.h4, flexShrink:0, fontWeight:300, lineHeight:1, transition:"transform 0.2s var(--ease)", transform: open===i?"rotate(45deg)":"rotate(0deg)" }}>+</span>
             </button>
             {open===i && (
               <div style={{ paddingBottom:"1.5rem" }}>
@@ -1928,13 +1971,13 @@ function FeaturedCandidatesPage({ lang, setPage }) {
     const c = FEATURED.find(f => f.id === active);
     return (
       <div>
-        <section style={{ background:C.ink, padding:"9rem 2rem 3.5rem" }}>
+        <section className="fonce" style={{ background:C.ink, padding:"9rem 2rem 3.5rem" }}>
           <div style={{ maxWidth:"780px", margin:"0 auto" }}>
             <button onClick={() => setActive(null)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", fontWeight:500, color:W.mute, marginBottom:"3rem", display:"flex", alignItems:"center", gap:"8px" }}>
               {t.back}
             </button>
             <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"1.5rem" }}>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange }}>{c.sector[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt }}>{c.sector[lang]}</span>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, fontWeight:500, color:W.mute }}>·</span>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", fontWeight:500, color:W.mute }}>{c.tag[lang]}</span>
             </div>
@@ -1961,7 +2004,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
             <div style={{ display:"flex", flexDirection:"column", gap:"0" }}>
               {c.highlights[lang].map((h, i) => (
                 <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"1rem", padding:"0.85rem 0", borderBottom:`1px solid ${C.rule}` }}>
-                  <span style={{ color:C.orange, fontSize:T.small, marginTop:"2px", flexShrink:0 }}>▸</span>
+                  <span style={{ color:C.orangeTxt, fontSize:T.small, marginTop:"2px", flexShrink:0 }}>▸</span>
                   <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.ink, lineHeight:1.6 }}>{h}</span>
                 </div>
               ))}
@@ -1999,7 +2042,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
             {filters.map(([val, label]) => (
               <button key={val} onClick={() => setActiveFilter(val)} style={{
                 fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em",
-                color: activeFilter===val ? C.orange : C.muted,
+                color: activeFilter===val ? C.orangeTxt : C.muted,
                 borderBottom: activeFilter===val ? `1px solid ${C.orange}` : "1px solid transparent",
                 padding:"6px 0 7px", transition:"color 0.2s var(--ease)",
               }}>{label}</button>
@@ -2017,14 +2060,14 @@ function FeaturedCandidatesPage({ lang, setPage }) {
                 background:C.white, padding:"2.5rem", textAlign:"left",
                 transition:"background 0.2s var(--ease)", width:"100%",
               }}
-                onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
-                onMouseLeave={e => e.currentTarget.style.background=C.white}
+                onMouseEnter={survol(e => e.currentTarget.style.background=C.paperDark)}
+                onMouseLeave={survol(e => e.currentTarget.style.background=C.white)}
               >
                 {/* Sector tag */}
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.5rem" }}>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange }}>{c.sector[lang]}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt }}>{c.sector[lang]}</span>
                   {c.avail.en === "Actively looking" && (
-                    <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orange, border:`1px solid ${C.orange}`, padding:"2px 8px" }}>
+                    <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orangeTxt, border:`1px solid ${C.orange}`, padding:"2px 8px" }}>
                       {lang==="en"?"Active":"Actif"}
                     </span>
                   )}
@@ -2048,7 +2091,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
                 <div style={{ marginBottom:"1.5rem" }}>
                   {c.highlights[lang].slice(0,2).map((h,i) => (
                     <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"0.5rem", marginBottom:"0.4rem" }}>
-                      <span style={{ color:C.orange, fontSize:T.micro, marginTop:"2px", flexShrink:0 }}>▸</span>
+                      <span style={{ color:C.orangeTxt, fontSize:T.micro, marginTop:"2px", flexShrink:0 }}>▸</span>
                       <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.muted, lineHeight:1.5 }}>{h}</span>
                     </div>
                   ))}
@@ -2065,7 +2108,7 @@ function FeaturedCandidatesPage({ lang, setPage }) {
                   <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, color:C.ink, fontWeight:500 }}>
                     {c.notice ? c.notice[lang] : c.avail[lang]}
                   </span>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, flexShrink:0 }}>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, flexShrink:0 }}>
                     {lang==="en"?"Request this profile →":"Demander ce profil →"}
                   </span>
                 </div>
@@ -2117,7 +2160,7 @@ function AboutPage({ lang }) {
           <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}` }}>
             {[[t.v1h,t.v1p,"01"],[t.v2h,t.v2p,"02"],[t.v3h,t.v3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8 }}>{p}</p>
               </div>
@@ -2138,7 +2181,7 @@ function AboutPage({ lang }) {
 function TeamPage({ lang, setPage, setBlogPost }) {
   return (
     <div>
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Our Team":"Notre équipe"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:600, fontSize:T.h1, letterSpacing:"-0.012em", color:C.paper, lineHeight:1.15, marginBottom:"1.5rem" }}>
@@ -2168,7 +2211,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                   </div>
                   <div style={{ marginBottom:"1.5rem" }}>
                     <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, fontWeight:600 }}>{m.name}</div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginTop:"4px" }}>{m.title[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginTop:"4px" }}>{m.title[lang]}</div>
                   </div>
                   <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.muted, marginBottom:"1.25rem" }}>{m.sector[lang]}</div>
                   <a href={m.linkedin} target="_blank" rel="noopener noreferrer" style={{
@@ -2176,8 +2219,8 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                     fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase",
                     color:C.ink, borderBottom:`1px solid ${C.rule}`, padding:"4px 0 5px", transition:"color 0.2s, border-color 0.2s var(--ease)",
                   }}
-                    onMouseEnter={e => { e.currentTarget.style.color=C.orange; e.currentTarget.style.borderColor=C.orange; }}
-                    onMouseLeave={e => { e.currentTarget.style.color=C.ink; e.currentTarget.style.borderColor=C.rule; }}
+                    onMouseEnter={survol(e => { e.currentTarget.style.color=C.orange; e.currentTarget.style.borderColor=C.orange; })}
+                    onMouseLeave={survol(e => { e.currentTarget.style.color=C.ink; e.currentTarget.style.borderColor=C.rule; })}
                   ><LinkedInIcon /> LinkedIn</a>
                   {Object.entries(MEMBERS).find(([,v]) => v.name === m.name) && (
                     <button
@@ -2185,7 +2228,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                       style={{
                         display:"block", marginTop:"0.9rem",
                         fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em",
-                        textTransform:"uppercase", color:C.orange, borderBottom:`1px solid ${C.orange}`, padding:"6px 0 7px",
+                        textTransform:"uppercase", color:C.orangeTxt, borderBottom:`1px solid ${C.orange}`, padding:"6px 0 7px",
                       }}
                     >{lang==="en" ? "Full profile" : "Sa page"}</button>
                   )}
@@ -2201,7 +2244,7 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                   ))}
                   {m.articles.length > 0 && (
                     <div>
-                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.75rem" }}>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.75rem" }}>
                         {lang==="en"?"Articles":"Articles"}
                       </div>
                       <div style={{ display:"flex", flexDirection:"column", gap:"0" }}>
@@ -2212,10 +2255,10 @@ function TeamPage({ lang, setPage, setBlogPost }) {
                             display:"flex", alignItems:"center", gap:"1rem",
                             transition:"opacity 0.2s var(--ease)",
                           }}
-                            onMouseEnter={e => e.currentTarget.style.opacity="0.6"}
-                            onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                            onMouseEnter={survol(e => e.currentTarget.style.opacity="0.6")}
+                            onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
                           >
-                            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange, flexShrink:0 }}>0{j+1}</span>
+                            <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxt, flexShrink:0 }}>0{j+1}</span>
                             <span style={{ fontFamily:"'Playfair Display',serif", fontSize:T.body, color:C.ink }}>{post.title[lang]}</span>
                             <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted, marginLeft:"auto", flexShrink:0 }}>{post.date}</span>
                           </button>
@@ -2286,7 +2329,7 @@ function CandidatesPage({ lang, setPage }) {
           <div className="three-col num-list stagger" style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"4rem" }}>
             {[[t.h1h,t.h1p,"01"],[t.h2h,t.h2p,"02"],[t.h3h,t.h3p,"03"]].map(([h,p,n],i) => (
               <div key={n} style={{ padding:"2.5rem 2rem", borderRight: i<2?`1px solid ${C.rule}`:"none" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, marginBottom:"0.75rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8 }}>{p}</p>
               </div>
@@ -2417,9 +2460,9 @@ function EmployersPage({ lang, setPage }) {
           <p style={{ fontWeight:500, color:W.mute, fontSize:T.lead, lineHeight:1.75, maxWidth:"560px", marginBottom:"2.5rem" }}>{t.sub}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
             <button className="btn-orange" onClick={() => setPage("contact")}>{t.cta}</button>
-            <button style={{ display:"inline-block", border:`1.5px solid ${W.edge}`, color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)", cursor:"pointer", background:"transparent" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor=W.mute}
+            <button style={{ display:"inline-block", border:`1.5px solid ${C.rule}`, color:C.ink, padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)", cursor:"pointer", background:"transparent" }}
+              onMouseEnter={survol(e => e.currentTarget.style.borderColor=C.ink)}
+              onMouseLeave={survol(e => e.currentTarget.style.borderColor=W.mute)}
               onClick={() => setPage("food")}
             >{t.cta2}</button>
           </div>
@@ -2449,7 +2492,7 @@ function EmployersPage({ lang, setPage }) {
                   display:"grid", gridTemplateColumns:"auto 1fr", gap:"0.9rem", alignItems:"baseline",
                   padding:"0.85rem 0", borderTop:`1px solid ${C.rule}`,
                 }}>
-                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, fontWeight:700, color:C.orange, letterSpacing:"0.04em" }}>0{i+1}</span>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, fontWeight:700, color:C.orangeTxt, letterSpacing:"0.04em" }}>0{i+1}</span>
                   <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, lineHeight:1.55 }}>{c}</span>
                 </li>
               ))}
@@ -2474,7 +2517,7 @@ function EmployersPage({ lang, setPage }) {
             </div>
           ))}
           <div className="pt-desk" style={{ paddingTop:"2rem" }}>
-            <button onClick={() => setPage("howwework")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}`, padding:"6px 0 7px" }}>
+            <button onClick={() => setPage("howwework")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, borderBottom:`1px solid ${C.orange}`, padding:"6px 0 7px" }}>
               {t.processLink}
             </button>
           </div>
@@ -2494,7 +2537,7 @@ function EmployersPage({ lang, setPage }) {
                 borderBottom: i<2 ? `1px solid ${C.rule}` : "none",
                 background:C.white,
               }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8 }}>{p}</p>
               </div>
@@ -2520,7 +2563,7 @@ function EmployersPage({ lang, setPage }) {
       </section>
 
       {/* Sectors */}
-      <section style={{ background:C.ink, padding:"5rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow style={{ fontWeight:500, color:W.mute }}>{t.sectorsH}</Eyebrow>
           <div className="three-col" style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0,1fr))", gap:"2px", background:W.rule, marginTop:"2rem" }}>
@@ -2529,8 +2572,8 @@ function EmployersPage({ lang, setPage }) {
               { h:t.fashion, p:t.fashionP, pg:"fashion" },
             ].map(s => (
               <button key={s.pg} onClick={() => setPage(s.pg)} style={{ background:C.inkLight, padding:"2.5rem", textAlign:"left", transition:"background 0.2s var(--ease)", width:"100%" }}
-                onMouseEnter={e => e.currentTarget.style.background="#1e4080"}
-                onMouseLeave={e => e.currentTarget.style.background=C.inkLight}
+                onMouseEnter={survol(e => e.currentTarget.style.background="#1e4080")}
+                onMouseLeave={survol(e => e.currentTarget.style.background=C.inkLight)}
               >
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h3, color:C.orange, letterSpacing:"-0.005em", marginBottom:"0.6rem" }}>{s.h}</h3>
                 <p style={{ fontWeight:500, color:W.mute, fontSize:T.meta, lineHeight:1.7, marginBottom:"1.25rem" }}>{s.p}</p>
@@ -2565,9 +2608,9 @@ function EmployersPage({ lang, setPage }) {
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2Lg, color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:W.plain, fontSize:T.lead, maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.meta, letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s var(--ease)" }}
-            onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
-            onMouseLeave={e => e.currentTarget.style.opacity="1"}
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orangeTxt, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.meta, letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s var(--ease)" }}
+            onMouseEnter={survol(e => e.currentTarget.style.opacity="0.9")}
+            onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
           >{t.cta}</button>
         </div>
       </section>
@@ -2641,7 +2684,7 @@ function JobListingsPage({ lang }) {
                 <div className="job-title" style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, letterSpacing:"-0.01em", transition:"color 0.2s var(--ease)" }}>{r.title}</div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.muted, marginTop:"4px" }}>{r.co} · {r.loc}</div>
               </div>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, border:`1px solid ${C.orange}`, padding:"4px 10px" }}>Permanent</span>
             </a>
           ))}
           <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8, marginTop:"1.75rem" }}>{t.sampleNote}</p>
@@ -2831,7 +2874,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
               ← {lang==="en"?"Back":"Retour"}
             </button>
             <div style={{ display:"flex", gap:"1.5rem", alignItems:"center", marginBottom:"2rem", flexWrap:"wrap" }}>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange }}>{post.cat[lang]}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt }}>{post.cat[lang]}</span>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted }}>{post.date} · {post.read[lang]}</span>
             </div>
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:T.h2Lg, letterSpacing:"-0.015em", color:C.ink, lineHeight:1.05, marginBottom:"2.5rem" }}>{post.title[lang]}</h1>
@@ -2904,7 +2947,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
               {cats.map(([val,label]) => (
                 <button key={val} onClick={() => setFilter(val)} style={{
                   fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em",
-                  color: filter===val ? C.orange : C.muted,
+                  color: filter===val ? C.orangeTxt : C.muted,
                   borderBottom: filter===val ? `1px solid ${C.orange}` : "1px solid transparent",
                   padding:"6px 0 7px", transition:"color 0.2s var(--ease)",
                 }}>{label}</button>
@@ -2929,7 +2972,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                 onBlur={e => e.target.style.borderColor=C.rule}
               />
               <span style={{ position:"absolute", right:"10px", top:"50%", transform:"translateY(-50%)", color:C.muted, fontSize:T.small, pointerEvents:"none" }}>
-                {query ? <button onClick={() => setQuery("")} style={{ color:C.orange, fontSize:T.small, cursor:"pointer" }}>✕</button> : "⌕"}
+                {query ? <button onClick={() => setQuery("")} style={{ color:C.orangeTxt, fontSize:T.small, cursor:"pointer" }}>✕</button> : "⌕"}
               </span>
             </div>
           </div>
@@ -2939,7 +2982,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
               <p style={{ fontFamily:"'Playfair Display',serif", fontSize:T.lead, color:C.muted, fontStyle:"italic" }}>
                 {lang==="en" ? `No articles found for "${query}".` : `Aucun article trouvé pour « ${query} ».`}
               </p>
-              <button onClick={() => { setQuery(""); setFilter("all"); }} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginTop:"1rem", borderBottom:`1px solid ${C.orange}` }}>
+              <button onClick={() => { setQuery(""); setFilter("all"); }} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginTop:"1rem", borderBottom:`1px solid ${C.orange}` }}>
                 {lang==="en" ? "Clear search" : "Effacer la recherche"}
               </button>
             </div>
@@ -2958,38 +3001,38 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
             );
             if (i === 0) {
               return (
-                <div key={post.id}>
+                <article key={post.id}>
                   <button onClick={open} style={{ width:"100%", textAlign:"left", padding:"0 0 2.75rem", transition:"opacity 0.2s var(--ease)" }}
-                    onMouseEnter={e => e.currentTarget.style.opacity="0.78"}
-                    onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                    onMouseEnter={survol(e => e.currentTarget.style.opacity="0.78")}
+                    onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
                   >
                     <div style={{ width:"100%", aspectRatio:"16 / 7", overflow:"hidden", background:C.ink, marginBottom:"1.75rem" }}>
                       <Photo src={postCover(post.id)} w={1600} h={873}
                         style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
                     </div>
                     <div style={{ display:"flex", gap:"1.25rem", alignItems:"center", flexWrap:"wrap", marginBottom:"0.9rem" }}>
-                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange, letterSpacing:"0.02em" }}>{post.cat[lang]}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxt, letterSpacing:"0.02em" }}>{post.cat[lang]}</span>
                       <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted, letterSpacing:"0.04em" }}>{post.date} · {post.read[lang]}</span>
                     </div>
                     <div style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2, color:C.ink, letterSpacing:"-0.02em", lineHeight:1.12, marginBottom:"0.8rem" }}>{post.title[lang]}</div>
                     <div style={{ fontFamily:"'Playfair Display',serif", fontSize:T.lead, color:C.muted, lineHeight:1.7, fontStyle:"italic", maxWidth:"620px" }}>{post.excerpt[lang]}</div>
                   </button>
                   <Divider />
-                </div>
+                </article>
               );
             }
             return (
-              <div key={post.id}>
+              <article key={post.id}>
                 <button onClick={open} className="post-row" style={{
                   width:"100%", display:"grid", gridTemplateColumns:"60px 150px 1fr 120px",
                   gap:"2rem", alignItems:"start", padding:"2.25rem 0", textAlign:"left",
                   transition:"opacity 0.2s var(--ease)",
                 }}
-                  onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
-                  onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                  onMouseEnter={survol(e => e.currentTarget.style.opacity="0.65")}
+                  onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
                 >
                   <div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange, letterSpacing:"0.04em" }}>{String(i+1).padStart(2,"0")}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxt, letterSpacing:"0.04em" }}>{String(i+1).padStart(2,"0")}</div>
                     <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted, letterSpacing:"0.04em", marginTop:"4px" }}>{post.cat[lang]}</div>
                   </div>
                   <div className="post-thumb" style={{ width:"100%", aspectRatio:"3 / 2", overflow:"hidden", background:C.ink }}>
@@ -3003,7 +3046,7 @@ function BlogPage({ lang, setPage, initialPost, onOpenPost }) {
                   {meta}
                 </button>
                 <Divider />
-              </div>
+              </article>
             );
           })}
 
@@ -3071,18 +3114,18 @@ function ContactPage({ lang }) {
               <div key={o.city} style={{ marginBottom:"3rem" }}>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.h4, color:C.ink, marginBottom:"1.25rem" }}>{o.city}</div>
                 <Divider style={{ marginBottom:"1.25rem" }} />
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Phone":"Téléphone"}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.4rem" }}>{lang==="en"?"Phone":"Téléphone"}</div>
                 <a href={`tel:+1${o.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.ink, marginBottom:"1rem", textDecoration:"none" }}>{o.phone}</a>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{lang==="en"?"Address":"Adresse"}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.4rem" }}>{lang==="en"?"Address":"Adresse"}</div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.muted, lineHeight:1.7, whiteSpace:"pre-line" }}>{o.addr}</div>
               </div>
             ))}
-            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>Email</div>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.4rem" }}>Email</div>
             <a href="mailto:info@proforce.ca" style={{ display:"block", fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.ink, marginBottom:"2.5rem", textDecoration:"none" }}>info@proforce.ca</a>
 
             {/* Booking CTA */}
             <div style={{ padding:"1.75rem", background:C.ink, borderLeft:`3px solid ${C.orange}` }}>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.6rem" }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.6rem" }}>
                 {lang==="en"?"Prefer to book directly?":"Tu préfères réserver directement?"}
               </div>
               <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, fontWeight:500, color:W.mute, lineHeight:1.6, marginBottom:"1.25rem" }}>
@@ -3099,7 +3142,7 @@ function ContactPage({ lang }) {
               </a>
             </div>
 
-            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.75rem" }}>{lang==="en"?"Follow Us":"Nous suivre"}</div>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxtF, marginBottom:"0.75rem" }}>{lang==="en"?"Follow Us":"Nous suivre"}</div>
             <div style={{ display:"flex", gap:"0.75rem" }}>
               {[
                 { href:"https://www.facebook.com/share/17YcPvUvNn/", title:"Facebook", icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
@@ -3108,8 +3151,8 @@ function ContactPage({ lang }) {
               ].map(s => (
                 <a key={s.title} href={s.href} target="_blank" rel="noopener noreferrer" title={s.title}
                   style={{ width:"36px", height:"36px", border:`1px solid ${C.rule}`, display:"flex", alignItems:"center", justifyContent:"center", color:C.muted, transition:"all 0.2s var(--ease)" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=C.rule; e.currentTarget.style.color=C.muted; }}
+                  onMouseEnter={survol(e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; })}
+                  onMouseLeave={survol(e => { e.currentTarget.style.borderColor=C.rule; e.currentTarget.style.color=C.muted; })}
                 >{s.icon}</a>
               ))}
             </div>
@@ -3143,10 +3186,10 @@ function ContactPage({ lang }) {
                   />
                 </Field>
                 {touched && missing && (
-                  <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orange, margin:0 }}>{t.required}</p>
+                  <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orangeTxt, margin:0 }}>{t.required}</p>
                 )}
                 {status === "error" && (
-                  <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orange, margin:0, lineHeight:1.6 }}>{t.errorMsg}</p>
+                  <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orangeTxt, margin:0, lineHeight:1.6 }}>{t.errorMsg}</p>
                 )}
                 <button className="btn-ink" onClick={submit} disabled={status === "sending"}
                   style={{ alignSelf:"flex-start", opacity: status === "sending" ? 0.6 : 1 }}>
@@ -3324,10 +3367,10 @@ function CalculatorPage({ lang, setPage }) {
       <div style={{
         fontFamily:"'Archivo',sans-serif", fontSize: big ? "0.95rem" : "0.88rem", fontWeight:700, flexShrink:0, marginLeft:"1rem",
         color: row.type === "cost" ? "#c0392b"
-             : row.type === "credit" ? "#27ae60"
+             : row.type === "credit" ? "#1b7a43"
              : row.type === "fee" ? C.muted
-             : row.type === "saving" ? (row.value >= 0 ? "#27ae60" : "#c0392b")
-             : (row.value >= 0 ? "#c0392b" : "#27ae60"),
+             : row.type === "saving" ? (row.value >= 0 ? "#1b7a43" : "#c0392b")
+             : (row.value >= 0 ? "#c0392b" : "#1b7a43"),
       }}>
         {row.type === "saving" && row.value > 0 ? "+" : ""}{fmt(row.value)}
       </div>
@@ -3336,7 +3379,7 @@ function CalculatorPage({ lang, setPage }) {
 
   return (
     <div>
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h1, letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>{t.h1}</h1>
@@ -3358,7 +3401,7 @@ function CalculatorPage({ lang, setPage }) {
                   <div key={i} style={{ marginBottom:"1.9rem" }}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap:"1rem", marginBottom:"0.35rem" }}>
                       <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.ink, fontWeight:500 }}>{sl.label}</span>
-                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, color:C.orange, fontWeight:600, flexShrink:0 }}>{sl.fmt(sl.value)}</span>
+                      <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, color:C.orangeTxt, fontWeight:600, flexShrink:0 }}>{sl.fmt(sl.value)}</span>
                     </div>
                     {sl.hint && (
                       <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, color:C.muted, marginBottom:"0.5rem" }}>{sl.hint}</div>
@@ -3382,7 +3425,7 @@ function CalculatorPage({ lang, setPage }) {
             {/* Le chiffre hebdomadaire en premier. Un total de six chiffres ne
                 veut rien dire a personne. Un montant par semaine, oui. */}
             <div style={{ padding:"1.9rem", background:C.ink, borderLeft:`4px solid ${C.orange}`, marginBottom:"2.5rem" }}>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.5rem" }}>{t.weekLabel}</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxtF, marginBottom:"0.5rem" }}>{t.weekLabel}</div>
               <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.display, fontWeight:700, letterSpacing:"-0.015em", color:"#fff", lineHeight:1 }}>
                 {fmt(weeklyNet)}
               </div>
@@ -3409,7 +3452,7 @@ function CalculatorPage({ lang, setPage }) {
                 background: ecart >= 0 ? C.paperDark : "#fdf0ee",
                 borderLeft:`4px solid ${ecart >= 0 ? C.orange : "#c0392b"}`,
               }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color: ecart >= 0 ? C.orange : "#c0392b", marginBottom:"0.4rem" }}>{t.c4}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color: ecart >= 0 ? C.orangeTxt : "#c0392b", marginBottom:"0.4rem" }}>{t.c4}</div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.stat, fontWeight:700, letterSpacing:"-0.015em", color:C.ink, lineHeight:1 }}>
                   {ecart > 0 ? "+" : ""}{fmt(ecart)}
                 </div>
@@ -3429,7 +3472,7 @@ function CalculatorPage({ lang, setPage }) {
         <div style={{ maxWidth:"860px", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"2rem" }}>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2Lg, color:"#fff", letterSpacing:"-0.015em" }}>{t.cta}</h2>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
-            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase" }}>{t.cta2}</button>
+            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orangeTxt, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase" }}>{t.cta2}</button>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.6)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase" }}>
               {lang === "en" ? "Book a Call" : "Réserver un appel"}
             </a>
@@ -3626,7 +3669,7 @@ function HowWeWorkPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -3663,12 +3706,12 @@ function HowWeWorkPage({ lang, setPage }) {
                 width:"100%", display:"grid", gridTemplateColumns:"56px 1fr auto",
                 gap:"1.5rem", alignItems:"center", padding:"2rem 0", textAlign:"left",
               }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.stat, fontWeight:700, color: openPhase===i ? C.orange : C.rule, letterSpacing:"-0.015em", lineHeight:1, transition:"color 0.2s var(--ease)" }}>{phase.n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.stat, fontWeight:700, color: openPhase===i ? C.orangeTxt : C.muted, letterSpacing:"-0.015em", lineHeight:1, transition:"color 0.2s var(--ease)" }}>{phase.n}</div>
                 <div>
-                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.4rem" }}>{phase.phase}</div>
+                  <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.4rem" }}>{phase.phase}</div>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:T.bodyFluid, color:C.ink, letterSpacing:"-0.01em" }}>{phase.h}</div>
                 </div>
-                <span style={{ color:C.orange, fontSize:T.h4, fontWeight:300, transition:"transform 0.2s var(--ease)", transform: openPhase===i?"rotate(45deg)":"rotate(0deg)", flexShrink:0 }}>+</span>
+                <span style={{ color:C.orangeTxt, fontSize:T.h4, fontWeight:300, transition:"transform 0.2s var(--ease)", transform: openPhase===i?"rotate(45deg)":"rotate(0deg)", flexShrink:0 }}>+</span>
               </button>
 
               {openPhase === i && (
@@ -3678,11 +3721,11 @@ function HowWeWorkPage({ lang, setPage }) {
                   ))}
                   <div style={{ display:"flex", gap:"2rem", flexWrap:"wrap", marginTop:"1.5rem", paddingTop:"1.25rem", borderTop:`1px solid ${C.rule}` }}>
                     <div>
-                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.3rem" }}>{lang==="en"?"Typical duration":"Durée typique"}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.3rem" }}>{lang==="en"?"Typical duration":"Durée typique"}</div>
                       <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.ink }}>{phase.duration}</div>
                     </div>
                     <div>
-                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.3rem" }}>{lang==="en"?"What you get":"Ce que tu reçois"}</div>
+                      <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.3rem" }}>{lang==="en"?"What you get":"Ce que tu reçois"}</div>
                       <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.ink }}>{phase.deliverable}</div>
                     </div>
                   </div>
@@ -3694,7 +3737,7 @@ function HowWeWorkPage({ lang, setPage }) {
       </section>
 
       {/* Photo + phrase d'appui, le seul dispositif visuel de la page */}
-      <section style={{ background:C.ink, padding:"0" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"0" }}>
         <div className="two-col" style={{
           maxWidth:"1100px", margin:"0 auto", display:"grid",
           gridTemplateColumns:"minmax(0,0.85fr) minmax(0,1.15fr)", alignItems:"stretch",
@@ -3737,7 +3780,7 @@ function HowWeWorkPage({ lang, setPage }) {
           {t.timelines.map((tl, i) => (
             <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"1.5rem 0", borderBottom:`1px solid ${C.rule}`, flexWrap:"wrap", gap:"0.5rem" }}>
               <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.ink }}>{tl.role}</span>
-              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, letterSpacing:"0.04em", color:C.orange, flexShrink:0 }}>{tl.time}</span>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, letterSpacing:"0.04em", color:C.orangeTxt, flexShrink:0 }}>{tl.time}</span>
             </div>
           ))}
           <p style={{ fontFamily:"'Playfair Display',serif", fontSize:T.body, color:C.muted, fontStyle:"italic", marginTop:"1.5rem", lineHeight:1.8 }}>
@@ -3749,7 +3792,7 @@ function HowWeWorkPage({ lang, setPage }) {
       </section>
 
       {/* Commitments */}
-      <section style={{ background:C.ink, padding:"5rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"860px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"Our Commitments":"Nos engagements"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2, letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.commitH}</h2>
@@ -3773,13 +3816,13 @@ function HowWeWorkPage({ lang, setPage }) {
             <p style={{ color:W.plain, fontSize:T.lead, lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap" }}>
-            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", transition:"opacity 0.2s var(--ease)" }}
-              onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
-              onMouseLeave={e => e.currentTarget.style.opacity="1"}
+            <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orangeTxt, padding:"13px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", transition:"opacity 0.2s var(--ease)" }}
+              onMouseEnter={survol(e => e.currentTarget.style.opacity="0.9")}
+              onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
             >{t.cta}</button>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ background:"transparent", border:"2px solid rgba(255,255,255,0.6)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", transition:"border-color 0.2s var(--ease)" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor=W.mute}
+              onMouseEnter={survol(e => e.currentTarget.style.borderColor=C.ink)}
+              onMouseLeave={survol(e => e.currentTarget.style.borderColor=W.mute)}
             >{t.cta2}</a>
           </div>
         </div>
@@ -3847,7 +3890,7 @@ function PressPage({ lang, setPage }) {
 
   return (
     <div>
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -3874,10 +3917,10 @@ function PressPage({ lang, setPage }) {
                   <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted }}>·</span>
                   <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted }}>{item.date}</span>
                   {item.featured && (
-                    <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}20`, background:C.orange+"10", padding:"2px 8px" }}>{t.featuredLabel}</span>
+                    <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, border:`1px solid ${C.orange}20`, background:C.orange+"10", padding:"2px 8px" }}>{t.featuredLabel}</span>
                   )}
                 </div>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orange + "80" }}>{item.type[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orangeTxt + "80" }}>{item.type[lang]}</span>
               </div>
 
               <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.75rem" }}>{item.title[lang]}</h3>
@@ -3886,10 +3929,10 @@ function PressPage({ lang, setPage }) {
               {item.url && (
                 <a href={item.url} target="_blank" rel="noopener noreferrer" style={{
                   fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em",
-                  color:C.orange, borderBottom:`1px solid ${C.orange}30`, padding:"6px 0 7px", transition:"border-color 0.2s var(--ease)",
+                  color:C.orangeTxt, borderBottom:`1px solid ${C.orange}30`, padding:"6px 0 7px", transition:"border-color 0.2s var(--ease)",
                 }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor=C.orange}
-                  onMouseLeave={e => e.currentTarget.style.borderColor=C.orange+"30"}
+                  onMouseEnter={survol(e => e.currentTarget.style.borderColor=C.orange)}
+                  onMouseLeave={survol(e => e.currentTarget.style.borderColor=C.orange+"30")}
                 >{ctaLabel(item.type[lang])}</a>
               )}
             </div>
@@ -3904,7 +3947,7 @@ function PressPage({ lang, setPage }) {
       </section>
 
       {/* Pitch section */}
-      <section style={{ background:C.ink, padding:"5rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"5rem 2rem" }}>
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <div style={{ width:"36px", height:"3px", background:C.orange, marginBottom:"1.5rem" }} />
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2Lg, letterSpacing:"-0.015em", color:"#fff", marginBottom:"1rem" }}>{t.pitchH}</h2>
@@ -4025,7 +4068,7 @@ function ReferralPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"34vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", right:"2rem", bottom:"2rem", fontFamily:"'Playfair Display',serif", fontSize:"clamp(6rem, 5.06rem + 9vw, 16rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", letterSpacing:"-0.025em" }}>1K$</div>
         <div className="hero-plate" style={{ maxWidth:"900px", position:"relative" }}>
           <div style={{ height:"2px", background:C.orange, marginBottom:"1.6rem" }} className="fu" />
@@ -4089,7 +4132,7 @@ function ReferralPage({ lang, setPage }) {
             <div>
               {/* Your info */}
               <div style={{ marginBottom:"3rem" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"1.5rem" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"1.5rem" }}>
                   {lang==="en"?"Your information":"Tes informations"}
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.5rem 2rem" }} className="two-col">
@@ -4108,7 +4151,7 @@ function ReferralPage({ lang, setPage }) {
 
               {/* Their info */}
               <div style={{ marginBottom:"2rem" }}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"1.5rem" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"1.5rem" }}>
                   {lang==="en"?"Who you're referring":"Qui tu réfères"}
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.5rem 2rem", marginBottom:"1.5rem" }} className="two-col">
@@ -4134,10 +4177,10 @@ function ReferralPage({ lang, setPage }) {
               </div>
 
               {touched && missing && (
-                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orange, marginBottom:"1rem" }}>{msg.required}</p>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orangeTxt, marginBottom:"1rem" }}>{msg.required}</p>
               )}
               {status === "error" && (
-                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orange, marginBottom:"1rem", lineHeight:1.6 }}>{msg.errorMsg}</p>
+                <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.orangeTxt, marginBottom:"1rem", lineHeight:1.6 }}>{msg.errorMsg}</p>
               )}
               <button className="btn-orange" onClick={submit} disabled={status === "sending"}
                 style={{ opacity: status === "sending" ? 0.6 : 1 }}>
@@ -4155,7 +4198,7 @@ function ReferralPage({ lang, setPage }) {
           <Divider style={{ marginBottom:"0" }} />
           {t.terms.map((term, i) => (
             <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"1rem", padding:"1rem 0", borderBottom:`1px solid ${C.rule}` }}>
-              <span style={{ color:C.orange, fontSize:T.small, marginTop:"3px", flexShrink:0 }}>▸</span>
+              <span style={{ color:C.orangeTxt, fontSize:T.small, marginTop:"3px", flexShrink:0 }}>▸</span>
               <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.muted, lineHeight:1.8 }}>{term}</p>
             </div>
           ))}
@@ -4187,7 +4230,7 @@ function FooterNewsletter({ lang }) {
     } catch { setStatus("error"); }
   };
 
-  if (status === "done" || status === "mail") return <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange }}>{t.done}</p>;
+  if (status === "done" || status === "mail") return <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt }}>{t.done}</p>;
 
   return (
     <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap", alignItems:"flex-end" }}>
@@ -4197,7 +4240,7 @@ function FooterNewsletter({ lang }) {
         style={{ flex:"1 1 180px", padding:"9px 0", background:"transparent", border:"none", borderBottom:"1px solid rgba(255,255,255,0.2)", color:"#fff", fontFamily:"'Archivo',sans-serif", fontSize:T.meta }}
       />
       <button onClick={handleSubmit} disabled={status==="sending"} style={{
-        background:C.orange, color:"#fff", padding:"9px 20px",
+        background:C.orangeTxt, color:"#fff", padding:"9px 20px",
         fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:T.small,
         letterSpacing:"0.04em", textTransform:"uppercase", cursor:"pointer", flexShrink:0,
         opacity: status==="sending" ? 0.6 : 1,
@@ -4228,26 +4271,26 @@ function Footer({ lang, setPage }) {
             <button onClick={() => setPage("home")} style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.h4, color:C.paper, letterSpacing:"-0.01em", display:"flex", alignItems:"center", gap:"3px", marginBottom:"1rem" }}>
               PROFORCE<span style={{ color:C.orange }}>.</span>
             </button>
-            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:"rgba(244,241,235,0.4)", lineHeight:1.7, maxWidth:"220px" }}>
+            <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:W.mute, lineHeight:1.7, maxWidth:"220px" }}>
               {lang==="en"?"Specialist recruitment. Food, consumer packaged goods and fashion. Montreal, Quebec City & Toronto. Since 2001.":"Recrutement spécialisé. Alimentaire, produits de consommation emballés et mode. Montréal, Québec & Toronto. Depuis 2001."}
             </p>
           </div>
 
           <div style={{ display:"flex", gap:"4rem", flexWrap:"wrap" }}>
             <div>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"1rem" }}>Pages</div>
-              <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxtF, marginBottom:"1rem" }}>Pages</div>
+              <div className="pied-liens" style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
                 {links.map(([k,l]) => (
-                  <PageLink key={k} to={k} setPage={setPage} style={{  padding:"5px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:"rgba(244,241,235,0.45)", textAlign:"left", transition:"color 0.2s var(--ease)" }}
-                    onMouseEnter={e => e.currentTarget.style.color=C.paper}
-                    onMouseLeave={e => e.currentTarget.style.color="rgba(244,241,235,0.45)"}
+                  <PageLink key={k} to={k} setPage={setPage} style={{ padding:"5px 0",fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:W.mute, textAlign:"left", transition:"color 0.2s var(--ease)" }}
+                    onMouseEnter={survol(e => e.currentTarget.style.color=C.paper)}
+                    onMouseLeave={survol(e => e.currentTarget.style.color=W.mute)}
                   >{l}</PageLink>
                 ))}
               </div>
             </div>
             <div>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"1rem" }}>Contact</div>
-              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:"rgba(244,241,235,0.45)", lineHeight:2 }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxtF, marginBottom:"1rem" }}>Contact</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:W.mute, lineHeight:2 }}>
                 <a href="tel:+15149050606" style={{ color:"inherit", textDecoration:"none", display:"inline-block", padding:"4px 0" }}>(514) 905-0606</a><br/>
                 <a href="tel:+14184311441" style={{ color:"inherit", textDecoration:"none", display:"inline-block", padding:"4px 0" }}>(418) 431-1441</a><br/>
                 <a href="tel:+16474906626" style={{ color:"inherit", textDecoration:"none", display:"inline-block", padding:"4px 0" }}>(647) 490-6626</a><br/>
@@ -4256,8 +4299,8 @@ function Footer({ lang, setPage }) {
               <div style={{ display:"flex", gap:"0.75rem", marginTop:"1.25rem" }}>
                 <a href="https://www.facebook.com/share/17YcPvUvNn/" target="_blank" rel="noopener noreferrer"
                   style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:500, color:W.mute, transition:"all 0.2s var(--ease)" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; }}
+                  onMouseEnter={survol(e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; })}
+                  onMouseLeave={survol(e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; })}
                   title="Facebook"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -4266,8 +4309,8 @@ function Footer({ lang, setPage }) {
                 </a>
                 <a href="https://www.instagram.com/proforcepersonnel" target="_blank" rel="noopener noreferrer"
                   style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:500, color:W.mute, transition:"all 0.2s var(--ease)" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; }}
+                  onMouseEnter={survol(e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; })}
+                  onMouseLeave={survol(e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; })}
                   title="Instagram"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -4276,8 +4319,8 @@ function Footer({ lang, setPage }) {
                 </a>
                 <a href="https://www.linkedin.com/company/proforce-personnel" target="_blank" rel="noopener noreferrer"
                   style={{ width:"32px", height:"32px", border:"1px solid rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:500, color:W.mute, transition:"all 0.2s var(--ease)" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; }}
+                  onMouseEnter={survol(e => { e.currentTarget.style.borderColor=C.orange; e.currentTarget.style.color=C.orange; })}
+                  onMouseLeave={survol(e => { e.currentTarget.style.borderColor=W.edge; e.currentTarget.style.color=W.mute; })}
                   title="LinkedIn"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -4292,8 +4335,8 @@ function Footer({ lang, setPage }) {
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:"1.5rem", display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:"0.75rem", alignItems:"center" }}>
           <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:W.mute }}>© {new Date().getFullYear()} Proforce Personnel Inc.</p>
           <button onClick={() => setPage("privacy")} style={{ padding:"7px 0", fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:W.mute, transition:"color 0.2s var(--ease)" }}
-            onMouseEnter={e => e.currentTarget.style.color=W.mute}
-            onMouseLeave={e => e.currentTarget.style.color=W.edge}
+            onMouseEnter={survol(e => e.currentTarget.style.color=W.mute)}
+            onMouseLeave={survol(e => e.currentTarget.style.color=W.edge)}
           >{lang==="en"?"Privacy Policy":"Politique de confidentialité"}</button>
           <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:W.mute }}>proforce.ca</p>
         </div>
@@ -4539,10 +4582,10 @@ const track = {
 function NotFoundPage({ lang, setPage }) {
   return (
     <div>
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"72vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"4rem 2rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", fontFamily:"'Playfair Display',serif", fontSize:"clamp(12rem, 8.44rem + 15vw, 28rem)", fontWeight:700, color:"rgba(232,93,26,0.06)", lineHeight:1, userSelect:"none", pointerEvents:"none", letterSpacing:"-0.025em" }}>404</div>
         <div style={{ maxWidth:"600px", margin:"0 auto", textAlign:"center", position:"relative" }}>
-          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orange, marginBottom:"2rem" }}>404</div>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orangeTxt, marginBottom:"2rem" }}>404</div>
           <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:T.h1, color:"#fff", letterSpacing:"-0.015em", lineHeight:0.95, marginBottom:"1rem" }}>
             {lang==="en" ? "This page doesn't exist." : "Cette page n'existe pas."}
           </h1>
@@ -4559,8 +4602,8 @@ function NotFoundPage({ lang, setPage }) {
               {lang==="en" ? "Back to Home" : "Retour à l'accueil"}
             </button>
             <button style={{ display:"inline-block", border:"1.5px solid rgba(255,255,255,0.2)", color:"#fff", padding:"11px 28px", fontFamily:"'Archivo',sans-serif", fontWeight:600, fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", background:"transparent", cursor:"pointer", transition:"border-color 0.2s var(--ease)" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor="#fff"}
-              onMouseLeave={e => e.currentTarget.style.borderColor=W.edge}
+              onMouseEnter={survol(e => e.currentTarget.style.borderColor=C.ink)}
+              onMouseLeave={survol(e => e.currentTarget.style.borderColor=C.rule)}
               onClick={() => setPage("contact")}
             >
               {lang==="en" ? "Contact Us" : "Nous contacter"}
@@ -4569,8 +4612,8 @@ function NotFoundPage({ lang, setPage }) {
           <div style={{ marginTop:"4rem", display:"flex", gap:"2rem", justifyContent:"center", flexWrap:"wrap" }}>
             {[["food", lang==="en"?"Food & CPG":"Alimentaire & CPG"],["fashion", lang==="en"?"Fashion":"Mode"],["blog", lang==="en"?"Blog":"Blogue"],["team", lang==="en"?"Team":"Équipe"]].map(([k,l]) => (
               <button key={k} onClick={() => setPage(k)} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", fontWeight:500, color:W.mute, borderBottom:`1px solid rgba(255,255,255,0.2)`, padding:"6px 0 7px", transition:"color 0.2s var(--ease)" }}
-                onMouseEnter={e => e.currentTarget.style.color=C.orange}
-                onMouseLeave={e => e.currentTarget.style.color=W.mute}
+                onMouseEnter={survol(e => e.currentTarget.style.color=C.orange)}
+                onMouseLeave={survol(e => e.currentTarget.style.color=W.mute)}
               >{l}</button>
             ))}
           </div>
@@ -4619,7 +4662,7 @@ function PrivacyPage({ lang, setPage }) {
 
   return (
     <div>
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"40vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
         <div className="hero-plate" style={{ maxWidth:"780px" }}>
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h1Xl, letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"1rem" }}>{t.h1}</h1>
@@ -4996,11 +5039,25 @@ export default function App() {
   // SEO meta tags
   useSEO(page, lang, blogPost);
 
+  // Au changement de page, le focus reste ou il etait: un lecteur d'ecran ne
+  // signale rien et le clavier repart du milieu de l'ancienne page. On le
+  // pose sur le titre de la nouvelle page, sans anneau visible puisque c'est
+  // nous qui l'avons deplace et non l'utilisateur.
+  const deplacerLeFocus = () => {
+    requestAnimationFrame(() => {
+      const h = document.querySelector("main h1");
+      if (!h) return;
+      h.setAttribute("tabindex", "-1");
+      h.focus({ preventScroll: true });
+    });
+  };
+
   const go = (p, sub) => {
     setPage(p);
     if (p !== "blog") setBlogPost(null);
     window.history.pushState(null, "", pathOf(p, sub));
     window.scrollTo({top:0,behavior:"smooth"});
+    deplacerLeFocus();
   };
 
   const goPost = (postId) => {
@@ -5252,7 +5309,7 @@ function GlossaryPage({ lang, setPage }) {
 
   return (
     <div>
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem" }}>
         <div className="hero-plate" style={{ maxWidth:"900px" }}>
           <Eyebrow>{lang==="en"?"Industry Glossary":"Glossaire de l'industrie"}</Eyebrow>
           <h1 className="fu" style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h1, letterSpacing:"-0.005em", textTransform:"uppercase", color:"#fff", lineHeight:1.05, marginBottom:"0.75rem" }}>
@@ -5306,7 +5363,7 @@ function GlossaryPage({ lang, setPage }) {
             <div key={item.term} style={{ padding:"2.5rem 0", borderBottom:`1px solid ${C.rule}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1rem", flexWrap:"wrap", gap:"0.5rem" }}>
                 <h2 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, letterSpacing:"-0.01em" }}>{item.term}</h2>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, border:`1px solid ${C.orange}20`, padding:"3px 8px", background:C.orange+"10", flexShrink:0 }}>{item.cat[lang]}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, border:`1px solid ${C.orange}20`, padding:"3px 8px", background:C.orange+"10", flexShrink:0 }}>{item.cat[lang]}</span>
               </div>
               <p style={{ fontFamily:"'Playfair Display',serif", fontSize:T.body, color:C.muted, lineHeight:1.85, fontWeight:300 }}>{item.def[lang]}</p>
             </div>
@@ -5369,12 +5426,12 @@ function MarketPage({ lang, setPage, market }) {
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", background:C.rule, marginBottom:"4rem" }} className="two-col">
             {[{h:t.foodH,p:t.foodP,pg:"food"},{h:t.fashH,p:t.fashP,pg:"fashion"}].map(s => (
               <button key={s.pg} onClick={() => setPage(s.pg)} style={{ background:C.white, padding:"2.5rem", textAlign:"left", transition:"background 0.2s var(--ease)", width:"100%" }}
-                onMouseEnter={e => e.currentTarget.style.background=C.paperDark}
-                onMouseLeave={e => e.currentTarget.style.background=C.white}
+                onMouseEnter={survol(e => e.currentTarget.style.background=C.paperDark)}
+                onMouseLeave={survol(e => e.currentTarget.style.background=C.white)}
               >
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, marginBottom:"0.75rem" }}>{s.h}</h3>
                 <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.muted, lineHeight:1.8, marginBottom:"1.5rem" }}>{s.p}</p>
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange }}>{lang==="en"?"Learn more →":"En savoir plus →"}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt }}>{lang==="en"?"Learn more →":"En savoir plus →"}</span>
               </button>
             ))}
           </div>
@@ -5388,7 +5445,7 @@ function MarketPage({ lang, setPage, market }) {
                   <Avatar m={m} size={56} />
                   <div>
                     <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:"#fff" }}>{m.name}</div>
-                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orange, marginTop:"2px" }}>{m.title[lang]}</div>
+                    <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orangeTxt, marginTop:"2px" }}>{m.title[lang]}</div>
                   </div>
                 </div>
                 <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, fontWeight:500, color:W.mute, lineHeight:1.6 }}>{m.sector[lang]}</p>
@@ -5399,7 +5456,7 @@ function MarketPage({ lang, setPage, market }) {
 
           {/* Contact */}
           <div style={{ background:C.paperDark, padding:"2.5rem", borderLeft:`3px solid ${C.orange}` }}>
-            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginBottom:"0.5rem" }}>{lang==="en"?"Office":"Bureau"}</div>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginBottom:"0.5rem" }}>{lang==="en"?"Office":"Bureau"}</div>
             <a href={`tel:+1${t.phone.replace(/\D/g,"")}`} style={{ display:"block", fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:C.ink, marginBottom:"0.35rem", fontWeight:500, textDecoration:"none" }}>{t.phone}</a>
             <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.muted, marginBottom:"1.5rem" }}>{t.addr}</div>
             <button className="btn-ink" onClick={() => setPage("contact")}>{t.cta}</button>
@@ -5581,7 +5638,7 @@ function StartupPage({ lang, setPage }) {
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:"0", border:`1px solid ${C.rule}` }}>
             {t.roles.map((r, i) => (
               <div key={r} style={{ padding:"1rem 1.5rem", borderRight:(i+1)%3!==0?`1px solid ${C.rule}`:"none", borderBottom:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.ink, display:"flex", alignItems:"center", gap:"0.75rem" }}>
-                <span style={{ color:C.orange, fontSize:T.small, flexShrink:0 }}>▸</span>{r}
+                <span style={{ color:C.orangeTxt, fontSize:T.small, flexShrink:0 }}>▸</span>{r}
               </div>
             ))}
           </div>
@@ -5589,7 +5646,7 @@ function StartupPage({ lang, setPage }) {
       </section>
 
       {/* Process */}
-      <section style={{ background:C.ink, padding:"6rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <Eyebrow style={{ fontWeight:500, color:W.mute }}>{lang==="en"?"Our approach":"Notre approche"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2, letterSpacing:"-0.015em", color:"#fff", marginBottom:"3rem" }}>{t.processH}</h2>
@@ -5617,10 +5674,10 @@ function StartupPage({ lang, setPage }) {
                 gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", textAlign:"left",
                 transition:"opacity 0.2s var(--ease)",
               }}
-                onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
-                onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                onMouseEnter={survol(e => e.currentTarget.style.opacity="0.65")}
+                onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
               >
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange }}>0{i+1}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxt }}>0{i+1}</span>
                 <span style={{ fontFamily:"'Playfair Display',serif", fontSize:T.bodyFluid, color:C.ink, letterSpacing:"-0.01em" }}>{post.title[lang]}</span>
                 <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted, whiteSpace:"nowrap" }}>{post.date}</span>
               </button>
@@ -5637,9 +5694,9 @@ function StartupPage({ lang, setPage }) {
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2Lg, color:"#fff", letterSpacing:"-0.015em", lineHeight:1, marginBottom:"0.75rem" }}>{t.ctaH}</h2>
             <p style={{ color:W.plain, fontSize:T.lead, maxWidth:"400px", lineHeight:1.7 }}>{t.ctaP}</p>
           </div>
-          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orange, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.meta, letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s var(--ease)" }}
-            onMouseEnter={e => e.currentTarget.style.opacity="0.9"}
-            onMouseLeave={e => e.currentTarget.style.opacity="1"}
+          <button onClick={() => setPage("contact")} style={{ background:"#fff", color:C.orangeTxt, padding:"14px 32px", fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.meta, letterSpacing:"0.04em", textTransform:"uppercase", flexShrink:0, transition:"opacity 0.2s var(--ease)" }}
+            onMouseEnter={survol(e => e.currentTarget.style.opacity="0.9")}
+            onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
           >{t.cta}</button>
         </div>
       </section>
@@ -5659,13 +5716,13 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
 
   return (
     <div>
-      <section style={{ background:C.ink, padding:"9rem 2rem 3.5rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"9rem 2rem 3.5rem" }}>
         <div className="two-col" style={{ maxWidth:"1000px", margin:"0 auto", display:"grid", gridTemplateColumns:"240px 1fr", gap:"3rem", alignItems:"center" }}>
           <div className="team-photo" style={{ maxWidth:"240px" }}><Avatar m={m} full /></div>
           <div>
             <div style={{ height:"2px", width:"56px", background:C.orange, marginBottom:"1.4rem" }} />
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h1, textTransform:"uppercase", letterSpacing:"-0.005em", color:"#fff", lineHeight:1.05, marginBottom:"0.5rem" }}>{m.name}</h1>
-            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orange, marginBottom:"1.6rem" }}>{m.title[lang]} &nbsp;/&nbsp; {m.sector[lang]}</div>
+            <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.small, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orangeTxt, marginBottom:"1.6rem" }}>{m.title[lang]} &nbsp;/&nbsp; {m.sector[lang]}</div>
             <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h3Fluid, lineHeight:1.4, color:W.plain }}>{d.lede[lang]}</p>
           </div>
         </div>
@@ -5678,7 +5735,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))", gap:"0", border:`1px solid ${C.rule}`, marginBottom:"1.5rem" }}>
             {d.covers.map((c,i) => (
               <div key={c.en} style={{ padding:"0.95rem 1.4rem", borderRight:`1px solid ${C.rule}`, borderBottom:`1px solid ${C.rule}`, fontFamily:"'Archivo',sans-serif", fontSize:T.meta, color:C.ink, display:"flex", alignItems:"center", gap:"0.7rem" }}>
-                <span style={{ color:C.orange, fontSize:T.small }}>&#9656;</span>{c[lang]}
+                <span style={{ color:C.orangeTxt, fontSize:T.small }}>&#9656;</span>{c[lang]}
               </div>
             ))}
           </div>
@@ -5731,7 +5788,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
           <div style={{ borderTop:`1px solid ${C.rule}` }}>
             {posts.map((p,i) => (
               <button key={p.id} onClick={() => setBlogPost(p.id)} style={{ width:"100%", textAlign:"left", display:"grid", gridTemplateColumns:"46px 1fr 110px", gap:"1.2rem", alignItems:"start", padding:"1.4rem 0", borderBottom:`1px solid ${C.rule}` }} className="post-row">
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange, letterSpacing:"0.04em", paddingTop:"0.25rem" }}>{String(i+1).padStart(2,"0")}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxt, letterSpacing:"0.04em", paddingTop:"0.25rem" }}>{String(i+1).padStart(2,"0")}</div>
                 <div>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:T.lead, color:C.ink, lineHeight:1.35, marginBottom:"0.3rem" }}>{p.title[lang]}</div>
                   <div style={{ fontSize:T.meta, lineHeight:1.6, color:C.muted, fontStyle:"italic", fontFamily:"'Playfair Display',serif" }}>{p.excerpt[lang]}</div>
@@ -5744,7 +5801,7 @@ function MemberPage({ lang, setPage, slug, setBlogPost }) {
       </section>
 
       {/* Contact */}
-      <section style={{ background:C.ink, padding:"4rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"4rem 2rem" }}>
         <div style={{ maxWidth:"1000px", margin:"0 auto" }}>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontWeight:500, fontSize:T.h2, color:"#fff", lineHeight:1.3, marginBottom:"1.8rem", maxWidth:"620px" }}>
             {d.cta[lang]}
@@ -5806,7 +5863,7 @@ function SimonPage({ lang, setPage }) {
   return (
     <div>
       {/* Hero */}
-      <section className="hero-flat" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
+      <section className="hero-flat fonce" style={{ background:C.ink, minHeight:"32vh", display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"9rem 2rem 3.5rem", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"80px", left:"2rem", right:"2rem" }}>
           <div style={{ height:"1px", background:W.rule }} />
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.75rem" }}>
@@ -5840,7 +5897,7 @@ function SimonPage({ lang, setPage }) {
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:"3rem" }}>
             {[[t.p1h,t.p1p,"01"],[t.p2h,t.p2p,"02"],[t.p3h,t.p3p,"03"]].map(([h,p,n]) => (
               <div key={n}>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orange, marginBottom:"1.25rem" }}>{n}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", color:C.orangeTxt, marginBottom:"1.25rem" }}>{n}</div>
                 <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.6rem" }}>{h}</h3>
                 <p style={{ color:C.muted, fontSize:T.body, lineHeight:1.8 }}>{p}</p>
               </div>
@@ -5850,7 +5907,7 @@ function SimonPage({ lang, setPage }) {
       </section>
 
       {/* Mentors */}
-      <section style={{ background:C.ink, padding:"6rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"900px", margin:"0 auto" }}>
           <Eyebrow>{lang==="en"?"The people who shaped me":"Les gens qui m'ont formé"}</Eyebrow>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:T.h2, letterSpacing:"-0.015em", color:"#fff", marginBottom:"4rem" }}>
@@ -5863,7 +5920,7 @@ function SimonPage({ lang, setPage }) {
               <div style={{ width:"44px", height:"44px", background:C.orange, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Archivo',sans-serif", fontSize:T.body, color:"#fff", fontWeight:700, flexShrink:0 }}>CL</div>
               <div>
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.lead, color:"#fff" }}>Christopher Livingstone</div>
-                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, marginTop:"2px" }}>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, marginTop:"2px" }}>
                   {lang==="en"?"Recruitment Mentor":"Mentor en recrutement"}
                 </div>
               </div>
@@ -5872,8 +5929,8 @@ function SimonPage({ lang, setPage }) {
                 fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase",
                 fontWeight:500, color:W.mute, borderBottom:"1px solid rgba(255,255,255,0.2)", padding:"6px 0 7px", transition:"color 0.2s var(--ease)",
               }}
-                onMouseEnter={e => e.currentTarget.style.color=C.orange}
-                onMouseLeave={e => e.currentTarget.style.color=W.mute}
+                onMouseEnter={survol(e => e.currentTarget.style.color=C.orange)}
+                onMouseLeave={survol(e => e.currentTarget.style.color=W.mute)}
               ><LinkedInIcon />LinkedIn</a>
             </div>
             <p style={{ fontFamily:"'Playfair Display',serif", fontSize:T.lead, color:W.mute, lineHeight:1.85, fontWeight:300 }}>
@@ -5918,14 +5975,14 @@ function SimonPage({ lang, setPage }) {
                 <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.muted }}>{item.outlet} · {item.date}</div>
               </div>
               {item.url && (
-                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orange, whiteSpace:"nowrap" }}>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.04em", textTransform:"uppercase", color:C.orangeTxt, whiteSpace:"nowrap" }}>
                   {lang==="en"?"Listen →":"Écouter →"}
                 </a>
               )}
             </div>
           ))}
           <div style={{ marginTop:"1.5rem" }}>
-            <button onClick={() => setPage("press")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orange, borderBottom:`1px solid ${C.orange}` }}>
+            <button onClick={() => setPage("press")} style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em", color:C.orangeTxt, borderBottom:`1px solid ${C.orange}` }}>
               {lang==="en"?"All media mentions →":"Toutes les mentions médias →"}
             </button>
           </div>
@@ -5975,10 +6032,10 @@ function SimonPage({ lang, setPage }) {
                 width:"100%", display:"grid", gridTemplateColumns:"40px 1fr auto",
                 gap:"1.5rem", alignItems:"center", padding:"1.5rem 0", textAlign:"left", transition:"opacity 0.2s var(--ease)",
               }}
-                onMouseEnter={e => e.currentTarget.style.opacity="0.65"}
-                onMouseLeave={e => e.currentTarget.style.opacity="1"}
+                onMouseEnter={survol(e => e.currentTarget.style.opacity="0.65")}
+                onMouseLeave={survol(e => e.currentTarget.style.opacity="1")}
               >
-                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orange }}>0{i+1}</span>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:T.micro, color:C.orangeTxt }}>0{i+1}</span>
                 <div>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:T.bodyFluid, color:C.ink, letterSpacing:"-0.01em", marginBottom:"0.2rem" }}>{post.title[lang]}</div>
                   <div style={{ fontFamily:"'Playfair Display',serif", fontSize:T.meta, color:C.muted, fontStyle:"italic" }}>{post.excerpt[lang]}</div>
@@ -5992,15 +6049,15 @@ function SimonPage({ lang, setPage }) {
       </section>
 
       {/* Connect */}
-      <section style={{ background:C.ink, padding:"6rem 2rem" }}>
+      <section className="fonce" style={{ background:C.ink, padding:"6rem 2rem" }}>
         <div style={{ maxWidth:"760px", margin:"0 auto" }}>
           <Eyebrow>{t.conH}</Eyebrow>
           <p style={{ fontFamily:"'Playfair Display',serif", fontSize:T.lead, fontWeight:500, color:W.mute, lineHeight:1.8, marginBottom:"3rem", maxWidth:"520px" }}>{t.conP}</p>
           <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", alignItems:"center", marginBottom:"2.5rem" }}>
             <a href={CALENDLY} target="_blank" rel="noopener noreferrer" className="btn-orange" onClick={() => track.contactClick()}>{t.cta}</a>
             <button className="btn-ghost" onClick={() => setPage("contact")} style={{ borderColor:W.edge, color:"#fff" }}
-              onMouseEnter={e => { e.currentTarget.style.background=W.rule; }}
-              onMouseLeave={e => { e.currentTarget.style.background="transparent"; }}
+              onMouseEnter={survol(e => { e.currentTarget.style.background=W.rule; })}
+              onMouseLeave={survol(e => { e.currentTarget.style.background="transparent"; })}
             >{t.cta2}</button>
           </div>
           <a href="https://www.linkedin.com/in/simonstamand" target="_blank" rel="noopener noreferrer" style={{
@@ -6008,8 +6065,8 @@ function SimonPage({ lang, setPage }) {
             fontFamily:"'Archivo',sans-serif", fontSize:T.micro, letterSpacing:"0.02em",
             fontWeight:500, color:W.mute, borderBottom:"1px solid rgba(255,255,255,0.2)", padding:"6px 0 7px", transition:"color 0.2s var(--ease)",
           }}
-            onMouseEnter={e => e.currentTarget.style.color=C.orange}
-            onMouseLeave={e => e.currentTarget.style.color=W.mute}
+            onMouseEnter={survol(e => e.currentTarget.style.color=C.orange)}
+            onMouseLeave={survol(e => e.currentTarget.style.color=W.mute)}
           >
             <LinkedInIcon /> LinkedIn, Simon St-Amand
           </a>
@@ -6068,8 +6125,8 @@ function SimonPage({ lang, setPage }) {
         className="float-cta"
         onClick={() => track.contactClick()}
         style={{
-          position:"fixed", bottom:"2rem", right:"2rem", zIndex:150,
-          background:C.orange, color:"#fff",
+          position:"fixed", bottom:"2rem", right:"2rem", zIndex:"var(--z-flottant)",
+          background:C.orangeTxt, color:"#fff",
           padding:"12px 20px",
           fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:T.small,
           letterSpacing:"0.04em", textTransform:"uppercase",
@@ -6077,8 +6134,8 @@ function SimonPage({ lang, setPage }) {
           display:"flex", alignItems:"center", gap:"8px",
           transition:"transform 0.2s, box-shadow 0.2s var(--ease)",
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 8px 28px rgba(232,93,26,0.5)"; }}
-        onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(232,93,26,0.4)"; }}
+        onMouseEnter={survol(e => { e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 8px 28px rgba(232,93,26,0.5)"; })}
+        onMouseLeave={survol(e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(232,93,26,0.4)"; })}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>
